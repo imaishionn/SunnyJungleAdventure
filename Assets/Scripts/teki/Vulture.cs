@@ -1,11 +1,7 @@
 using UnityEngine;
-using Debug = UnityEngine.Debug; // Debugの曖昧な参照を解消するため
+using Debug = UnityEngine.Debug;
 
-/// <summary>
-/// Vulture（ハゲタカ）の敵の動作を制御します。
-/// プレイヤーを検知すると追尾し、死亡時はベースのEnemyクラスのDieメソッドを呼び出します。
-/// </summary>
-public class Vulture : Enemy // Enemyクラスを継承
+public class Vulture : Enemy
 {
     [Header("プレイヤー検知距離")]
     [SerializeField] float DetectRange = 5f;
@@ -17,28 +13,50 @@ public class Vulture : Enemy // Enemyクラスを継承
 
     private bool m_isFlying = false;
 
-    protected override void Awake() // StartからAwakeに変更 (ベースクラスのAwakeを呼び出す)
+    protected override void Awake()
     {
-        base.Awake(); // 親クラス(Enemy)のAwakeを呼び出す
+        base.Awake();
 
         if (m_player == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
                 m_player = playerObj.transform;
-            else
-                Debug.LogWarning("Vulture: プレイヤーオブジェクトが見つかりません。タグ 'Player' を確認してください。");
         }
 
         if (m_rb != null)
         {
-            m_rb.gravityScale = 0f; // 重力を無効化して飛行
+            m_rb.gravityScale = 0f; // 重力無効
+            m_rb.drag = 1f; // 空気抵抗
         }
     }
 
-    void Update()
+    protected override void FixedUpdate()
     {
-        if (m_isDead || m_player == null) return; // 死亡中またはプレイヤーが見つからない場合は処理を終了
+        base.FixedUpdate(); // EnemyクラスのFixedUpdateも呼び出す
+
+        // ゲームが停止状態（ゲームオーバー、クリアなど）または敵が死亡している場合は処理を停止
+        if ((GameManager.instance != null &&
+             (GameManager.instance.GetCurrentGameState() == GameManager.GameState.enGameState_GameOver || // ★修正: GetState() -> GetCurrentGameState()★
+              GameManager.instance.GetCurrentGameState() == GameManager.GameState.enGameState_Clear)) || m_isDead) // ★修正: GetState() -> GetCurrentGameState()★
+        {
+            if (m_animator != null)
+            {
+                m_animator.SetBool("fly", false);
+            }
+            if (m_rb != null)
+            {
+                m_rb.velocity = Vector2.zero;
+            }
+            return;
+        }
+
+        if (m_player == null || m_rb == null)
+        {
+            if (m_rb != null) m_rb.velocity = Vector2.zero;
+            if (m_animator != null) m_animator.SetBool("fly", false);
+            return;
+        }
 
         float distance = Vector2.Distance(transform.position, m_player.position);
 
@@ -66,29 +84,30 @@ public class Vulture : Enemy // Enemyクラスを継承
                 m_isFlying = false;
             }
 
-            if (m_rb != null)
-            {
-                m_rb.velocity = Vector2.zero; // プレイヤーが範囲外に出たら停止
-            }
+            m_rb.velocity = Vector2.zero; // 範囲外では停止
         }
     }
 
     void FlyToPlayer()
     {
         Vector2 direction = (m_player.position - transform.position).normalized;
-        if (m_rb != null)
-        {
-            m_rb.velocity = direction * FlySpeed;
-        }
+        m_rb.velocity = direction * FlySpeed;
 
-        if (direction.x != 0)
+        // プレイヤーの方向に応じてスプライトを反転
+        if (direction.x > 0 && transform.localScale.x < 0)
         {
-            Vector3 scale = transform.localScale;
-            scale.x = Mathf.Abs(scale.x) * Mathf.Sign(direction.x);
-            transform.localScale = scale;
+            FlipSprite();
+        }
+        else if (direction.x < 0 && transform.localScale.x > 0)
+        {
+            FlipSprite();
         }
     }
 
-    // Vulture固有の死亡処理が必要な場合は、ここで override public void Die() を実装できます
-    // 今回はベースのEnemy.Die()を使用します
+    void FlipSprite()
+    {
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
+    }
 }

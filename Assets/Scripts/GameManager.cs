@@ -1,600 +1,497 @@
-ï»¿using System.Collections;
-using System.Collections.Generic;
-using TMPro; // TextMeshProã‚’ä½¿ã†ãŸã‚è¿½åŠ 
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics;
+// using System.Net.Mime; // š‚±‚Ìs‚ª‚ ‚ê‚Îíœ‚·‚éIš
+using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using Debug = UnityEngine.Debug; // Debugã®æ›–æ˜§ãªå‚ç…§ã‚’è§£æ¶ˆã™ã‚‹ãŸã‚
+using UnityEngine.UI; // š‚±‚±‚ªUnityEngine.UI‚Å‚ ‚é‚±‚Æ‚ğŠm”Fš
+using static System.Net.Mime.MediaTypeNames;
 
 public class GameManager : MonoBehaviour
 {
-    // ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
-    public static GameManager instance;
+    // ƒV[ƒ“–¼‚Ì’è”
+    public const string TitleSceneName = "TitleScene";
+    public const string StageSelectSceneName = "StageSelect";
+    public const string UISceneName = "UI";
+    public const string MainGameSceneName = "Demo_tileset2"; // ‚ ‚È‚½‚ÌƒQ[ƒ€ƒvƒŒƒCƒV[ƒ“–¼‚É‡‚í‚¹‚Ä‚­‚¾‚³‚¢
+    public const string GameOverSceneName = "GameOverScene";
+    public const string GameClearSceneName = "GameClearScene"; // ƒQ[ƒ€ƒNƒŠƒAƒV[ƒ“–¼‚ğ’Ç‰Ái‚à‚µ‚ ‚ê‚Îj
 
-    // ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’å®šç¾©
+    // ƒVƒ“ƒOƒ‹ƒgƒ“ƒCƒ“ƒXƒ^ƒ“ƒX
+    public static GameManager instance { get; private set; }
+
+    // ƒQ[ƒ€‚Ìó‘Ô
     public enum GameState
     {
-        enGameState_Play,       // ãƒ—ãƒ¬ã‚¤ä¸­
-        enGameState_GameOver,   // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼
-        enGameState_Clear,      // ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢
+        enGameState_Init,
+        enGameState_Title,
+        enGameState_StageSelect,
+        enGameState_Play,
+        enGameState_Pause,
+        enGameState_GameOver,
+        enGameState_GameClear, // ƒQ[ƒ€ƒNƒŠƒAó‘Ô
+        enGameState_Clear // ŒİŠ·«‚Ì‚½‚ßienGameState_GameClear‚Æ“¯‚¶ˆÓ–¡‡‚¢‚Åg‚í‚ê‚Ä‚¢‚é‰Â”\«j
     }
 
-    [SerializeField, Header("ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹")]
-    private GameState m_gameState = GameState.enGameState_Play;
+    private GameState m_currentGameState = GameState.enGameState_Init;
 
-    // ç¾åœ¨ã®ã‚²ãƒ¼ãƒ ãƒ—ãƒ¬ã‚¤ã®ã‚¹ã‚³ã‚¢
-    [SerializeField, Header("ç¾åœ¨ã®ã‚¹ã‚³ã‚¢")]
-    private int currentPlayScore = 0;
+    // --- ƒtƒF[ƒhŠÖ˜A ---
+    [Header("ƒtƒF[ƒhİ’è")]
+    [SerializeField] private GameObject permanentCanvasPrefab;
+    [SerializeField] private GameObject globalFadeCanvasPrefab;
+    [SerializeField] private GameObject globalFadePanelPrefab;
+    [SerializeField] private GameObject permanentEventSystemPrefab;
+    [SerializeField] private Sprite fadePanelSprite;
 
-    // ã‚¹ã‚³ã‚¢è¡¨ç¤ºç”¨UIã¸ã®å‚ç…§ (ScoreDisplayã¯UIã‚·ãƒ¼ãƒ³ã«å­˜åœ¨ã—ã€ã‚·ãƒ¼ãƒ³ãƒ­ãƒ¼ãƒ‰æ™‚ã«å†å–å¾—ã™ã‚‹)
-    private ScoreDisplay m_uiScore;
+    private GameObject m_permanentCanvasInstance;
+    private GameObject m_globalFadeCanvasInstance;
+    private Image m_globalFadePanelImage; // š‚±‚ê‚ªUnityEngine.UI.Image‚ğQÆ‚µ‚Ä‚¢‚é‚±‚Æ‚ğŠm”Fš
+    private GameObject m_permanentEventSystemInstance;
 
-    // ã‚·ãƒ¼ãƒ³é·ç§»æ™‚ã®ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ã¨ãƒ•ã‚§ãƒ¼ãƒ‰æ™‚é–“
-    [SerializeField, Header("ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«")]
-    private UnityEngine.UI.Image m_fadePanel; // UnityEngine.UI.Image ã‚’æ˜ç¤ºçš„ã«æŒ‡å®š
-    [SerializeField, Header("ãƒ•ã‚§ãƒ¼ãƒ‰æ™‚é–“")]
-    private float m_fadeDuration = 1.0f; // â˜…ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ãŒé©åˆ‡ã‹ç¢ºèª (1.0fãŒå¦¥å½“)â˜…
+    private Coroutine m_fadeCoroutine;
+    private bool m_isTransitioning = false;
 
-    // ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ã«å‰²ã‚Šå½“ã¦ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’Inspectorã‹ã‚‰è¨­å®šã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹
-    [SerializeField, Header("ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ç”¨ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ (å¿…é ˆ)")]
-    private Sprite m_fadePanelSprite;
+    // --- UIŠÖ˜A ---
+    [Header("UI—v‘f (ƒ‰ƒ“ƒ^ƒCƒ€‚Åİ’è)")]
+    public ScoreDisplay scoreDisplay; // Inspector‚Åİ’è‚·‚éA‚Ü‚½‚ÍFindObjectOfType‚Å’T‚·
+    public GameObject scorePanel; // ScoreDisplay‚ğe‚É‚·‚éƒpƒlƒ‹
 
-    // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼éŸ³ (BGMã§ã¯ãªãåŠ¹æœéŸ³ã¨ã—ã¦æ‰±ã†)
-    // [SerializeField, Header("ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼éŸ³")] // ã“ã®ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã¯å‰Šé™¤æ¸ˆã¿
-    // private AudioClip gameOverSoundClip;
-    private AudioSource gameManagerAudioSource; // åŠ¹æœéŸ³å†ç”Ÿç”¨
+    [Header("ƒQ[ƒ€ƒvƒŒƒCİ’è")]
+    [SerializeField] private int initialGemCount = 0;
+    public int currentGemCount { get; private set; }
 
-    // ç¾åœ¨å®Ÿè¡Œä¸­ã®ãƒ•ã‚§ãƒ¼ãƒ‰ã‚³ãƒ«ãƒ¼ãƒãƒ³ã¸ã®å‚ç…§
-    private Coroutine currentFadeCoroutine = null;
+    // --- ƒXƒe[ƒW‘I‘ğŠÖ˜A ---
+    [Header("ƒXƒe[ƒW‘I‘ğİ’è")]
+    // StageSelectManager‚©‚çQÆ‚³‚ê‚é”z—ñ‚ÆƒCƒ“ƒfƒbƒNƒX
+    public string[] stageSceneNames = { "Stage1", "Stage2", "Stage3" }; // ‚ ‚È‚½‚ÌÀÛ‚ÌƒXƒe[ƒW–¼‚É‡‚í‚¹‚é
+    public int currentStageIndex = 0;
 
-    // GameManagerãŒç”Ÿæˆã•ã‚Œã‚‹éš›ã«ä¸€åº¦ã ã‘å‘¼ã³å‡ºã•ã‚Œã‚‹
+
+    // --- Awake ---
     void Awake()
     {
-        Debug.Log("GameManager AwakeãŒå‘¼ã³å‡ºã•ã‚Œã¾ã—ãŸï¼");
-
         if (instance == null)
         {
             instance = this;
-            // ã“ã®GameManagerã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ã‚·ãƒ¼ãƒ³é·ç§»ã—ã¦ã‚‚ç ´æ£„ã—ãªã„
             DontDestroyOnLoad(gameObject);
-            Debug.Log("GameManagerã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒè¨­å®šã•ã‚Œã€DontDestroyOnLoadã«è¨­å®šã•ã‚Œã¾ã—ãŸã€‚");
+            Debug.Log("GameManager: Awake - DontDestroyOnLoad‚ğİ’è‚µ‚Ü‚µ‚½B");
 
-            // ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ã¨EventSystemã‚’è‡ªå‹•çš„ã«ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã—ã€æ°¸ç¶šåŒ–ã™ã‚‹
             SetupPermanentUIElements();
+            InitializeGame();
 
-            // AudioSourceã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’å–å¾—ã¾ãŸã¯è¿½åŠ  (ä»–ã®åŠ¹æœéŸ³ç”¨ã¨ã—ã¦æ®‹ã™)
-            gameManagerAudioSource = GetComponent<AudioSource>();
-            if (gameManagerAudioSource == null)
+            if (SceneManager.GetActiveScene().name == "Bootstrap")
             {
-                gameManagerAudioSource = gameObject.AddComponent<AudioSource>();
-                gameManagerAudioSource.playOnAwake = false; // è‡ªå‹•å†ç”Ÿã—ãªã„
-                gameManagerAudioSource.loop = false; // åŠ¹æœéŸ³ãªã®ã§ãƒ«ãƒ¼ãƒ—ã—ãªã„
-                Debug.Log("GameManagerã«AudioSourceã‚’è¿½åŠ ã—ã¾ã—ãŸã€‚(åŠ¹æœéŸ³ç”¨)");
+                Debug.Log("GameManager: Bootstrap‚©‚ç‹N“®‚µ‚Ü‚µ‚½BTitleScene‚Ö‚Ì‘JˆÚ‚ğŠJn‚µ‚Ü‚·B");
+                LoadSceneWithFade(TitleSceneName);
             }
-
-            // AudioListenerã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’å–å¾—ã¾ãŸã¯è¿½åŠ 
-            // ã‚·ãƒ¼ãƒ³å†…ã«AudioListenerãŒä¸€ã¤ã ã‘å­˜åœ¨ã™ã‚‹ã‚ˆã†ã«GameManagerãŒç®¡ç†ã™ã‚‹
-            AudioListener existingListener = FindObjectOfType<AudioListener>();
-            if (existingListener == null)
-            {
-                // ã‚·ãƒ¼ãƒ³ã«AudioListenerãŒä¸€ã¤ã‚‚ãªã‘ã‚Œã°ã€GameManagerã«ã‚¢ã‚¿ãƒƒãƒ
-                gameObject.AddComponent<AudioListener>();
-                Debug.Log("GameManagerã«AudioListenerã‚’è¿½åŠ ã—ã¾ã—ãŸã€‚");
-            }
-            else if (existingListener.gameObject != gameObject)
-            {
-                // æ—¢ã«åˆ¥ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«AudioListenerãŒã‚ã‚‹å ´åˆã€ãã‚Œã‚’ç„¡åŠ¹åŒ–ã¾ãŸã¯ç ´æ£„
-                Debug.LogWarning($"æ—¢å­˜ã®AudioListenerãŒ '{existingListener.gameObject.name}' ã«è¦‹ã¤ã‹ã‚Šã¾ã—ãŸã€‚GameManagerãŒAudioListenerã‚’æŒã¤ã‚ˆã†ã«ã—ã¾ã™ã€‚");
-                // existingListener.enabled = false; // ç„¡åŠ¹åŒ–ã™ã‚‹
-                // Destroy(existingListener); // ã‚ã‚‹ã„ã¯ç ´æ£„ã™ã‚‹ï¼ˆDontDestroyOnLoadã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å ´åˆã¯æ³¨æ„ï¼‰
-                gameObject.AddComponent<AudioListener>(); // é‡è¤‡ã™ã‚‹ãŒã€ä»–ã®ã‚‚ã®ã‚’ç„¡åŠ¹åŒ–/ç ´æ£„ã™ã‚‹å‰æ
-            }
-
-            // UIã‚·ãƒ¼ãƒ³ã‚’ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³ã«è¿½åŠ ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ (Additive)
-            if (!SceneManager.GetSceneByName("UI").isLoaded)
-            {
-                SceneManager.LoadScene("UI", LoadSceneMode.Additive);
-                Debug.Log("GameManager Awake: UIã‚·ãƒ¼ãƒ³ã‚’åˆæˆãƒ­ãƒ¼ãƒ‰ã—ã¾ã—ãŸã€‚");
-            }
-            else
-            {
-                Debug.Log("GameManager Awake: UIã‚·ãƒ¼ãƒ³ã¯æ—¢ã«ãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¦ã„ã¾ã™ã€‚");
-            }
-
-            // TitleSceneã‚’Singleãƒ¢ãƒ¼ãƒ‰ã§ãƒ­ãƒ¼ãƒ‰ã—ã€æ—¢å­˜ã®ã‚·ãƒ¼ãƒ³ã‚’ã‚¢ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹
-            if (!SceneManager.GetSceneByName("TitleScene").isLoaded)
-            {
-                SceneManager.LoadScene("TitleScene", LoadSceneMode.Single);
-                Debug.Log("GameManager Awake: TitleSceneã‚’å˜ç‹¬ãƒ­ãƒ¼ãƒ‰ã—ã¾ã—ãŸã€‚(Single Mode)");
-            }
-            else
-            {
-                Debug.Log("GameManager Awake: TitleSceneã¯æ—¢ã«ãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¦ã„ã¾ã™ã€‚");
-            }
-
         }
         else
         {
-            // æ—¢ã«ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒã‚ã‚‹å ´åˆã¯ã€ã“ã®é‡è¤‡ã—ãŸã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç ´æ£„
-            Debug.Log("é‡è¤‡ã—ãŸGameManagerã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ç ´æ£„ã—ã¾ã™ã€‚");
             Destroy(gameObject);
-            return; // ã“ã‚Œä»¥ä¸Šå‡¦ç†ã—ãªã„
+            Debug.Log("GameManager: Šù‘¶‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ª‚ ‚é‚½‚ßA‚±‚ÌGameManager‚ğ”jŠü‚µ‚Ü‚µ‚½B");
         }
     }
 
-    // ã‚·ãƒ¼ãƒ³ãŒãƒ­ãƒ¼ãƒ‰ã•ã‚ŒãŸéš›ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ã‚¤ãƒ™ãƒ³ãƒˆã‚’ç™»éŒ²/è§£é™¤
+    // --- OnEnable / OnDisable ---
     void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
+        Debug.Log("GameManager: SceneManager.sceneLoaded ƒCƒxƒ“ƒg‚ğ“o˜^‚µ‚Ü‚µ‚½B");
     }
 
     void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        Debug.Log("GameManager: SceneManager.sceneLoaded ƒCƒxƒ“ƒg‚ğ‰ğœ‚µ‚Ü‚µ‚½B");
     }
 
-    // Unityã®Startãƒ¡ã‚½ãƒƒãƒ‰ã€‚ã‚¹ã‚¯ãƒªãƒ—ãƒˆãŒæœ‰åŠ¹ã«ãªã£ãŸæœ€åˆã®ãƒ•ãƒ¬ãƒ¼ãƒ ã§å‘¼ã³å‡ºã•ã‚Œã‚‹
-    void Start()
+    // --- ƒQ[ƒ€‰Šú‰» ---
+    private void InitializeGame()
     {
-        // StartCoroutine(FadeIn(m_fadeDuration)); // ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ã¯OnSceneLoadedã§åˆ¶å¾¡
+        SetState(GameState.enGameState_Init);
+        currentGemCount = initialGemCount;
     }
 
-    // ã‚·ãƒ¼ãƒ³ãŒãƒ­ãƒ¼ãƒ‰ã•ã‚Œã‚‹ãŸã³ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ãƒ¡ã‚½ãƒƒãƒ‰
+    // --- ƒV[ƒ“ƒ[ƒh‚ÌƒR[ƒ‹ƒoƒbƒN ---
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Debug.Log($"GameManager OnSceneLoaded: ã‚·ãƒ¼ãƒ³ '{scene.name}' ãŒãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¾ã—ãŸã€‚ãƒ¢ãƒ¼ãƒ‰: {mode}");
+        Debug.Log($"GameManager: ƒV[ƒ“'{scene.name}'‚ªƒ[ƒh‚³‚ê‚Ü‚µ‚½Bƒ‚[ƒh: {mode}");
 
-        // UIã‚·ãƒ¼ãƒ³ãŒãƒ­ãƒ¼ãƒ‰ã•ã‚ŒãŸå ´åˆã®åˆæœŸåŒ– (ScoreDisplayã®å‚ç…§å–å¾—ã¨è¦ªå­é–¢ä¿‚ã®è¨­å®š)
-        if (scene.name == "UI")
+        if (scene.name == MainGameSceneName && mode == LoadSceneMode.Single)
         {
-            m_uiScore = GameObject.FindGameObjectWithTag("ScoreText")?.GetComponent<ScoreDisplay>();
-
-            if (m_uiScore != null)
+            Debug.Log($"GameManager: ƒQ[ƒ€ƒvƒŒƒCƒV[ƒ“'{scene.name}'‚ªƒ[ƒh‚³‚ê‚Ü‚µ‚½B");
+            if (!SceneManager.GetSceneByName(UISceneName).isLoaded)
             {
-                m_uiScore.ScoreUpdate(currentPlayScore);
-                Debug.Log($"GameManager OnSceneLoaded: UIã‚·ãƒ¼ãƒ³ãƒ­ãƒ¼ãƒ‰æ™‚ã€UIã‚¹ã‚³ã‚¢ã‚’ {currentPlayScore} ã«åˆæœŸæ›´æ–°ã—ã¾ã—ãŸã€‚");
-
-                Canvas permanentCanvas = GameObject.Find("PermanentCanvas_DontDestroy")?.GetComponent<Canvas>();
-
-                if (permanentCanvas != null)
-                {
-                    if (m_uiScore.transform.parent != permanentCanvas.transform)
-                    {
-                        m_uiScore.transform.SetParent(permanentCanvas.transform, false);
-                        m_uiScore.transform.SetAsLastSibling();
-
-                        RectTransform rectT = m_uiScore.GetComponent<RectTransform>();
-                        TMP_Text tmpText = m_uiScore.GetComponent<TMP_Text>();
-
-                        rectT.anchorMin = new Vector2(0f, 1f);
-                        rectT.anchorMax = new Vector2(0f, 1f);
-                        rectT.pivot = new Vector2(0f, 1f);
-                        rectT.anchoredPosition = new Vector2(20f, -20f);
-                        rectT.sizeDelta = new Vector2(250f, 60f);
-                        rectT.localScale = Vector3.one;
-
-                        if (tmpText != null)
-                        {
-                            tmpText.fontSize = 60;
-                            tmpText.alignment = TextAlignmentOptions.Left;
-                        }
-                        Debug.Log("ScoreTextã‚’æ°¸ç¶šCanvasã®å­ã«è¨­å®šã—ã€RectTransformã¨æ–‡å­—ã‚µã‚¤ã‚ºã‚’èª¿æ•´ã—ã¾ã—ãŸã€‚");
-                    }
-
-                    GameObject scorePanel = GameObject.Find("Image")?.gameObject;
-                    if (scorePanel != null && scorePanel.transform.parent != permanentCanvas.transform)
-                    {
-                        scorePanel.transform.SetParent(permanentCanvas.transform, false);
-                        scorePanel.transform.SetAsFirstSibling();
-
-                        RectTransform panelRectT = scorePanel.GetComponent<RectTransform>();
-                        panelRectT.anchorMin = new Vector2(0f, 1f);
-                        panelRectT.anchorMax = new Vector2(0f, 1f);
-                        panelRectT.pivot = new Vector2(0f, 1f);
-                        panelRectT.anchoredPosition = new Vector2(15f, -15f);
-                        panelRectT.sizeDelta = new Vector2(270f, 70f);
-                        panelRectT.localScale = Vector3.one;
-
-                        Debug.Log("Score Panelã‚’æ°¸ç¶šCanvasã®å­ã«è¨­å®šã—ã€RectTransformã‚’èª¿æ•´ã—ã¾ã—ãŸã€‚");
-                    }
-                }
-                else
-                {
-                    Debug.LogError("PermanentCanvas_DontDestroyãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ï¼UIãŒæ­£ã—ãè¡¨ç¤ºã•ã‚Œãªã„å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚GameManagerã®SetupPermanentUIElements()ã‚’ç¢ºèªã—ã¦ãã ã•ã„ã€‚");
-                }
+                Debug.Log("GameManager: UIƒV[ƒ“‚ª‚Ü‚¾ƒ[ƒh‚³‚ê‚Ä‚¢‚È‚¢‚½‚ßAAdditive‚Åƒ[ƒh‚µ‚Ü‚·B");
+                SceneManager.LoadScene(UISceneName, LoadSceneMode.Additive);
             }
-            else
-            {
-                Debug.LogWarning("ScoreDisplay (with tag ScoreText) not found in UI scene! UIè¡¨ç¤ºãŒã§ãã¾ã›ã‚“ã€‚");
-            }
-        }
-        // ã‚²ãƒ¼ãƒ ãƒ—ãƒ¬ã‚¤ã‚·ãƒ¼ãƒ³ï¼ˆ"Demo_tileset"ï¼‰ãŒãƒ­ãƒ¼ãƒ‰ã•ã‚ŒãŸå ´åˆã®åˆæœŸåŒ–
-        else if (scene.name == "Demo_tileset")
-        {
-            SetState(GameState.enGameState_Play); // ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’ãƒ—ãƒ¬ã‚¤ä¸­ã«è¨­å®š
-            currentPlayScore = 0; // æ–°ã—ã„ã‚²ãƒ¼ãƒ é–‹å§‹ãªã®ã§ã‚¹ã‚³ã‚¢ã‚’ãƒªã‚»ãƒƒãƒˆ
-            Debug.Log($"GameManager OnSceneLoaded: {scene.name} ã®ç¾åœ¨ã®ã‚¹ã‚³ã‚¢ã‚’ {currentPlayScore} ã«ãƒªã‚»ãƒƒãƒˆã—ã¾ã—ãŸã€‚");
-            currentFadeCoroutine = StartCoroutine(FadeIn(m_fadeDuration));
-
-            // ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³ã®UIè¦ç´ ã‚’éè¡¨ç¤ºã«ã™ã‚‹ï¼ˆå…ƒã®ã‚·ãƒ¼ãƒ³ã«ã‚ã‚‹ã‚‚ã®ï¼‰
-            GameObject titleLogo = GameObject.Find("Image"); // ã‚¿ã‚¤ãƒˆãƒ«ãƒ­ã‚´ã®GameObjectå
-            if (titleLogo != null)
-            {
-                titleLogo.SetActive(false);
-                Debug.Log("GameManager OnSceneLoaded: ã‚²ãƒ¼ãƒ ã‚·ãƒ¼ãƒ³ãƒ­ãƒ¼ãƒ‰æ™‚ã«ã‚¿ã‚¤ãƒˆãƒ«ãƒ­ã‚´ã‚’éè¡¨ç¤ºã«ã—ã¾ã—ãŸã€‚");
-            }
-            GameObject startButton = GameObject.Find("Button"); // ã‚¹ã‚¿ãƒ¼ãƒˆãƒœã‚¿ãƒ³ã®GameObjectå
-            if (startButton != null)
-            {
-                startButton.SetActive(false);
-                Debug.Log("GameManager OnSceneLoaded: ã‚²ãƒ¼ãƒ ã‚·ãƒ¼ãƒ³ãƒ­ãƒ¼ãƒ‰æ™‚ã«ã‚¹ã‚¿ãƒ¼ãƒˆãƒœã‚¿ãƒ³ã‚’éè¡¨ç¤ºã«ã—ã¾ã—ãŸã€‚");
-            }
-
-            // ã‚¹ã‚³ã‚¢UIã‚’ãƒªã‚»ãƒƒãƒˆã•ã‚ŒãŸã‚¹ã‚³ã‚¢ã§æ›´æ–°ã—ã€è¡¨ç¤ºã™ã‚‹
-            if (m_uiScore != null)
-            {
-                m_uiScore.ScoreUpdate(currentPlayScore);
-                m_uiScore.ShowScore(); // ã‚¹ã‚³ã‚¢ãƒ†ã‚­ã‚¹ãƒˆã¨èƒŒæ™¯ã‚’è¡¨ç¤º
-                Debug.Log($"GameManager OnSceneLoaded: {scene.name} ãƒ­ãƒ¼ãƒ‰å¾Œã€UIã‚¹ã‚³ã‚¢ã‚’ {currentPlayScore} ã«æ›´æ–°ã—ã€è¡¨ç¤ºã—ã¾ã—ãŸã€‚");
-            }
-            else
-            {
-                Debug.LogWarning("GameManager OnSceneLoaded: m_uiScoreãŒnullã®ãŸã‚ã€ã‚¹ã‚³ã‚¢UIã‚’æ›´æ–°ãƒ»è¡¨ç¤ºã§ãã¾ã›ã‚“ã§ã—ãŸã€‚");
-            }
-        }
-        // ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³ãŒãƒ­ãƒ¼ãƒ‰ã•ã‚ŒãŸå ´åˆã®åˆæœŸåŒ–
-        else if (scene.name == "TitleScene")
-        {
-            currentPlayScore = 0;
             SetState(GameState.enGameState_Play);
-            Debug.Log($"GameManager OnSceneLoaded: {scene.name} ã®ç¾åœ¨ã®ã‚¹ã‚³ã‚¢ã‚’ {currentPlayScore} ã«ãƒªã‚»ãƒƒãƒˆã—ã¾ã—ãŸã€‚");
-            currentFadeCoroutine = StartCoroutine(FadeIn(m_fadeDuration));
+            InitializeGemCount();
 
-            if (m_uiScore != null)
-            {
-                m_uiScore.ScoreUpdate(currentPlayScore);
-                m_uiScore.HideScore();
-                Debug.Log($"GameManager OnSceneLoaded: {scene.name} ãƒ­ãƒ¼ãƒ‰å¾Œã€UIã‚¹ã‚³ã‚¢ã‚’ {currentPlayScore} ã«æ›´æ–°ã—ã€éè¡¨ç¤ºã«ã—ã¾ã—ãŸã€‚");
-            }
-            else
-            {
-                Debug.LogWarning("GameManager OnSceneLoaded: m_uiScoreãŒnullã®ãŸã‚ã€ã‚¹ã‚³ã‚¢UIã‚’æ›´æ–°ãƒ»éè¡¨ç¤ºã§ãã¾ã›ã‚“ã§ã—ãŸã€‚");
-            }
-
-            GameObject titleLogo = GameObject.Find("Image");
-            if (titleLogo != null)
-            {
-                titleLogo.SetActive(true);
-                Debug.Log("GameManager OnSceneLoaded: ã‚¿ã‚¤ãƒˆãƒ«ãƒ­ã‚´ã‚’ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã«ã—ã¾ã—ãŸã€‚");
-            }
-            else
-            {
-                Debug.LogWarning("ã‚¿ã‚¤ãƒˆãƒ«ãƒ­ã‚´ (Image) ãŒTitleSceneã«è¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚åå‰ã‚’ç¢ºèªã—ã¦ãã ã•ã„ã€‚");
-            }
-
-            GameObject startButton = GameObject.Find("Button");
-            if (startButton != null)
-            {
-                startButton.SetActive(true);
-                Debug.Log("GameManager OnSceneLoaded: ã‚¹ã‚¿ãƒ¼ãƒˆãƒœã‚¿ãƒ³ã‚’ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã«ã—ã¾ã—ãŸã€‚");
-            }
-            else
-            {
-                Debug.LogWarning("ã‚¹ã‚¿ãƒ¼ãƒˆãƒœã‚¿ãƒ³ (Button) ãŒTitleSceneã«è¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚åå‰ã‚’ç¢ºèªã—ã¦ãã ã•ã„ã€‚");
-            }
+            // ƒƒCƒ“ƒQ[ƒ€ƒV[ƒ“‚ªƒ[ƒh‚³‚ê‚½‚çUI‚ğ•\¦
+            SetScoreUIActive(true);
         }
-        // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ã‚·ãƒ¼ãƒ³ã¾ãŸã¯ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢ã‚·ãƒ¼ãƒ³ãŒãƒ­ãƒ¼ãƒ‰ã•ã‚ŒãŸå ´åˆ
-        else if (scene.name == "GameOver" || scene.name == "GameOverScene" || scene.name == "GameClear" || scene.name == "ClearScene")
+        else if (scene.name == UISceneName && mode == LoadSceneMode.Additive)
         {
-            SetState(GameState.enGameState_GameOver); // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼/ã‚¯ãƒªã‚¢çŠ¶æ…‹ã«è¨­å®š
-            Debug.Log($"GameManager OnSceneLoaded: {scene.name} ãƒ­ãƒ¼ãƒ‰å®Œäº†ã€‚ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³é–‹å§‹ã€‚");
-            currentFadeCoroutine = StartCoroutine(FadeIn(m_fadeDuration)); // ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ã‚’é–‹å§‹
-
-            // ã‚¹ã‚³ã‚¢UIã¯éè¡¨ç¤ºã®ã¾ã¾ç¶­æŒã™ã‚‹ã‹ã€å¿…è¦ã«å¿œã˜ã¦è¡¨ç¤ºåˆ¶å¾¡
-            if (m_uiScore != null)
+            Debug.Log("GameManager: UIƒV[ƒ“‚ªƒ[ƒh‚³‚ê‚Ü‚µ‚½BPermanentCanvas‚ğƒAƒNƒeƒBƒu‚É‚µ‚Ü‚·B");
+            if (m_permanentCanvasInstance != null)
             {
-                m_uiScore.HideScore(); // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼/ã‚¯ãƒªã‚¢ç”»é¢ã§ã¯ã‚¹ã‚³ã‚¢ã‚’éè¡¨ç¤º
-                Debug.Log($"GameManager OnSceneLoaded: {scene.name} ãƒ­ãƒ¼ãƒ‰å¾Œã€UIã‚¹ã‚³ã‚¢ã‚’éè¡¨ç¤ºã«ã—ã¾ã—ãŸã€‚");
+                m_permanentCanvasInstance.SetActive(true);
+            }
+
+            // ScoreDisplay‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğæ“¾‚µ‚Äİ’è
+            scoreDisplay = FindObjectOfType<ScoreDisplay>();
+            if (scoreDisplay != null)
+            {
+                Debug.Log("GameManager: ScoreDisplay‚ªŒ©‚Â‚©‚è‚Ü‚µ‚½B");
+                scoreDisplay.transform.SetParent(m_permanentCanvasInstance.transform, false);
+                Debug.Log("GameManager: ScoreDisplay‚ÌeqŠÖŒW‚ğİ’è‚µ‚Ü‚·B");
             }
             else
             {
-                Debug.LogWarning("GameManager OnSceneLoaded: m_uiScoreãŒnullã®ãŸã‚ã€ã‚¹ã‚³ã‚¢UIã‚’éè¡¨ç¤ºã§ãã¾ã›ã‚“ã§ã—ãŸã€‚");
+                Debug.LogWarning("GameManager: ScoreDisplay‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBUI•\¦‚É–â‘è‚ª‚ ‚é‰Â”\«‚ª‚ ‚è‚Ü‚·B");
             }
 
-            // ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³ã®UIè¦ç´ ã‚’éè¡¨ç¤ºã«ã™ã‚‹ï¼ˆå…ƒã®ã‚·ãƒ¼ãƒ³ã«ã‚ã‚‹ã‚‚ã®ï¼‰
-            GameObject titleLogo = GameObject.Find("Image");
-            if (titleLogo != null)
+            // ScorePanel‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğæ“¾‚µ‚Äİ’è
+            scorePanel = GameObject.Find("ScorePanel");
+            if (scorePanel != null)
             {
-                titleLogo.SetActive(false);
-                Debug.Log("GameManager OnSceneLoaded: ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼/ã‚¯ãƒªã‚¢ã‚·ãƒ¼ãƒ³ãƒ­ãƒ¼ãƒ‰æ™‚ã«ã‚¿ã‚¤ãƒˆãƒ«ãƒ­ã‚´ã‚’éè¡¨ç¤ºã«ã—ã¾ã—ãŸã€‚");
+                scorePanel.transform.SetParent(m_permanentCanvasInstance.transform, false);
+                Debug.Log("GameManager: ScorePanel‚ÌeqŠÖŒW‚ğİ’è‚µ‚Ü‚·B");
             }
-            GameObject startButton = GameObject.Find("Button");
-            if (startButton != null)
+            else
             {
-                startButton.SetActive(false);
-                Debug.Log("GameManager OnSceneLoaded: ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼/ã‚¯ãƒªã‚¢ã‚·ãƒ¼ãƒ³ãƒ­ãƒ¼ãƒ‰æ™‚ã«ã‚¹ã‚¿ãƒ¼ãƒˆãƒœã‚¿ãƒ³ã‚’éè¡¨ç¤ºã«ã—ã¾ã—ãŸã€‚");
+                Debug.LogWarning("GameManager: ScorePanel‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBUI•\¦‚É–â‘è‚ª‚ ‚é‰Â”\«‚ª‚ ‚è‚Ü‚·B");
             }
+
+            // UIƒV[ƒ“‚ªƒ[ƒh‚³‚ê‚½“_‚Å‚ÍAƒXƒRƒAUI‚Í”ñ•\¦‚É‚µ‚Ä‚¨‚­
+            SetScoreUIActive(false);
         }
-    }
-
-    // æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å‘¼ã³å‡ºã•ã‚Œã‚‹ (å¿…è¦ã«å¿œã˜ã¦å‡¦ç†ã‚’è¿½åŠ )
-    void Update()
-    {
-        // ...
-    }
-
-    // ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’è¨­å®šã™ã‚‹
-    public void SetState(GameState state)
-    {
-        m_gameState = state;
-        // ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢æ™‚ã«ã‚‚ç¾åœ¨ã®ã‚¹ã‚³ã‚¢ã‚’ãƒã‚¤ã‚¹ã‚³ã‚¢ã¨æ¯”è¼ƒã—ã¦ä¿å­˜
-        if (m_gameState == GameState.enGameState_Clear) // else if ã‹ã‚‰ if ã«å¤‰æ›´ (ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼éŸ³å‰Šé™¤ã®ãŸã‚)
+        else if (scene.name == TitleSceneName && mode == LoadSceneMode.Single)
         {
-            Debug.Log($"GameManager SetState: ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢ã€‚");
+            Debug.Log("GameManager: TitleScene‚ªƒ[ƒh‚³‚ê‚Ü‚µ‚½B");
+            SetState(GameState.enGameState_Title);
+            StartFadeIn(true);
+            // ƒ^ƒCƒgƒ‹ƒV[ƒ“‚Å‚ÍUI‚ğ”ñ•\¦
+            SetScoreUIActive(false);
         }
-    }
-
-    // ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’å–å¾—ã™ã‚‹
-    public GameState GetState()
-    {
-        return m_gameState;
-    }
-
-    // ã‚¹ã‚³ã‚¢ã‚’åŠ ç®—ã—ã€UIã‚’æ›´æ–°ã™ã‚‹
-    public void AddScore(int score)
-    {
-        currentPlayScore += score;
-        if (m_uiScore != null)
+        else if (scene.name == StageSelectSceneName && mode == LoadSceneMode.Single)
         {
-            m_uiScore.ScoreUpdate(currentPlayScore);
-            Debug.Log($"GameManager AddScore: ç¾åœ¨ã®ã‚¹ã‚³ã‚¢ã‚’ {currentPlayScore} ã«æ›´æ–°ã—ã¾ã—ãŸã€‚");
+            Debug.Log("GameManager: StageSelect‚ªƒ[ƒh‚³‚ê‚Ü‚µ‚½B");
+            SetState(GameState.enGameState_StageSelect);
+            StartFadeIn(false);
+            // ƒXƒe[ƒW‘I‘ğƒV[ƒ“‚Å‚ÍUI‚ğ”ñ•\¦
+            SetScoreUIActive(false);
+        }
+        else if (scene.name == GameOverSceneName && mode == LoadSceneMode.Single)
+        {
+            Debug.Log("GameManager: GameOverScene ‚ªƒ[ƒh‚³‚ê‚Ü‚µ‚½B");
+            SetState(GameState.enGameState_GameOver);
+            StartFadeIn(false);
+            // ƒQ[ƒ€ƒI[ƒo[ƒV[ƒ“‚Å‚ÍUI‚ğ”ñ•\¦
+            SetScoreUIActive(false);
+        }
+        else if (scene.name == GameClearSceneName && mode == LoadSceneMode.Single)
+        {
+            Debug.Log("GameManager: GameClearScene ‚ªƒ[ƒh‚³‚ê‚Ü‚µ‚½B");
+            SetState(GameState.enGameState_GameClear);
+            StartFadeIn(false);
+            // ƒQ[ƒ€ƒNƒŠƒAƒV[ƒ“‚Å‚ÍUI‚ğ”ñ•\¦
+            SetScoreUIActive(false);
         }
         else
         {
-            Debug.LogWarning("ScoreDisplay (m_uiScore) is null when trying to update score.");
+            if (scene.name != "Bootstrap")
+            {
+                StartFadeIn(false);
+            }
+            else
+            {
+                Debug.Log($"GameManager: ƒV[ƒ“'{scene.name}'‚Å‚ÍƒtƒF[ƒhƒCƒ“‚ÍŠJn‚³‚ê‚Ü‚¹‚ñB");
+            }
+            // ‚»‚Ì‘¼‚ÌƒV[ƒ“‚Å‚ÍUI‚ğ”ñ•\¦ (•K—v‚É‰‚¶‚Ä’²®)
+            SetScoreUIActive(false);
         }
     }
 
-    // ç¾åœ¨ã®ã‚²ãƒ¼ãƒ ãƒ—ãƒ¬ã‚¤ã®ã‚¹ã‚³ã‚¢ã‚’å–å¾—ã™ã‚‹
-    public int GetCurrentPlayScore()
+    // ƒQ[ƒ€ó‘Ô‚Ì•ÏX
+    public void SetState(GameState newState)
     {
-        return currentPlayScore;
+        if (m_currentGameState == newState) return;
+
+        Debug.Log($"GameManager: ƒQ[ƒ€‚Ìó‘Ô‚ğ {newState} ‚É•ÏX‚µ‚Ü‚µ‚½B");
+        m_currentGameState = newState;
+
+        // ƒQ[ƒ€‚Ìó‘Ô‚É‰‚¶‚½ƒ^ƒCƒ€ƒXƒP[ƒ‹‚Ìİ’è
+        switch (m_currentGameState)
+        {
+            case GameState.enGameState_Play:
+                Time.timeScale = 1f;
+                break;
+            case GameState.enGameState_Pause:
+                Time.timeScale = 0f;
+                break;
+            case GameState.enGameState_GameOver:
+                Time.timeScale = 0f;
+                break;
+            case GameState.enGameState_GameClear:
+            case GameState.enGameState_Clear: // Šù‘¶‚ÌƒR[ƒhŒİŠ·«‚Ì‚½‚ß
+                Time.timeScale = 0f;
+                break;
+            default:
+                Time.timeScale = 1f;
+                break;
+        }
     }
 
-    // æŒ‡å®šã—ãŸã‚·ãƒ¼ãƒ³ã«ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆã—ãªãŒã‚‰é·ç§»ã™ã‚‹å…¬å…±ãƒ¡ã‚½ãƒƒãƒ‰
+    // Œ»İ‚ÌƒQ[ƒ€ó‘Ô‚ğæ“¾‚·‚é‚½‚ß‚Ì public ƒƒ\ƒbƒh
+    public GameState GetCurrentGameState()
+    {
+        return m_currentGameState;
+    }
+
+    // ƒQ[ƒ€ƒI[ƒo[ó‘Ô‚Ö‚Ì‘JˆÚ‚ğ‘¦À‚ÉŠJn
+    public void SetGameOverStateImmediately()
+    {
+        if (m_isTransitioning)
+        {
+            Debug.Log("GameManager: Šù‚ÉƒV[ƒ“‘JˆÚ’†‚Ì‚½‚ßASetGameOverStateImmediately‚ğƒXƒLƒbƒv‚µ‚Ü‚·B");
+            return;
+        }
+
+        Debug.Log("GameManager: ƒQ[ƒ€ƒI[ƒo[ó‘Ô‚Éİ’è‚µAGameOverScene‚Ö‚Ì‘JˆÚ‚ğŠJn‚µ‚Ü‚µ‚½B");
+        SetState(GameState.enGameState_GameOver);
+        LoadSceneWithFade(GameOverSceneName);
+    }
+
+    // ƒV[ƒ“‘JˆÚ
     public void LoadSceneWithFade(string sceneName)
     {
-        Debug.Log($"GameManager LoadSceneWithFade: ã‚·ãƒ¼ãƒ³ '{sceneName}' ã¸ã®é·ç§»ã‚’é–‹å§‹ã—ã¾ã™ã€‚");
-        // æ—¢å­˜ã®ãƒ•ã‚§ãƒ¼ãƒ‰ã‚³ãƒ«ãƒ¼ãƒãƒ³ãŒã‚ã‚Œã°åœæ­¢ã™ã‚‹
-        if (currentFadeCoroutine != null)
+        if (m_isTransitioning)
         {
-            StopCoroutine(currentFadeCoroutine);
-            Debug.Log("LoadSceneWithFade: æ—¢å­˜ã®ãƒ•ã‚§ãƒ¼ãƒ‰ã‚³ãƒ«ãƒ¼ãƒãƒ³ã‚’åœæ­¢ã—ã¾ã—ãŸã€‚");
+            Debug.Log($"GameManager: Šù‚ÉƒV[ƒ“‘JˆÚ’†‚Ì‚½‚ßA'{sceneName}'‚Ö‚Ìƒ[ƒh‚ğƒXƒLƒbƒv‚µ‚Ü‚·B");
+            return;
         }
-        currentFadeCoroutine = StartCoroutine(FadeOutAndLoadScene(sceneName));
+
+        m_isTransitioning = true;
+
+        Debug.Log($"GameManager: ƒV[ƒ“'{sceneName}'‚Ö‚ÌƒtƒF[ƒhƒAƒEƒg‚Æƒ[ƒh‚ğŠJn‚µ‚Ü‚·B");
+
+        if (m_fadeCoroutine != null)
+        {
+            StopCoroutine(m_fadeCoroutine);
+            Debug.Log("GameManager: Šù‘¶‚ÌƒtƒF[ƒhƒRƒ‹[ƒ`ƒ“‚ğ’â~‚µ‚Ü‚µ‚½ (LoadSceneWithFade)B");
+        }
+        m_fadeCoroutine = StartCoroutine(FadeOutAndLoadScene(sceneName));
     }
 
-    // --- ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆãƒ˜ãƒ«ãƒ‘ãƒ¼ãƒ¡ã‚½ãƒƒãƒ‰ï¼ˆUIåˆæœŸåŒ–ã¨ãƒ•ã‚§ãƒ¼ãƒ‰å‡¦ç†ï¼‰ ---
+    // ƒWƒFƒ€ŠÖ˜A
+    public void InitializeGemCount()
+    {
+        currentGemCount = 0;
+        Debug.Log($"GameManager: ƒWƒFƒ€”‚ğ‰Šú‰»‚µ‚Ü‚µ‚½B‘ƒWƒFƒ€”: {currentGemCount}");
+        if (scoreDisplay != null)
+        {
+            scoreDisplay.UpdateGemCount(currentGemCount);
+        }
+    }
 
-    // ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ã¨EventSystemã‚’ç”Ÿæˆãƒ»è¨­å®šã—ã€DontDestroyOnLoadã«è¨­å®šã™ã‚‹
+    // ƒWƒFƒ€‚ÌûW‚ÆƒXƒRƒA‰ÁZ‚ğ“‡‚µ‚½ƒƒ\ƒbƒh
+    public void AddGem(int amount)
+    {
+        currentGemCount += amount;
+        Debug.Log($"GameManager: ƒWƒFƒ€‚ğE‚¢‚Ü‚µ‚½BŒ»İ: {currentGemCount}");
+        if (scoreDisplay != null)
+        {
+            scoreDisplay.UpdateGemCount(currentGemCount);
+        }
+    }
+
+    // Permanent‚ÈUI—v‘f‚ÌƒZƒbƒgƒAƒbƒv
     private void SetupPermanentUIElements()
     {
-        // æ°¸ç¶šçš„ãªCanvasã‚’è¦‹ã¤ã‘ã‚‹ã‹ã€æ–°ã—ãä½œæˆã™ã‚‹
-        Canvas permanentCanvas = GameObject.Find("PermanentCanvas_DontDestroy")?.GetComponent<Canvas>();
+        Debug.Log("GameManager: SetupPermanentUIElements‚ğŠJn‚µ‚Ü‚·B");
 
-        if (permanentCanvas == null)
+        // PermanentCanvas‚Ì¶¬‚Æİ’è
+        if (permanentCanvasPrefab != null && m_permanentCanvasInstance == null)
         {
-            GameObject canvasGO = new GameObject("PermanentCanvas_DontDestroy");
-            permanentCanvas = canvasGO.AddComponent<Canvas>();
-            permanentCanvas.renderMode = RenderMode.ScreenSpaceOverlay; // ç”»é¢å…¨ä½“ã«ã‚ªãƒ¼ãƒãƒ¼ãƒ¬ã‚¤è¡¨ç¤º
-
-            // CanvasScalerã®è¨­å®šã‚’å¼·åŒ–ã—ã€ç”»é¢ã‚µã‚¤ã‚ºã«åˆã‚ã›ã¦ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°ã™ã‚‹
-            CanvasScaler canvasScaler = canvasGO.AddComponent<CanvasScaler>();
-            canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            canvasScaler.referenceResolution = new Vector2(1920, 1080); // åŸºæº–ã¨ãªã‚‹è§£åƒåº¦ (ä¾‹: ãƒ•ãƒ«HD)
-            canvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            canvasScaler.matchWidthOrHeight = 0.5f; // å¹…ã¨é«˜ã•ã®ä¸­é–“ã§ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°
-
-            canvasGO.AddComponent<GraphicRaycaster>();
-            permanentCanvas.sortingOrder = 100; // æœ€å‰é¢ã«è¡¨ç¤ºã•ã‚Œã‚‹ã‚ˆã†ã«é«˜ã„ã‚½ãƒ¼ãƒˆé †ã‚’è¨­å®š
-            DontDestroyOnLoad(canvasGO); // Canvasè‡ªä½“ã‚’æ°¸ç¶šåŒ–
-            Debug.Log("PermanentCanvas_DontDestroyã‚’ä½œæˆã—ã¾ã—ãŸã€‚è¦ª: " + canvasGO.transform.parent + ", DDOLè¨­å®šæ¸ˆã¿.");
+            m_permanentCanvasInstance = Instantiate(permanentCanvasPrefab);
+            m_permanentCanvasInstance.name = "PermanentCanvas_DontDestroy";
+            DontDestroyOnLoad(m_permanentCanvasInstance);
+            m_permanentCanvasInstance.SetActive(false); // ‰Šú‚Í”ñƒAƒNƒeƒBƒu
+            Debug.Log("GameManager: PermanentCanvas_DontDestroy‚ğ¶¬‚µ‚Ü‚µ‚½B");
         }
-        else
+        else if (permanentCanvasPrefab == null)
         {
-            Debug.Log("PermanentCanvas_DontDestroyã¯æ—¢ã«å­˜åœ¨ã—ã¾ã™ã€‚");
-            // æ—¢å­˜ã®CanvasScalerã®è¨­å®šã‚’å†ç¢ºèªã¾ãŸã¯é©ç”¨
-            CanvasScaler canvasScaler = permanentCanvas.GetComponent<CanvasScaler>();
-            if (canvasScaler == null)
-            {
-                canvasScaler = permanentCanvas.gameObject.AddComponent<CanvasScaler>();
-            }
-            canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            canvasScaler.referenceResolution = new Vector2(1920, 1080);
-            canvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            canvasScaler.matchWidthOrHeight = 0.5f;
-            Debug.Log("PermanentCanvas_DontDestroyã®CanvasScalerè¨­å®šã‚’èª¿æ•´ã—ã¾ã—ãŸã€‚");
+            Debug.LogWarning("GameManager: permanentCanvasPrefab‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB");
         }
 
-        // æ°¸ç¶šçš„ãªEventSystemã‚’è¦‹ã¤ã‘ã‚‹ã‹ã€æ–°ã—ãä½œæˆã™ã‚‹
-        EventSystem permanentEventSystem = GameObject.Find("PermanentEventSystem_DontDestroy")?.GetComponent<EventSystem>();
-        if (permanentEventSystem == null)
+        // GlobalFadeCanvas‚Ì¶¬‚Æİ’è
+        if (globalFadeCanvasPrefab != null && m_globalFadeCanvasInstance == null)
         {
-            // ã‚·ãƒ¼ãƒ³å†…ã«å­˜åœ¨ã™ã‚‹ä»–ã®EventSystemã‚’å…¨ã¦å‰Šé™¤ã—ã¦ã‹ã‚‰ã€æ–°ã—ãä½œæˆã™ã‚‹
-            EventSystem[] existingEventSystems = FindObjectsOfType<EventSystem>();
-            foreach (EventSystem es in existingEventSystems)
-            {
-                if (es.gameObject.name != "PermanentEventSystem_DontDestroy")
-                {
-                    Debug.Log($"æ—¢å­˜ã®EventSystem '{es.gameObject.name}' ã‚’ç ´æ£„ã—ã¾ã™ã€‚");
-                    Destroy(es.gameObject);
-                }
-            }
-
-            GameObject eventSystemGO = new GameObject("PermanentEventSystem_DontDestroy");
-            permanentEventSystem = eventSystemGO.AddComponent<EventSystem>();
-            eventSystemGO.AddComponent<StandaloneInputModule>();
-            DontDestroyOnLoad(eventSystemGO);
-            Debug.Log("PermanentEventSystem_DontDestroyã‚’ä½œæˆã—ã¾ã—ãŸã€‚DDOLè¨­å®šæ¸ˆã¿.");
+            m_globalFadeCanvasInstance = Instantiate(globalFadeCanvasPrefab);
+            m_globalFadeCanvasInstance.name = "GlobalFadeCanvas_DontDestroy";
+            DontDestroyOnLoad(m_globalFadeCanvasInstance);
+            m_globalFadeCanvasInstance.SetActive(false); // ‰Šú‚Í”ñƒAƒNƒeƒBƒu
+            Debug.Log("GameManager: GlobalFadeCanvas_DontDestroy‚ğ¶¬‚µ‚Ü‚µ‚½B");
         }
-        else
+        else if (globalFadeCanvasPrefab == null)
         {
-            Debug.Log("PermanentEventSystem_DontDestroyã¯æ—¢ã«å­˜åœ¨ã—ã¾ã™ã€‚");
-            EventSystem[] existingEventSystems = FindObjectsOfType<EventSystem>();
-            if (existingEventSystems.Length > 1)
-            {
-                foreach (EventSystem es in existingEventSystems)
-                {
-                    if (es.gameObject.name != "PermanentEventSystem_DontDestroy" && es != permanentEventSystem)
-                    {
-                        Debug.LogWarning($"é‡è¤‡ã™ã‚‹EventSystem '{es.gameObject.name}' ãŒæ¤œå‡ºã•ã‚Œã¾ã—ãŸã€‚ç ´æ£„ã—ã¾ã™ã€‚");
-                        Destroy(es.gameObject);
-                    }
-                }
-            }
+            Debug.LogWarning("GameManager: globalFadeCanvasPrefab‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB");
         }
 
-        // ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ï¼ˆImageï¼‰ã‚’ä½œæˆã¾ãŸã¯æ—¢å­˜ã®ã‚‚ã®ã‚’åˆ©ç”¨ã™ã‚‹
-        if (m_fadePanel == null)
+        // PermanentEventSystem‚Ì¶¬‚Æİ’è
+        if (permanentEventSystemPrefab != null && m_permanentEventSystemInstance == null)
         {
-            if (permanentCanvas == null)
+            m_permanentEventSystemInstance = Instantiate(permanentEventSystemPrefab);
+            m_permanentEventSystemInstance.name = "PermanentEventSystem_DontDestroy";
+            DontDestroyOnLoad(m_permanentEventSystemInstance);
+            Debug.Log("GameManager: PermanentEventSystem_DontDestroy‚ğ¶¬‚µ‚Ü‚µ‚½B");
+        }
+        else if (permanentEventSystemPrefab == null)
+        {
+            Debug.LogWarning("GameManager: permanentEventSystemPrefab‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+        }
+
+        // GlobalFadePanel‚Ì¶¬‚Æİ’è
+        if (globalFadePanelPrefab != null && m_globalFadeCanvasInstance != null)
+        {
+            GameObject fadePanelObject = Instantiate(globalFadePanelPrefab, m_globalFadeCanvasInstance.transform);
+            fadePanelObject.name = "GlobalFadePanel";
+            m_globalFadePanelImage = fadePanelObject.GetComponent<Image>();
+            if (m_globalFadePanelImage == null)
             {
-                Debug.LogError("ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ä½œæˆä¸­ã«PermanentCanvas_DontDestroyãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚ã“ã‚Œã¯è‡´å‘½çš„ãªã‚¨ãƒ©ãƒ¼ã§ã™ã€‚");
-                return;
+                Debug.LogError("GameManager: GlobalFadePanelPrefab‚ÉImageƒRƒ“ƒ|[ƒlƒ“ƒg‚ª‚ ‚è‚Ü‚¹‚ñB");
             }
 
-            GameObject fadePanelGO = new GameObject("GlobalFadePanel");
-            fadePanelGO.transform.SetParent(permanentCanvas.transform); // PermanentCanvasã®å­ã«ã™ã‚‹
-            m_fadePanel = fadePanelGO.AddComponent<UnityEngine.UI.Image>(); // UnityEngine.UI.Image ã‚’æ˜ç¤ºçš„ã«æŒ‡å®š
-
-            RectTransform rectT = m_fadePanel.GetComponent<RectTransform>();
-            rectT.anchorMin = Vector2.zero;
-            rectT.anchorMax = Vector2.one;
-            rectT.sizeDelta = Vector2.zero;
-            rectT.anchoredPosition = Vector2.zero;
-
-            // Inspectorã§å‰²ã‚Šå½“ã¦ã‚‰ã‚ŒãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’ä½¿ç”¨ã™ã‚‹
-            if (m_fadePanelSprite != null)
+            if (fadePanelSprite != null)
             {
-                m_fadePanel.sprite = m_fadePanelSprite;
-                Debug.Log("GameManager: ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ã«Inspectorã‹ã‚‰å‰²ã‚Šå½“ã¦ã‚‰ã‚ŒãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’è¨­å®šã—ã¾ã—ãŸã€‚");
+                m_globalFadePanelImage.sprite = fadePanelSprite;
+                Debug.Log("GameManager: FadePanelSprite‚ğŠ„‚è“–‚Ä‚Ü‚µ‚½B");
             }
             else
             {
-                // ã“ã“ã¯è­¦å‘Šãƒ­ã‚°ã«ç•™ã‚ã‚‹ã€‚ã‚¨ãƒ©ãƒ¼ã§ã¯ãªã„
-                Debug.LogWarning("GameManager: ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ç”¨ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ (m_fadePanelSprite) ãŒInspectorã§å‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ãŒæ­£ã—ãè¡¨ç¤ºã•ã‚Œãªã„å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚");
+                Debug.LogWarning("GameManager: FadePanelSprite‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB");
             }
 
-            m_fadePanel.color = new Color(0, 0, 0, 0); // åˆæœŸã¯é€æ˜
-            m_fadePanel.transform.SetAsLastSibling(); // æœ€ã‚‚æ‰‹å‰ï¼ˆæœ€ä¸Šå±¤ï¼‰ã«æç”»ã•ã‚Œã‚‹ã‚ˆã†ã«ã™ã‚‹
-            m_fadePanel.raycastTarget = false; // ã‚¯ãƒªãƒƒã‚¯ã‚’é€éã•ã›ã‚‹
-            Debug.Log("GlobalFadePanelã‚’ä½œæˆã—ã¾ã—ãŸã€‚è¦ª: " + fadePanelGO.transform.parent.name + ", ã‚¢ã‚¯ãƒ†ã‚£ãƒ–çŠ¶æ…‹: " + fadePanelGO.activeSelf);
+            m_globalFadePanelImage.color = new Color(0, 0, 0, 0); // ‰Šú‚ÍŠ®‘S‚É“§–¾
+            m_globalFadePanelImage.gameObject.SetActive(false); // ‰Šú‚Í”ñƒAƒNƒeƒBƒu
+            Debug.Log("GameManager: GlobalFadePanel‚ğ¶¬‚µ‚Ü‚µ‚½B‰Šúó‘Ô‚Í“§–¾‚Å”ñƒAƒNƒeƒBƒu‚Å‚·B");
+        }
+        else if (globalFadePanelPrefab == null)
+        {
+            Debug.LogWarning("GameManager: globalFadePanelPrefab‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+        }
+
+        Debug.Log("GameManager: SetupPermanentUIElements‚ğŠ®—¹‚µ‚Ü‚µ‚½B");
+    }
+
+    // ƒtƒF[ƒhƒCƒ“ˆ—
+    private void StartFadeIn(bool isInitialLoad)
+    {
+        if (m_globalFadePanelImage == null)
+        {
+            Debug.LogError("GameManager: ƒtƒF[ƒhƒpƒlƒ‹‚ÌImage‚ªnull‚Å‚·BƒtƒF[ƒhƒCƒ“‚Å‚«‚Ü‚¹‚ñB");
+            m_isTransitioning = false;
+            return;
+        }
+
+        if (m_fadeCoroutine != null)
+        {
+            StopCoroutine(m_fadeCoroutine);
+            Debug.Log("GameManager: Šù‘¶‚ÌƒtƒF[ƒhƒRƒ‹[ƒ`ƒ“‚ğ’â~‚µ‚Ü‚µ‚½ (OnSceneLoaded / ’Êí)B");
+        }
+
+        Debug.Log($"GameManager: {(isInitialLoad ? "‰‰ñ" : "’Êí")}ƒtƒF[ƒhƒCƒ“‚ğŠJn‚µ‚Ü‚· (ƒV[ƒ“: {SceneManager.GetActiveScene().name})B");
+        m_fadeCoroutine = StartCoroutine(FadeIn());
+    }
+
+    private IEnumerator FadeIn(float duration = 2.0f)
+    {
+        Debug.Log($"GameManager: FadeIn‚ğŠJn‚µ‚Ü‚·BŠÔ: {duration}•b");
+        m_globalFadeCanvasInstance.SetActive(true);
+        m_globalFadePanelImage.gameObject.SetActive(true);
+
+        m_globalFadePanelImage.color = new Color(0, 0, 0, 1); // Å‰‚Í•s“§–¾
+        Debug.Log("GameManager: ƒtƒF[ƒhƒCƒ“ŠJn (•s“§–¾ -> “§–¾)");
+
+        float timer = 0f;
+        while (timer < duration)
+        {
+            timer += Time.unscaledDeltaTime;
+            float alpha = Mathf.Lerp(1, 0, timer / duration); // 1‚©‚ç0‚Ö•âŠÔ
+            m_globalFadePanelImage.color = new Color(0, 0, 0, alpha);
+            yield return null;
+        }
+
+        m_globalFadePanelImage.color = new Color(0, 0, 0, 0); // Š®‘S‚É“§–¾‚É
+        m_globalFadePanelImage.gameObject.SetActive(false);
+        m_globalFadeCanvasInstance.SetActive(false);
+        m_isTransitioning = false;
+        Debug.Log("GameManager: FadeIn: Š®—¹‚µ‚Ü‚µ‚½Bƒpƒlƒ‹‚Æê—pCanvas‚ğ”ñƒAƒNƒeƒBƒu‚É‚µ‚Ü‚µ‚½B");
+    }
+
+
+    // ƒtƒF[ƒhƒAƒEƒg‚ÆƒV[ƒ“ƒ[ƒhˆ—
+    private IEnumerator FadeOutAndLoadScene(string sceneName, float duration = 1.0f)
+    {
+        Debug.Log($"GameManager: FadeOutAndLoadScene‚ğŠJn‚µ‚Ü‚·B‘ÎÛƒV[ƒ“: {sceneName}");
+        m_globalFadeCanvasInstance.SetActive(true);
+        m_globalFadePanelImage.gameObject.SetActive(true);
+
+        m_globalFadePanelImage.color = new Color(0, 0, 0, 0); // Å‰‚Í“§–¾
+        Debug.Log("GameManager: ƒtƒF[ƒhƒAƒEƒgŠJn (“§–¾ -> •s“§–¾)");
+
+        float timer = 0f;
+        while (timer < duration)
+        {
+            timer += Time.unscaledDeltaTime;
+            float alpha = Mathf.Lerp(0, 1, timer / duration); // 0‚©‚ç1‚Ö•âŠÔ
+            m_globalFadePanelImage.color = new Color(0, 0, 0, alpha);
+            yield return null;
+        }
+
+        m_globalFadePanelImage.color = new Color(0, 0, 0, 1); // Š®‘S‚É•s“§–¾‚É
+        Debug.Log($"GameManager: ƒV[ƒ“ƒ[ƒhŠJn: {sceneName}");
+
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
+        asyncLoad.allowSceneActivation = false; // ƒV[ƒ“‚ÌƒAƒNƒeƒBƒu‰»‚ğ‘Ò‚Â
+
+        while (!asyncLoad.isDone)
+        {
+            // 0.9f‚É’B‚µ‚½‚çAƒV[ƒ“‚ÌƒAƒNƒeƒBƒu‰»‚ğ‹–‰Â
+            if (asyncLoad.progress >= 0.9f)
+            {
+                asyncLoad.allowSceneActivation = true;
+                Debug.Log($"GameManager: ƒV[ƒ“ '{sceneName}' ‚ÌƒAƒNƒeƒBƒu‰»‚ğ‹–‰Â‚µ‚Ü‚µ‚½B");
+            }
+            yield return null;
+        }
+    }
+
+    // ƒXƒRƒAUI‚Ì•\¦/”ñ•\¦‚ğ§Œä‚·‚éV‚µ‚¢ƒƒ\ƒbƒh
+    private void SetScoreUIActive(bool isActive)
+    {
+        if (scorePanel != null)
+        {
+            scorePanel.SetActive(isActive);
+            Debug.Log($"GameManager: ScorePanel‚Ì•\¦‚ğ {(isActive ? "—LŒø" : "–³Œø")} ‚É‚µ‚Ü‚µ‚½B");
         }
         else
         {
-            Debug.Log("GlobalFadePanelã¯æ—¢ã«å­˜åœ¨ã—ã¾ã™ã€‚");
-            // æ—¢å­˜ã®ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ã®RectTransformãŒç”»é¢å…¨ä½“ã‚’è¦†ã†ã‚ˆã†ã«å†è¨­å®š
-            RectTransform rectT = m_fadePanel.GetComponent<RectTransform>();
-            if (rectT != null)
-            {
-                // AnchorMinã¨AnchorMaxã‚’Vector2.zeroã¨Vector2.oneã«è¨­å®šã—ã€ç”»é¢å…¨ä½“ã‚’è¦†ã†ã‚ˆã†ã«ã™ã‚‹
-                rectT.anchorMin = Vector2.zero;
-                rectT.anchorMax = Vector2.one;
-                rectT.sizeDelta = Vector2.zero; // sizeDeltaã‚’ã‚¼ãƒ­ã«è¨­å®š
-                rectT.anchoredPosition = Vector2.zero; // anchoredPositionã‚’ã‚¼ãƒ­ã«è¨­å®š
-                m_fadePanel.transform.SetAsLastSibling(); // æœ€ã‚‚æ‰‹å‰ï¼ˆæœ€ä¸Šå±¤ï¼‰ã«æç”»ã•ã‚Œã‚‹ã‚ˆã†ã«ã™ã‚‹
-                Debug.Log("GlobalFadePanelã®RectTransformã‚’ç”»é¢å…¨ä½“ã«å†è¨­å®šã—ã¾ã—ãŸã€‚");
-            }
-            // æ—¢å­˜ã®ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ã«ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ãªã„å ´åˆã€Inspectorã‹ã‚‰å‰²ã‚Šå½“ã¦ã‚‰ã‚ŒãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’è¨­å®š
-            if (m_fadePanel.sprite == null && m_fadePanelSprite != null)
-            {
-                m_fadePanel.sprite = m_fadePanelSprite;
-                Debug.Log("GameManager: æ—¢å­˜ã®ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ã«Inspectorã‹ã‚‰å‰²ã‚Šå½“ã¦ã‚‰ã‚ŒãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’è¨­å®šã—ã¾ã—ãŸã€‚");
-            }
-        }
-        // ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ã®åˆæœŸçŠ¶æ…‹ã‚’ãƒ­ã‚°å‡ºåŠ›
-        if (m_fadePanel != null)
-        {
-            Debug.Log($"SetupPermanentUIElements: m_fadePanelã®åˆæœŸè‰²: {m_fadePanel.color}, ã‚¢ã‚¯ãƒ†ã‚£ãƒ–çŠ¶æ…‹: {m_fadePanel.gameObject.activeSelf}, ã‚½ãƒ¼ãƒˆé †: {m_fadePanel.canvas.sortingOrder}");
+            Debug.LogWarning("GameManager: SetScoreUIActive - scorePanel‚ªnull‚Å‚·B");
         }
     }
 
-    // ç”»é¢ãŒå®Œå…¨ã«é»’ããªã‚‹ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆå‡¦ç†
-    private IEnumerator FadeOutAndLoadScene(string sceneName)
+    // ƒQ[ƒ€‚ğI—¹‚·‚é
+    public void QuitGame()
     {
-        if (currentFadeCoroutine != null)
-        {
-            StopCoroutine(currentFadeCoroutine);
-            Debug.Log("FadeOutAndLoadScene: æ—¢å­˜ã®ãƒ•ã‚§ãƒ¼ãƒ‰ã‚³ãƒ«ãƒ¼ãƒãƒ³ã‚’åœæ­¢ã—ã¾ã—ãŸã€‚");
-        }
-
-        if (m_fadePanel == null)
-        {
-            Debug.LogWarning("Fade Panel is null, directly loading scene.");
-            SceneManager.LoadScene(sceneName); // Singleãƒ¢ãƒ¼ãƒ‰ã§ãƒ­ãƒ¼ãƒ‰
-            yield break;
-        }
-
-        Debug.Log("FadeOutAndLoadScene: ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆé–‹å§‹ã€‚");
-        m_fadePanel.gameObject.SetActive(true);
-        float timer = 0f;
-        Color panelColor = m_fadePanel.color;
-        panelColor.a = 0f; // ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆé–‹å§‹æ™‚ã¯é€æ˜
-        m_fadePanel.color = panelColor; // è‰²ã‚’é€æ˜ã«è¨­å®šã—ç›´ã™
-        Debug.Log($"FadeOutAndLoadScene: é–‹å§‹æ™‚ã®ãƒ‘ãƒãƒ«è‰²: {m_fadePanel.color}, ã‚¢ã‚¯ãƒ†ã‚£ãƒ–çŠ¶æ…‹: {m_fadePanel.gameObject.activeSelf}");
-
-        while (timer < m_fadeDuration)
-        {
-            timer += Time.deltaTime;
-            panelColor.a = Mathf.Lerp(0f, 1f, timer / m_fadeDuration);
-            m_fadePanel.color = panelColor;
-            Debug.Log($"FadeOut: Alpha={panelColor.a:F2}"); // ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆä¸­ã®ã‚¢ãƒ«ãƒ•ã‚¡å€¤ãƒ­ã‚°
-            yield return null;
-        }
-        panelColor.a = 1f; // å®Œå…¨ã«é»’
-        m_fadePanel.color = panelColor;
-        Debug.Log($"FadeOutAndLoadScene: ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆå®Œäº†æ™‚ã®ãƒ‘ãƒãƒ«è‰²: {m_fadePanel.color}, ã‚¢ã‚¯ãƒ†ã‚£ãƒ–çŠ¶æ…‹: {m_fadePanel.gameObject.activeSelf}");
-
-        SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
-    }
-
-    // ç”»é¢ãŒå¾ã€…ã«æ˜ã‚‹ããªã‚‹ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³å‡¦ç†
-    private IEnumerator FadeIn(float duration)
-    {
-        if (currentFadeCoroutine != null)
-        {
-            StopCoroutine(currentFadeCoroutine);
-            Debug.Log("FadeIn: æ—¢å­˜ã®ãƒ•ã‚§ãƒ¼ãƒ‰ã‚³ãƒ«ãƒ¼ãƒãƒ³ã‚’åœæ­¢ã—ã¾ã—ãŸã€‚");
-        }
-
-        if (m_fadePanel == null)
-        {
-            Debug.LogWarning("Fade Panel is null, cannot perform FadeIn.");
-            yield break;
-        }
-
-        Debug.Log("FadeIn: ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³é–‹å§‹ã€‚");
-        m_fadePanel.gameObject.SetActive(true); // ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ‘ãƒãƒ«ã‚’ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã«ã™ã‚‹
-
-        float timer = 0f;
-        Color panelColor = m_fadePanel.color;
-        panelColor.a = 1f; // æœ€åˆã¯å®Œå…¨ã«é»’
-        m_fadePanel.color = panelColor;
-        Debug.Log($"FadeIn: ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³é–‹å§‹æ™‚ã®ãƒ‘ãƒãƒ«è‰²: {m_fadePanel.color}, ã‚¢ã‚¯ãƒ†ã‚£ãƒ–çŠ¶æ…‹: {m_fadePanel.gameObject.activeSelf}");
-
-        while (timer < duration)
-        {
-            timer += Time.deltaTime;
-            panelColor.a = Mathf.Lerp(1f, 0f, timer / duration);
-            m_fadePanel.color = panelColor;
-            Debug.Log($"FadeIn: Alpha={panelColor.a:F2}"); // ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ä¸­ã®ã‚¢ãƒ«ãƒ•ã‚¡å€¤ãƒ­ã‚°
-            yield return null;
-        }
-        panelColor.a = 0f; // å®Œå…¨ã«é€æ˜
-        m_fadePanel.color = panelColor;
-        m_fadePanel.gameObject.SetActive(false); // ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³å®Œäº†å¾Œã€ãƒ‘ãƒãƒ«ã‚’éã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã«ã™ã‚‹
-        Debug.Log($"FadeIn: ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³å®Œäº†æ™‚ã®ãƒ‘ãƒãƒ«è‰²: {m_fadePanel.color}, ã‚¢ã‚¯ãƒ†ã‚£ãƒ–çŠ¶æ…‹: {m_fadePanel.gameObject.activeSelf}");
-        currentFadeCoroutine = null; // ã‚³ãƒ«ãƒ¼ãƒãƒ³ãŒçµ‚äº†ã—ãŸã®ã§å‚ç…§ã‚’ã‚¯ãƒªã‚¢
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+        Debug.Log("GameManager: ƒQ[ƒ€‚ğI—¹‚µ‚Ü‚·B");
     }
 }

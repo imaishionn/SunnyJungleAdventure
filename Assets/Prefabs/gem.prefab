@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2486063676030184631}
   m_Layer: 2
   m_Name: gem
-  m_TagString: Untagged
+  m_TagString: Gem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -120,7 +120,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c53461a080ec914fb5403e834e04faa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Point: 30
+  scoreValue: 100
+  collectSound: {fileID: 8300000, guid: c2e49be144eeb76419fb91da9314ecc8, type: 3}
+  deactivateDelay: 0.1
 --- !u!58 &2486063676030184631
 CircleCollider2D:
   m_ObjectHideFlags: 0

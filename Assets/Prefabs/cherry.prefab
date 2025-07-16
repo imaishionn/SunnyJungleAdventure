@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3797132304685203564}
   m_Layer: 0
   m_Name: cherry
-  m_TagString: Untagged
+  m_TagString: Gem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -120,7 +120,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c53461a080ec914fb5403e834e04faa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Point: 100
+  scoreValue: 100
+  collectSound: {fileID: 8300000, guid: c2e49be144eeb76419fb91da9314ecc8, type: 3}
 --- !u!58 &3797132304685203564
 CircleCollider2D:
   m_ObjectHideFlags: 0

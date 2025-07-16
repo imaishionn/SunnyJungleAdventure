@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement; // シーン管理のために必要
 using UnityEngine.EventSystems;    // UIイベントシステムのために必要
+using UnityEngine.UI;              // Buttonコンポーネントを操作するために必要
 using Debug = UnityEngine.Debug;   // Debugの曖昧な参照を解消するため
 
 public class GameOverManager : MonoBehaviour
@@ -11,22 +12,31 @@ public class GameOverManager : MonoBehaviour
     // シーン遷移中フラグ
     private bool m_isTransitioning = false;
 
+    // 現在アクティブなゲームオーバーボタン（On Clickイベントに紐付けられている想定）
+    private Button m_gameOverButton; // ★追加：ボタンへの参照
+
     // スクリプトが有効になった最初のフレームで呼び出される
     void Start()
     {
         Debug.Log("GameOverManager: Startが呼び出されました。");
-        // ゲームパッドでのUI操作のため、指定されたUI要素にフォーカスを設定する
+
+        // firstSelected がボタンであることを期待し、参照を取得する
         if (firstSelected != null)
         {
-            EventSystem.current.SetSelectedGameObject(null); // 一旦現在の選択を解除
-            EventSystem.current.SetSelectedGameObject(firstSelected); // 指定されたオブジェクトを選択状態にする
+            m_gameOverButton = firstSelected.GetComponent<Button>();
+            if (m_gameOverButton == null)
+            {
+                Debug.LogWarning("GameOverManager: firstSelectedにButtonコンポーネントが見つかりません。");
+            }
+
+            EventSystem.current.SetSelectedGameObject(null);
+            EventSystem.current.SetSelectedGameObject(firstSelected);
             Debug.Log($"GameOverManager: UIの初期選択を '{firstSelected.name}' に設定しました。");
         }
         else
         {
             Debug.LogWarning("GameOverManager: firstSelectedが割り当てられていません。");
         }
-        m_isTransitioning = false; // シーンロード完了時に遷移フラグをリセット
     }
 
     // 毎フレーム呼び出される
@@ -36,7 +46,8 @@ public class GameOverManager : MonoBehaviour
         if (m_isTransitioning) return;
 
         // Submitボタン（Aボタン/Enterキー/Spaceキーなど）が押されたらタイトルに戻る処理を実行
-        if (Input.GetButtonDown("Submit"))
+        // ここでは、ボタンがインタラクト可能であることも条件に追加
+        if (Input.GetButtonDown("Submit") && m_gameOverButton != null && m_gameOverButton.interactable)
         {
             Debug.Log("GameOverManager: Submitボタンが押されました。");
             OnClickReturnTitle();
@@ -56,18 +67,25 @@ public class GameOverManager : MonoBehaviour
         m_isTransitioning = true; // 遷移中フラグを立てる
         Debug.Log("GameOverManager: タイトルに戻る処理を開始します。");
 
+        // ボタンが有効な場合、即座にインタラクト不能にする
+        if (m_gameOverButton != null)
+        {
+            m_gameOverButton.interactable = false; // ★追加：ボタンを非活性化
+            Debug.Log("GameOverManager: 登録ボタンを非活性化しました。");
+        }
+
         Time.timeScale = 1f; // 念のため、ゲームの時間を通常の速度に戻す（ポーズ解除）
 
         // GameManagerを通してタイトルシーンへフェードアウトしながら遷移する
         if (GameManager.instance != null)
         {
-            GameManager.instance.LoadSceneWithFade("TitleScene");
+            GameManager.instance.LoadSceneWithFade(GameManager.TitleSceneName); // 定数を使用
         }
         else
         {
             // GameManagerがない場合のフォールバックとして、直接シーンをロード
             Debug.LogError("GameOverManager: GameManager.instanceが見つかりません！直接TitleSceneをロードします。");
-            SceneManager.LoadScene("TitleScene");
+            SceneManager.LoadScene(GameManager.TitleSceneName); // 定数を使用
         }
     }
 }
