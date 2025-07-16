@@ -9,6 +9,7 @@ TagManager:
   - Goal
   - BGM
   - ScoreText
+  - Gem
   layers:
   - Default
   - TransparentFX
@@ -16,8 +17,8 @@ TagManager:
   - Ground
   - Water
   - UI
-  - 
-  - 
+  - Enemy
+  - Player
   - 
   - 
   - 
@@ -45,4 +46,7 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Static
+    uniqueID: 2148889149
     locked: 0

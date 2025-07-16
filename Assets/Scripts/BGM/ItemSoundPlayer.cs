@@ -1,5 +1,6 @@
+using System.Diagnostics;
 using UnityEngine;
-using Debug = UnityEngine.Debug; // Debugの曖昧な参照を解消するため
+ using Debug = UnityEngine.Debug; // Debugの曖昧な参照を解消するため -> 不要なので削除
 
 /// <summary>
 /// アイテム獲得時やジャンプ時などの効果音を再生するためのスクリプト。
@@ -26,7 +27,7 @@ public class ItemSoundPlayer : MonoBehaviour
         {
             audioSource.PlayOneShot(gemClip);
             audioSource.PlayOneShot(gemClip, 0.4f); // 2回目の再生 (音量0.4f)
-            Debug.Log("ItemSoundPlayer: 宝石獲得音を再生しました。");
+            // Debug.Log("ItemSoundPlayer: 宝石獲得音を再生しました。"); // デバッグログ削除
         }
         else
         {
@@ -43,7 +44,7 @@ public class ItemSoundPlayer : MonoBehaviour
         if (audioSource != null && jumpClip != null)
         {
             audioSource.PlayOneShot(jumpClip);
-            Debug.Log("ItemSoundPlayer: ジャンプ音を再生しました。");
+            // Debug.Log("ItemSoundPlayer: ジャンプ音を再生しました。"); // デバッグログ削除
         }
         else
         {

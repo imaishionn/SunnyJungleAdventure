@@ -11,11 +11,11 @@ GameObject:
   - component: {fileID: 283787232873110611}
   - component: {fileID: 283787232873110612}
   - component: {fileID: 283787232873110613}
+  - component: {fileID: 1861547009282261844}
+  - component: {fileID: 4481031191634856757}
   - component: {fileID: 283787232873110609}
   - component: {fileID: 283787232873110610}
   - component: {fileID: -3132937000123282896}
-  - component: {fileID: 1861547009282261844}
-  - component: {fileID: 4481031191634856757}
   m_Layer: 0
   m_Name: Dino
   m_TagString: Enemy
@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 671a594cd6415e04ba0bf26a8eae3621, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
+  m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 0.32, y: 0.26}
@@ -111,6 +111,41 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1861547009282261844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 283787232873110614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c4101a09f37fe142b4c1bcafc9e4740, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  knockDownClip: {fileID: 8300000, guid: b7db36b7c4a149e44a31a7586874f044, type: 3}
+  DetectRange: 10
+  RunSpeed: 4
+  PatrolDistance: 10
+  m_player: {fileID: 0}
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  wallCheckDistance: 0.8
+  wallCheckOffset: {x: 0, y: 1}
+--- !u!114 &4481031191634856757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 283787232873110614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5991d52fefd0ca44f889db35a6d2984f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  knockDownClip: {fileID: 8300000, guid: b7db36b7c4a149e44a31a7586874f044, type: 3}
 --- !u!70 &283787232873110609
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -120,12 +155,12 @@ CapsuleCollider2D:
   m_GameObject: {fileID: 283787232873110614}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: eb992ea6638f85b4da37b0b6371c6310, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.3, y: 0.3}
+  m_Size: {x: 0.25, y: 0.25}
   m_Direction: 0
 --- !u!50 &283787232873110610
 Rigidbody2D:
@@ -140,9 +175,9 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0.5
+  m_LinearDrag: 1
   m_AngularDrag: 0
-  m_GravityScale: 0
+  m_GravityScale: 1
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -244,33 +279,3 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &1861547009282261844
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 283787232873110614}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c4101a09f37fe142b4c1bcafc9e4740, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  knockDownClip: {fileID: 8300000, guid: b7db36b7c4a149e44a31a7586874f044, type: 3}
-  DetectRange: 10
-  RunSpeed: 5
-  PatrolDistance: 4
-  m_player: {fileID: 0}
---- !u!114 &4481031191634856757
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 283787232873110614}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5991d52fefd0ca44f889db35a6d2984f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  knockDownClip: {fileID: 8300000, guid: b7db36b7c4a149e44a31a7586874f044, type: 3}

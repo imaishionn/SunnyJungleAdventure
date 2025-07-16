@@ -150,7 +150,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 1, g: 1, b: 1, a: 1}
+  m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0.003921569}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -468,7 +468,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   clickSound: {fileID: 8300000, guid: 76b96f3363f30de47a810dc4f7d5d86f, type: 3}
-  sfxVolume: 0.7
+  selectSound: {fileID: 0}
+  sfxVolume: 0.5
+  targetSceneName: TitleScene
 --- !u!1 &1194912353
 GameObject:
   m_ObjectHideFlags: 0

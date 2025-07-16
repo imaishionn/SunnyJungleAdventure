@@ -1,12 +1,7 @@
 using UnityEngine;
-using Debug = UnityEngine.Debug; // Debugの曖昧な参照を解消するため
+using Debug = UnityEngine.Debug;
 
-/// <summary>
-/// Dino（恐竜）の敵の動作を制御します。
-/// プレイヤーを検知すると追尾し、それ以外はパトロールします。
-/// 死亡時はベースのEnemyクラスのDieメソッドを呼び出します。
-/// </summary>
-public class Dino : Enemy // Enemyクラスを継承
+public class Dino : Enemy
 {
     [Header("プレイヤー検知距離")]
     [SerializeField] float DetectRange = 5f;
@@ -17,101 +12,146 @@ public class Dino : Enemy // Enemyクラスを継承
     [Header("パトロール移動範囲（左右）")]
     [SerializeField] float PatrolDistance = 3f;
 
-    [SerializeField] Transform m_player; // ★このフィールドにプレイヤーのTransformを割り当てます★
+    [SerializeField] Transform m_player;
 
-    private bool m_isRunning = false;
+    [Header("壁検知設定")]
+    [SerializeField] LayerMask wallLayer;
+    [SerializeField] float wallCheckDistance = 0.3f;
+    [SerializeField] Vector2 wallCheckOffset = new Vector2(0, 0.1f);
+
     private Vector2 m_startPos;
-    private int m_patrolDirection = 1; // 1:右, -1:左
+    private int m_patrolDirection = 1;
 
-    protected override void Awake() // StartからAwakeに変更 (ベースクラスのAwakeを呼び出す)
+    private float m_targetVelocityX = 0f;
+
+    private bool IsFacingRight => transform.localScale.x > 0;
+
+    protected override void Awake()
     {
-        base.Awake(); // 親クラス(Enemy)のAwakeを呼び出す
+        base.Awake();
 
         if (m_rb != null)
         {
-            m_rb.freezeRotation = true; // 回転を固定
+            m_rb.freezeRotation = true;
         }
 
-        m_startPos = transform.position; // 初期位置を保存
+        m_startPos = transform.position;
 
-        // m_playerがInspectorで割り当てられていない場合のみ、タグで検索を試みる
         if (m_player == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
                 m_player = playerObj.transform;
-            else
-                Debug.LogWarning("Dino: プレイヤーオブジェクトが見つかりません。タグ 'Player' を確認してください。");
+        }
+
+        if (wallLayer.value == 0)
+        {
+            Debug.LogWarning("Dino: Wall Layerが設定されていません！衝突検知が正しく行われない可能性があります。");
         }
     }
 
-    void Update()
+    protected override void FixedUpdate()
     {
-        if (m_isDead || m_rb == null || !m_rb.simulated) return; // 死亡中、Rigidbodyがない、または物理演算が無効な場合は処理を終了
+        base.FixedUpdate(); // EnemyクラスのFixedUpdateも呼び出す
 
-        float distance = m_player != null ? Vector2.Distance(transform.position, m_player.position) : Mathf.Infinity;
-
-        if (distance < DetectRange)
+        // ゲームが停止状態（ゲームオーバー、クリアなど）または敵が死亡している場合は処理を停止
+        if ((GameManager.instance != null &&
+             (GameManager.instance.GetCurrentGameState() == GameManager.GameState.enGameState_GameOver || // ★修正: GetState() -> GetCurrentGameState()★
+              GameManager.instance.GetCurrentGameState() == GameManager.GameState.enGameState_Clear)) || m_isDead) // ★修正: GetState() -> GetCurrentGameState()★
         {
-            RunToPlayer();
+            if (m_animator != null)
+            {
+                m_animator.SetBool("run", false);
+            }
+            if (m_rb != null)
+            {
+                m_rb.velocity = Vector2.zero;
+            }
+            return;
+        }
+
+        if (m_rb == null || !m_rb.simulated)
+        {
+            if (m_rb != null) m_rb.velocity = Vector2.zero;
+            if (m_animator != null) m_animator.SetBool("run", false);
+            return;
+        }
+
+        float desiredMoveDirectionX = 0f;
+        float currentFacingDirectionX = IsFacingRight ? 1f : -1f;
+
+        // 壁検知
+        Vector2 checkOrigin = (Vector2)m_collider.bounds.center + new Vector2(m_collider.bounds.extents.x * currentFacingDirectionX, wallCheckOffset.y);
+        RaycastHit2D hit = Physics2D.Raycast(checkOrigin, Vector2.right * currentFacingDirectionX, wallCheckDistance, wallLayer);
+
+        if (hit.collider != null)
+        {
+            m_patrolDirection *= -1; // 方向転換
+            desiredMoveDirectionX = m_patrolDirection;
         }
         else
         {
-            Patrol();
-        }
-    }
+            float distanceToPlayer = m_player != null ? Vector2.Distance(transform.position, m_player.position) : Mathf.Infinity;
 
-    void RunToPlayer()
-    {
-        Vector2 direction = (m_player.position - transform.position).normalized;
-        if (m_rb != null)
-        {
-            Vector2 velocity = new Vector2(direction.x * RunSpeed, m_rb.velocity.y);
-            m_rb.velocity = velocity;
-        }
-
-        Flip(direction.x);
-        SetRunningAnimation(true);
-    }
-
-    void Patrol()
-    {
-        float distanceFromStart = transform.position.x - m_startPos.x;
-
-        if (Mathf.Abs(distanceFromStart) >= PatrolDistance)
-        {
-            m_patrolDirection *= -1; // 方向転換
-        }
-
-        if (m_rb != null)
-        {
-            Vector2 velocity = new Vector2(m_patrolDirection * RunSpeed, m_rb.velocity.y);
-            m_rb.velocity = velocity;
-        }
-
-        Flip(m_patrolDirection);
-        SetRunningAnimation(true);
-    }
-
-    void Flip(float dirX)
-    {
-        if (dirX != 0)
-        {
-            Vector3 scale = transform.localScale;
-            scale.x = Mathf.Abs(scale.x) * Mathf.Sign(dirX) * -1f;
-            transform.localScale = scale;
-        }
-    }
-
-    void SetRunningAnimation(bool isRunning)
-    {
-        if (m_isRunning != isRunning)
-        {
-            m_isRunning = isRunning;
-            if (m_animator != null)
+            if (distanceToPlayer < DetectRange)
             {
-                m_animator.SetBool("run", isRunning);
+                // プレイヤーを検知したらプレイヤーに向かって移動
+                desiredMoveDirectionX = Mathf.Sign(m_player.position.x - transform.position.x);
+            }
+            else
+            {
+                // パトロール範囲の端に達したら方向転換
+                float distanceFromStart = transform.position.x - m_startPos.x;
+
+                if (Mathf.Abs(distanceFromStart) >= PatrolDistance)
+                {
+                    m_patrolDirection *= -1;
+                    m_startPos = transform.position; // 新しいパトロール開始位置を現在の位置にする（必要であれば）
+                }
+                desiredMoveDirectionX = m_patrolDirection;
             }
         }
+
+        m_targetVelocityX = desiredMoveDirectionX * RunSpeed;
+
+        // 移動方向に応じてスプライトを反転
+        if ((m_targetVelocityX > 0 && !IsFacingRight) || (m_targetVelocityX < 0 && IsFacingRight))
+        {
+            FlipSprite();
+        }
+
+        m_rb.velocity = new Vector2(m_targetVelocityX, m_rb.velocity.y);
+
+        if (m_animator != null)
+        {
+            m_animator.SetBool("run", Mathf.Abs(m_rb.velocity.x) > 0.05f); // 速度が一定以上あれば走るアニメーション
+        }
+    }
+
+    void FlipSprite()
+    {
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
+    }
+
+    void OnDrawGizmos()
+    {
+        if (m_collider == null) return;
+
+        // 壁検知用のGizmo
+        Gizmos.color = Color.red;
+        float currentFacingDirectionX = IsFacingRight ? 1f : -1f;
+        Vector2 checkOrigin = (Vector2)m_collider.bounds.center + new Vector2(m_collider.bounds.extents.x * currentFacingDirectionX, wallCheckOffset.y);
+        Gizmos.DrawLine(checkOrigin, checkOrigin + Vector2.right * currentFacingDirectionX * wallCheckDistance);
+
+        // コライダーのバウンディングボックス
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(m_collider.bounds.center, m_collider.bounds.size);
+
+        // パトロール範囲のGizmo
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(m_startPos + Vector2.left * PatrolDistance, m_startPos + Vector2.left * PatrolDistance + Vector2.up * 1f);
+        Gizmos.DrawLine(m_startPos + Vector2.right * PatrolDistance, m_startPos + Vector2.right * PatrolDistance + Vector2.up * 1f);
     }
 }

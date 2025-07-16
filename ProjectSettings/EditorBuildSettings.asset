@@ -12,11 +12,17 @@ EditorBuildSettings:
     path: Assets/Scenes/TitleScene.unity
     guid: 536974f101d6dea4f8f8b56c870a8a26
   - enabled: 1
+    path: Assets/Scenes/StageSelect.unity
+    guid: 670d9234b3b82fa4e806fde258629e93
+  - enabled: 1
     path: Assets/Scenes/UI.unity
     guid: f95d8dfc5e11f074da819f80f2cabe26
   - enabled: 1
     path: Assets/Scenes/Demo_tileset.unity
     guid: 452af763b907cd140a1dca1564ae7b2b
+  - enabled: 1
+    path: Assets/Scenes/Demo_tileset2.unity
+    guid: beef2680cfe1dc9469f629eba7db6301
   - enabled: 1
     path: Assets/Scenes/GameOverScene.unity
     guid: 1adb9a4c50757d14e9f9a5820931b5a6
