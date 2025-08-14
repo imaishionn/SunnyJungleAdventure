@@ -3,10 +3,10 @@ using System.Collections;
 using UnityEngine.SceneManagement; // シーン管理のために必要
 using Debug = UnityEngine.Debug;   // Debugの曖昧な参照を解消するため
 
-public class BGMManager : MonoBehaviour
+public class BGM_Manager : MonoBehaviour
 {
     // シングルトンインスタンス
-    public static BGMManager instance;
+    public static BGM_Manager instance;
 
     // 各シーンのBGMクリップをInspectorから割り当てるためのフィールド
     [SerializeField, Header("タイトルBGM")]

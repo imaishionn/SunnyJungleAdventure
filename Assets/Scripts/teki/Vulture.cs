@@ -1,7 +1,7 @@
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-public class Vulture : Enemy
+public class Vulture : Enemy // Enemyを継承
 {
     [Header("プレイヤー検知距離")]
     [SerializeField] float DetectRange = 5f;
@@ -10,7 +10,6 @@ public class Vulture : Enemy
     [SerializeField] float FlySpeed = 5f;
 
     [SerializeField] Transform m_player;
-
     private bool m_isFlying = false;
 
     protected override void Awake()
@@ -22,39 +21,30 @@ public class Vulture : Enemy
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
                 m_player = playerObj.transform;
+            else
+            {
+                Debug.LogWarning("Vulture: 'Player'タグを持つGameObjectが見つかりません。", this);
+            }
         }
 
         if (m_rb != null)
         {
-            m_rb.gravityScale = 0f; // 重力無効
-            m_rb.drag = 1f; // 空気抵抗
+            m_rb.gravityScale = 0f;
+            m_rb.drag = 1f;
         }
     }
 
-    protected override void FixedUpdate()
+    protected void FixedUpdate()
     {
-        base.FixedUpdate(); // EnemyクラスのFixedUpdateも呼び出す
-
-        // ゲームが停止状態（ゲームオーバー、クリアなど）または敵が死亡している場合は処理を停止
-        if ((GameManager.instance != null &&
-             (GameManager.instance.GetCurrentGameState() == GameManager.GameState.enGameState_GameOver || // ★修正: GetState() -> GetCurrentGameState()★
-              GameManager.instance.GetCurrentGameState() == GameManager.GameState.enGameState_Clear)) || m_isDead) // ★修正: GetState() -> GetCurrentGameState()★
-        {
-            if (m_animator != null)
-            {
-                m_animator.SetBool("fly", false);
-            }
-            if (m_rb != null)
-            {
-                m_rb.velocity = Vector2.zero;
-            }
-            return;
-        }
+        if (IsDead) return;
 
         if (m_player == null || m_rb == null)
         {
             if (m_rb != null) m_rb.velocity = Vector2.zero;
-            if (m_animator != null) m_animator.SetBool("fly", false);
+            if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
+            {
+                m_animator.SetBool("fly", false);
+            }
             return;
         }
 
@@ -66,7 +56,7 @@ public class Vulture : Enemy
 
             if (!m_isFlying)
             {
-                if (m_animator != null)
+                if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
                 {
                     m_animator.SetBool("fly", true);
                 }
@@ -77,14 +67,14 @@ public class Vulture : Enemy
         {
             if (m_isFlying)
             {
-                if (m_animator != null)
+                if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
                 {
                     m_animator.SetBool("fly", false);
                 }
                 m_isFlying = false;
             }
 
-            m_rb.velocity = Vector2.zero; // 範囲外では停止
+            m_rb.velocity = Vector2.zero;
         }
     }
 
@@ -93,7 +83,6 @@ public class Vulture : Enemy
         Vector2 direction = (m_player.position - transform.position).normalized;
         m_rb.velocity = direction * FlySpeed;
 
-        // プレイヤーの方向に応じてスプライトを反転
         if (direction.x > 0 && transform.localScale.x < 0)
         {
             FlipSprite();

@@ -1,46 +1,41 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // SceneManagerを使用するため
-using Debug = UnityEngine.Debug; // Debugの曖昧な参照を解消するため
-
-// using System.Diagnostics; // この行は削除します。
+// using System.Diagnostics; // ★この行があったら削除またはコメントアウト！★
 
 public class Goal : MonoBehaviour
 {
-    [SerializeField, Header("次のシーン名")]
-    private string nextSceneName = "GameClear"; // デフォルトはGameClear
+    [SerializeField, Header("ゲームクリア時に遷移するシーン名")]
+    private string gameClearSceneName = "GameClearScene"; // GameManagerの定数を使用するように推奨
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log($"Goal OnTriggerEnter2D: {collision.gameObject.name} と衝突しました。");
-
-        // プレイヤーとの衝突か確認（プレイヤーに"Player"タグが付いていることを前提とします）
-        if (collision.gameObject.CompareTag("Player"))
+        // プレイヤーがゴールに触れたら
+        if (other.CompareTag("Player"))
         {
-            Debug.Log("Goal: プレイヤーがゴールに到達しました！");
+            UnityEngine.Debug.Log("Goal: プレイヤーがゴールしました！", this);
 
-            // プレイヤーの動きを止める（例：PlayerMoveスクリプトを無効化）
-            var playerMove = collision.GetComponent<PlayerMove>();
-            if (playerMove != null)
-            {
-                playerMove.enabled = false;
-                Debug.Log("Goal: プレイヤーの動きを停止しました。");
-            }
-            else
-            {
-                Debug.LogWarning("Goal: プレイヤーにPlayerMoveスクリプトが見つかりませんでした。");
-            }
-
-            // GameManagerのインスタンスが存在するか確認し、シーン遷移を要求
+            // GameManagerが存在するか確認
             if (GameManager.instance != null)
             {
-                Debug.Log($"Goal: {nextSceneName} シーンへ遷移します。");
-                GameManager.instance.LoadSceneWithFade(nextSceneName);
+                // GameManagerの現在の状態がプレイ中（Gameplay）であることを確認
+                // これにより、既にゲームオーバーやクリア状態になっている場合は多重処理を防ぐ
+                if (GameManager.instance.GetCurrentGameState() == GameManager.GameState.Gameplay)
+                {
+                    UnityEngine.Debug.Log("Goal: GameManagerにゲームクリアを通知します。", this);
+                    GameManager.instance.SetState(GameManager.GameState.StageClear);
+                    GameManager.instance.LoadSceneWithFade(gameClearSceneName);
+                }
+                else
+                {
+                    // 修正点: ここに閉じ丸かっこ`)`を追加
+                    UnityEngine.Debug.Log("Goal: ゲームが既にプレイ状態でないため、ゲームクリア処理をスキップしました。", this);
+                }
             }
             else
             {
-                Debug.LogError("Goal: GameManager.instanceが見つかりません！シーン遷移できません。直接シーンをロードします。");
-                // GameManagerが見つからない場合のフォールバック（デバッグ用）
-                SceneManager.LoadScene(nextSceneName, LoadSceneMode.Single);
+                // GameManagerが存在しない場合のフォールバック（望ましくないが、エラー回避のため）
+                UnityEngine.Debug.LogWarning("Goal: GameManagerのインスタンスが見つかりません。直接シーンをロードします。", this);
+                UnityEngine.Debug.Log($"Goal: シーン'{gameClearSceneName}'をロードします。", this);
+                UnityEngine.SceneManagement.SceneManager.LoadScene(gameClearSceneName);
             }
         }
     }

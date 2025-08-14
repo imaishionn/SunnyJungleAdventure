@@ -1,68 +1,69 @@
-using System.Collections; // コルーチンのために必要
 using UnityEngine;
-using UnityEngine.EventSystems; // EventSystem を使うために追加
-using UnityEngine.SceneManagement;
-using UnityEngine.UI; // Button クラスを使うために追加
-using Debug = UnityEngine.Debug; // ここが重要: Debugの曖昧な参照を解消するため、UnityEngine.Debugを明示的に指定
+using UnityEngine.EventSystems; // ボタンの初期選択用
+using UnityEngine.SceneManagement; // SceneManager を使用 (直接呼び出しは減らすが念のため)
+using UnityEngine.UI;
 
-/// <summary>
-/// タイトルシーンのUIボタンのクリックイベントを処理し、
-/// GameManagerを通してゲームプレイシーンへ遷移するためのスクリプト。
-/// </summary>
+// Debugの曖昧な参照を解消するため明示的に指定
+using Debug = UnityEngine.Debug;
+
 public class TitleSceneManager : MonoBehaviour
 {
-    [SerializeField, Header("初期選択ボタン")]
-    private Button startButton; // STARTボタンへの参照をInspectorで設定
+    [SerializeField] private Button startButton; // インスペクターで設定してください
+    [SerializeField] private GameObject titleCanvas; // タイトルシーンのメインCanvas（表示/非表示用）
 
-    // あなたのステージ選択シーン名に設定してください
-    [SerializeField, Header("ステージ選択シーン名")]
-    private string stageSelectSceneName = "StageSelect"; // 例: "StageSelectScene" や "LevelSelect" など
-
-    void Start()
+    private void Start()
     {
-        // シーンロード時に初期ボタンを選択状態にする
-        if (EventSystem.current != null && startButton != null)
+        // GameManagerからのAwake/OnSceneLoadedで状態は既にTitleに設定されているはず
+        // なので、ここでSetStateを呼び出す必要はないが、念のため状態確認はOK
+ 
+        if (titleCanvas != null)
         {
-            EventSystem.current.SetSelectedGameObject(startButton.gameObject);
+            // 既にフェードイン完了後なので、Startではアクティブにしておく
+            // フェードインはGameManagerのOnSceneLoadedで制御されるため、
+            // ここでCanvasのActive/Deactiveを直接制御する必要は基本的にない
+            titleCanvas.SetActive(true);
+  
         }
-        else if (EventSystem.current == null)
+        else
         {
-            Debug.LogError("TitleSceneManager: EventSystem.current が見つかりません。GameManagerがEventSystemを作成しているか確認してください。");
+            Debug.LogError("TitleSceneManager: Title Canvas が割り当てられていません！", this);
         }
-        else if (startButton == null)
+
+
+        if (startButton != null)
         {
-            Debug.LogWarning("TitleSceneManager: startButton がInspectorで割り当てられていません。");
+            startButton.onClick.AddListener(OnStartButtonClicked);
+
+
+            // ゲームパッド/キーボード操作のために初期選択を設定
+            // ボタンにButtonSoundEffectが付いている場合、ここでSetSelectedGameObjectを呼ぶと
+            // OnSelectが発火してサウンドが鳴る可能性があります。
+            // 必要に応じて、サウンド再生ロジックを調整してください。
+            if (EventSystem.current != null)
+            {
+                EventSystem.current.SetSelectedGameObject(startButton.gameObject);
+                // Debug.Log("TitleSceneManager: 初期選択をStartボタンに設定しました。", this); // 削除
+            }
+        }
+        else
+        {
+            Debug.LogError("TitleSceneManager: Startボタンが割り当てられていません！", this);
         }
     }
 
-    /// <summary>
-    /// STARTボタンがクリックされたときに呼び出されます。
-    /// ステージ選択シーンへ遷移します。
-    /// </summary>
-    public void OnStartButtonClicked()
+    private void OnStartButtonClicked()
     {
-        // 現在選択されているUI要素をクリア
-        if (EventSystem.current != null)
+
+
+        // GameManagerのフェード付きシーンロードを呼び出す
+        if (GameManager.instance != null)
         {
-            EventSystem.current.SetSelectedGameObject(null);
+            GameManager.instance.LoadSceneWithFade(GameManager.instance.StageSelectSceneName);
         }
-
-        // コルーチンを開始してGameManagerの準備を待つ
-        StartCoroutine(LoadStageSelectSceneWhenReady());
-    }
-
-    /// <summary>
-    /// GameManagerのインスタンスが準備できるまで待機し、その後ステージ選択シーン遷移を行うコルーチン。
-    /// </summary>
-    private IEnumerator LoadStageSelectSceneWhenReady()
-    {
-        // GameManager.instanceがnullでなくなるまで待機
-        while (GameManager.instance == null)
+        else
         {
-            yield return null; // 1フレーム待つ
+            Debug.LogError("TitleSceneManager: GameManagerが見つかりません！フェードなしで遷移します。", this);
+            SceneManager.LoadScene(GameManager.instance.StageSelectSceneName); // フォールバック
         }
-
-        // ステージ選択シーンへ遷移
-        GameManager.instance.LoadSceneWithFade(stageSelectSceneName);
     }
 }

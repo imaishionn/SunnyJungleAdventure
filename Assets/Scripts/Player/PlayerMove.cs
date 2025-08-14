@@ -1,107 +1,88 @@
-﻿using UnityEngine;
-using UnityEngine.SceneManagement; // シーン遷移のために必要
-using Debug = UnityEngine.Debug;    // Debugの曖昧な参照を解消するため
+﻿using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMove : MonoBehaviour
 {
-    [Header("移動設定")]
-    public float moveSpeed = 5f; // 移動速度
-    [SerializeField] private float jumpForce = 10f; // ジャンプ力
-    [SerializeField, Header("最大ジャンプ回数")]
-    private int maxJumps = 2; // 最大ジャンプ回数 (Inspectorで設定可能)
-    private int currentJumps; // 現在のジャンプ回数
+    [Header("Movement Settings")]
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float jumpForce = 10f;
+    [SerializeField] private int maxJumps = 2;
 
-    // 敵を踏みつけた際の跳ね返り力
-    [SerializeField, Header("踏みつけ跳ね返り力")]
-    private float stompBounceForce = 7f; // 敵を踏んだ際にプレイヤーが跳ね上がる力
+    [Header("Enemy Interaction")]
+    [SerializeField] private float m_stompBounceForce = 7f;
+    [SerializeField] private float invincibleDuration = 0.2f;
+    private bool isInvincible = false;
 
-    // 踏みつけ判定のYオフセット
-    [SerializeField, Header("踏みつけ判定Yオフセット")]
-    [Tooltip("プレイヤーの足元が敵の頭からどれだけ下まで食い込んでいても踏みつけと判定するか。負の値で設定。")]
-    private float stompYOffset = -0.5f; // デフォルト値を-0.5fに設定（より踏みやすく）
+    [Header("Ground Detection Settings")]
+    [SerializeField] private GroundCheck m_groundCheckComponent;
 
-    [Header("地面判定")]
-    [SerializeField] private GroundCheck groundCheckScript; // GroundCheckスクリプトをInspectorで割り当てる
-
-    [Header("ヘルス設定")]
-    [SerializeField] private int currentHealth = 1; // プレイヤーの初期HP
-    [SerializeField] private string enemyTag = "Enemy"; // 敵として判定するタグ
-    // [SerializeField] private string gameOverSceneName = "GameOver"; // GameManagerが管理するため不要になった
-
-    [SerializeField, Header("落下限界Y座標")]
-    private float fallThresholdY = -10f; // このY座標を下回るとゲームオーバー
-
+    [Header("Components")]
     private Rigidbody2D rb;
-    private Animator animator; // Animatorコンポーネントへの参照
-    private Collider2D playerCollider; // プレイヤーのCollider2Dへの参照
-
-    private bool isFacingRight = true; // プレイヤーが右を向いているか
-    private bool isDead = false; // プレイヤーが死亡しているか
-
-    // ItemSoundPlayerへの参照
+    private Animator animator;
     private ItemSoundPlayer itemSoundPlayer;
+
+    [Header("Game Over Conditions")]
+    [SerializeField] private float m_gameOverFallHeight = -10f;
+
+    private bool isGrounded;
+    private bool isFacingRight = true;
+    private int jumpsRemaining;
+
+    public bool IsDead { get; private set; } = false;
+    public float MoveSpeed => moveSpeed;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>(); // Animatorコンポーネントを取得
-        playerCollider = GetComponent<Collider2D>(); // プレイヤーのCollider2Dを取得
+        animator = GetComponent<Animator>();
 
-        if (rb == null)
+        if (rb == null) UnityEngine.Debug.LogError("PlayerMove: Rigidbody2Dがアタッチされていません。", this);
+        if (animator == null) UnityEngine.Debug.LogError("PlayerMove: Animatorがアタッチされていません。", this);
+
+        if (m_groundCheckComponent == null)
         {
-            Debug.LogError("Rigidbody2Dが見つかりません。プレイヤーにRigidbody2Dを追加してください。");
-        }
-        if (animator == null)
-        {
-            Debug.LogError("Animatorが見つかりません。プレイヤーにAnimatorを追加してください。");
-        }
-        if (groundCheckScript == null)
-        {
-            Debug.LogError("GroundCheck Scriptが割り当てられていません。PlayerMoveスクリプトのInspectorで設定してください。");
-        }
-        if (playerCollider == null)
-        {
-            Debug.LogError("Collider2Dが見つかりません。プレイヤーにCollider2Dを追加してください。");
+            m_groundCheckComponent = GetComponentInChildren<GroundCheck>();
+            if (m_groundCheckComponent == null)
+            {
+                UnityEngine.Debug.LogError("PlayerMove: GroundCheckコンポーネントが見つかりません。", this);
+            }
         }
 
-        // ItemSoundPlayerのインスタンスを取得
         itemSoundPlayer = FindObjectOfType<ItemSoundPlayer>();
         if (itemSoundPlayer == null)
         {
-            Debug.LogWarning("PlayerMove: ItemSoundPlayer がシーンに見つかりません。ジャンプ音を再生できません。");
+            // UnityEngine.Debug.LogWarning("PlayerMove: シーンにItemSoundPlayerが見つかりません。");
         }
 
-        // 初期ジャンプ回数をリセット
-        currentJumps = 0;
+        jumpsRemaining = maxJumps;
     }
 
     void Update()
     {
-        if (isDead) return; // 死亡中は操作を受け付けない
+        if (IsDead) return;
 
-        // 落下限界Y座標のチェック
-        if (transform.position.y < fallThresholdY)
+        bool previousIsGrounded = isGrounded;
+        isGrounded = m_groundCheckComponent != null && m_groundCheckComponent.GetIsGround();
+
+        if (animator != null && HasAnimatorParameter("isGrounded", AnimatorControllerParameterType.Bool))
         {
-            Die(); // ゲームオーバー処理を呼び出す
-            return; // 死亡したのでこれ以上Update処理を行わない
+            animator.SetBool("isGrounded", isGrounded);
         }
 
-        // 地面にいるかどうかの判定
-        bool grounded = groundCheckScript != null ? groundCheckScript.GetIsGround() : false;
-
-        // 地面にいる場合、ジャンプ回数をリセット
-        if (grounded)
+        if (!previousIsGrounded && isGrounded)
         {
-            currentJumps = 0;
+            jumpsRemaining = maxJumps;
         }
 
-        // 水平方向の入力取得
         float moveInput = Input.GetAxis("Horizontal");
-
-        // プレイヤーの移動
         rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
 
-        // プレイヤーの向きの反転
+        if (animator != null && HasAnimatorParameter("run", AnimatorControllerParameterType.Bool))
+        {
+            animator.SetBool("run", Mathf.Abs(moveInput) > 0.01f);
+        }
+
         if (moveInput > 0 && !isFacingRight)
         {
             Flip();
@@ -111,53 +92,48 @@ public class PlayerMove : MonoBehaviour
             Flip();
         }
 
-        // アニメーションの更新 (run)
-        if (animator != null)
+        if (animator != null && HasAnimatorParameter("velocityY", AnimatorControllerParameterType.Float))
         {
-            animator.SetBool("run", Mathf.Abs(moveInput) > 0.1f); // 0.1fはわずかな入力でも走ると判定するための閾値
-
-            // アニメーションの更新 (jump1 & jump2)
-            if (!grounded) // 地面にいない場合
-            {
-                if (rb.velocity.y > 0.1f) // 上昇中
-                {
-                    animator.SetBool("jump1", true); // jump1をtrue
-                    animator.SetBool("jump2", false); // jump2をfalse
-                }
-                else if (rb.velocity.y < -0.1f) // 下降中
-                {
-                    animator.SetBool("jump1", false); // jump1をfalse
-                    animator.SetBool("jump2", true); // jump2をtrue
-                }
-                else // ほぼ停止 (ジャンプの頂点など)
-                {
-                    animator.SetBool("jump1", false);
-                    animator.SetBool("jump2", false);
-                }
-            }
-            else // 地面にいる場合
-            {
-                animator.SetBool("jump1", false); // jump1をfalse
-                animator.SetBool("jump2", false); // jump2をfalse
-            }
+            animator.SetFloat("velocityY", rb.velocity.y);
         }
 
-        // ジャンプ入力
-        // 現在のジャンプ回数が最大ジャンプ回数未満の場合のみジャンプを許可
-        if (Input.GetButtonDown("Jump") && currentJumps < maxJumps)
+        if (Input.GetButtonDown("Jump") && jumpsRemaining > 0)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-            currentJumps++; // ジャンプ回数を増やす
+            jumpsRemaining--;
 
-            // ジャンプ音を再生
             if (itemSoundPlayer != null)
             {
                 itemSoundPlayer.PlayJumpSound();
             }
+
+            if (isGrounded && animator != null && HasAnimatorParameter("JumpTrigger", AnimatorControllerParameterType.Trigger))
+            {
+                animator.SetTrigger("JumpTrigger");
+            }
+            else if (!isGrounded && animator != null && HasAnimatorParameter("DoubleJumpTrigger", AnimatorControllerParameterType.Trigger))
+            {
+                animator.SetTrigger("DoubleJumpTrigger");
+            }
+        }
+
+        if (transform.position.y < m_gameOverFallHeight && !IsDead)
+        {
+            Die();
         }
     }
 
-    // プレイヤーの向きを反転させる
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (IsDead || isInvincible) return;
+
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            // 踏みつけ以外の衝突は即座にダメージを受ける
+            Die();
+        }
+    }
+
     void Flip()
     {
         isFacingRight = !isFacingRight;
@@ -166,171 +142,86 @@ public class PlayerMove : MonoBehaviour
         transform.localScale = scaler;
     }
 
-    // --- 衝突・トリガー判定とダメージ処理 ---
-
-    // 衝突判定（Collider2DのIs Triggerがオフの場合）
-    private void OnCollisionEnter2D(Collision2D collision)
+    private bool HasAnimatorParameter(string paramName, AnimatorControllerParameterType paramType)
     {
-        HandleInteraction(collision);
-    }
-
-    // トリガー判定（Collider2DのIs Triggerがオンの場合）
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        HandleInteraction(collision);
-    }
-
-    // Collision2Dオブジェクトを受け取るように変更し、より正確な踏みつけ判定を行う
-    private void HandleInteraction(Collision2D collision) // OnCollisionEnter2Dから呼ばれる場合
-    {
-        GameObject otherObject = collision.gameObject;
-        if (otherObject.CompareTag(enemyTag))
+        if (animator == null) return false;
+        foreach (AnimatorControllerParameter param in animator.parameters)
         {
-            Enemy enemy = otherObject.GetComponent<Enemy>();
-            if (enemy != null && !enemy.IsDead) // 敵がまだ生きている場合のみ処理
+            if (param.name == paramName && param.type == paramType)
             {
-                // プレイヤーのコライダーの底辺のY座標
-                float playerBottomY = playerCollider.bounds.min.y;
-                // 敵のコライダーの頂点のY座標
-                float enemyTopY = enemy.EnemyCollider.bounds.max.y;
-
-                // 衝突点のY座標 (プレイヤーが敵に触れたY座標)
-                float contactPointY = collision.contacts[0].point.y;
-
-                // プレイヤーが敵のコライダーの頂点よりも上にいて、かつ下向きに移動している（踏みつけ）
-                // プレイヤーの速度が下向き（負の値）であることを確認
-                // stompYOffsetを使用し、接触点が敵の頭の少し上にあることも確認
-                if (rb.velocity.y < 0 && playerBottomY > enemyTopY + stompYOffset && contactPointY > enemyTopY - 0.1f)
-                {
-                    enemy.Die(); // 敵を倒すメソッドを呼び出す
-                    rb.velocity = new Vector2(rb.velocity.x, stompBounceForce); // プレイヤーを上方向に跳ねさせる
-                    currentJumps = 0; // 踏みつけ後もジャンプ回数をリセット
-                }
-                else // 敵の側面などに衝突した場合はダメージを受ける
-                {
-                    TakeDamage(1); // 敵に触れたら1ダメージ
-                }
+                return true;
             }
         }
+        return false;
     }
 
-    private void HandleInteraction(Collider2D collision) // OnTriggerEnter2Dから呼ばれる場合
+    // StompCheck.csから呼び出されるメソッド
+    public void StompEnemy(GameObject enemyObject)
     {
-        GameObject otherObject = collision.gameObject;
-        if (otherObject.CompareTag(enemyTag))
+        if (IsDead) return;
+
+        Enemy enemy = enemyObject.GetComponent<Enemy>();
+        if (enemy == null) return;
+
+        // 踏みつけ成功
+        rb.velocity = new Vector2(rb.velocity.x, m_stompBounceForce);
+        enemy.TakeDamage();
+        StartCoroutine(BecomeInvincible(invincibleDuration));
+    }
+
+    public void Die()
+    {
+        if (IsDead) return;
+        IsDead = true;
+
+        if (itemSoundPlayer != null) itemSoundPlayer.PlayGameOverSound();
+        if (rb != null)
         {
-            Enemy enemy = otherObject.GetComponent<Enemy>();
-            if (enemy != null && !enemy.IsDead) // 敵がまだ生きている場合のみ処理
-            {
-                // トリガーの場合はOnCollisionEnter2Dのような物理的な衝突情報がないため、
-                // 踏みつけ判定はより限定的になるか、別の方法を検討する必要があります。
-                // ここでは、単純にプレイヤーが敵のY座標より上にいて、下向きに移動している場合を簡易的に踏みつけとします。
-                // より厳密なトリガーでの踏みつけ判定には、プレイヤーの下部に専用のトリガーを設けるなどの工夫が必要です。
-                if (rb.velocity.y < 0 && playerCollider.bounds.min.y > collision.bounds.center.y + 0.1f)
-                {
-                    enemy.Die(); // 敵を倒すメソッドを呼び出す
-                    rb.velocity = new Vector2(rb.velocity.x, stompBounceForce); // プレイヤーを上方向に跳ねさせる
-                    currentJumps = 0; // 踏みつけ後もジャンプ回数をリセット
-                }
-                else
-                {
-                    TakeDamage(1); // 敵に触れたら1ダメージ
-                }
-            }
+            rb.velocity = Vector2.zero;
+            rb.isKinematic = true;
+        }
+        Collider2D playerCollider = GetComponent<Collider2D>();
+        if (playerCollider != null) playerCollider.enabled = false;
+
+        if (animator != null && HasAnimatorParameter("GameOver", AnimatorControllerParameterType.Trigger))
+        {
+            animator.SetTrigger("GameOver");
+        }
+        else
+        {
+            StartCoroutine(FallbackDeathSequence());
         }
     }
 
-
-    // ダメージを受ける処理
-    public void TakeDamage(int damageAmount)
+    private IEnumerator FallbackDeathSequence()
     {
-        if (isDead) return; // 死亡中はダメージを受けない
-
-        Debug.Log($"PlayerMove (Health): ダメージを受けました。残りHP: {currentHealth}");
-        currentHealth -= damageAmount;
-
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        yield return new WaitForSeconds(1.0f);
+        FinalizeDeathAndSceneTransition();
     }
 
-    // プレイヤーが死亡する処理
-    private void Die()
+    public void OnGameOverAnimationEnd()
     {
-        if (isDead) return; // 既に死亡している場合は何もしない
-        isDead = true; // 死亡フラグを立てる
+        gameObject.SetActive(false);
+        FinalizeDeathAndSceneTransition();
+    }
 
-        // GameManagerにゲームオーバー状態への遷移を依頼する
-        // これにより、GameOverSceneへのLoadSceneWithFadeがGameManager側で一度だけ実行される
+    private void FinalizeDeathAndSceneTransition()
+    {
         if (GameManager.instance != null)
         {
             GameManager.instance.SetGameOverStateImmediately();
         }
         else
         {
-            Debug.LogError("PlayerMove (Health): GameManager.instanceが見つかりません！緊急でGameOverSceneをロードします。");
-            // GameManagerが存在しない場合のフォールバックとして、直接シーンをロード
-            // ここではGameManager.GameOverSceneName を使用できるようにする
-            SceneManager.LoadScene(GameManager.GameOverSceneName, LoadSceneMode.Single);
+            UnityEngine.Debug.LogError("GameManagerのインスタンスが見つかりません。");
+            SceneManager.LoadScene("GameOverScene");
         }
-
-        Debug.Log("PlayerMove (Health): プレイヤーが死亡しました！");
-
-        // プレイヤーの動きを完全に止める
-        this.enabled = false; // PlayerMoveスクリプト自体を無効化
-        if (rb != null)
-        {
-            rb.velocity = Vector2.zero; // 速度を0にする
-            rb.isKinematic = true; // 物理演算を停止（任意）
-            rb.simulated = false; // コライダーも無効にすることが多い
-        }
-
-        // 死亡アニメーションがあれば再生
-        if (animator != null)
-        {
-            // Animatorに "GameOver" というTriggerパラメータをセット
-            animator.SetTrigger("GameOver");
-        }
-        else
-        {
-            Debug.LogWarning("PlayerMove (Health): Animatorが見つからないため、死亡アニメーションを再生できません。");
-        }
-
-        // シーン遷移はSetGameOverStateImmediately()によってGameManager側で処理されるため、
-        // ここから直接シーン遷移を呼び出さない。
     }
 
-    // アニメーションイベントから呼ばれるメソッド
-    // Hurt_Animationの最後にこのイベントを追加してください。
-    public void OnGameOverAnimationEnd()
+    private IEnumerator BecomeInvincible(float duration)
     {
-        // Debug.Log("PlayerMove: OnGameOverAnimationEndが呼び出されました。");
-        // ここからシーン遷移を直接呼び出すと二重になるため、削除またはコメントアウト
-        // GameManager.instance.LoadSceneWithFade(GameManager.GameOverSceneName); // この行は削除
-    }
-
-    // HPを回復する処理（必要であれば）
-    public void Heal(int healAmount)
-    {
-        if (isDead) return;
-        currentHealth += healAmount;
-        Debug.Log($"PlayerMove (Health): HPが回復しました。残りHP: {currentHealth}");
-    }
-
-    // デバッグ用Gizmos
-    void OnDrawGizmos()
-    {
-        if (playerCollider == null) return;
-
-        Gizmos.color = Color.red;
-        Vector2 playerBottomLeft = new Vector2(playerCollider.bounds.min.x, playerCollider.bounds.min.y);
-        Vector2 playerBottomRight = new Vector2(playerCollider.bounds.max.x, playerCollider.bounds.min.y);
-        Gizmos.DrawLine(playerBottomLeft, playerBottomRight);
-
-        Gizmos.color = Color.yellow;
-        Vector2 stompLineStart = new Vector2(playerCollider.bounds.min.x, playerCollider.bounds.min.y - stompYOffset);
-        Vector2 stompLineEnd = new Vector2(playerCollider.bounds.max.x, playerCollider.bounds.min.y - stompYOffset);
-        Gizmos.DrawLine(stompLineStart, stompLineEnd);
+        isInvincible = true;
+        yield return new WaitForSeconds(duration);
+        isInvincible = false;
     }
 }
