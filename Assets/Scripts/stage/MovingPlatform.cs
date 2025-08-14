@@ -1,101 +1,108 @@
-using System.Collections; // Coroutineのために必要
+using System.Collections;
 using UnityEngine;
+
+// Resolves ambiguous reference to Debug
+using Debug = UnityEngine.Debug;
+
+// Unityエディタ上でのみ使用する名前空間を定義
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class MovingPlatform : MonoBehaviour
 {
-    [Header("移動設定")]
-    [Tooltip("移動速度")]
+    [Header("Movement Settings")]
+    [Tooltip("Movement speed for the back-and-forth platform")]
     [SerializeField] private float moveSpeed = 2.0f;
-
-    [Tooltip("目的地に到達してから次の移動を開始するまでの待機時間")]
+    [Tooltip("Wait time before moving to the next destination")]
     [SerializeField] private float waitTimeAtPoint = 1.0f;
+    [Tooltip("Movement distance along the X-axis (positive for right, negative for left)")]
+    [SerializeField] private float moveDistanceX = 0f;
+    [Tooltip("Movement distance along the Y-axis (positive for up, negative for down)")]
+    [SerializeField] private float moveDistanceY = 0f;
 
-    [Tooltip("X軸方向への移動距離 (正の値で右、負の値で左)")]
-    [SerializeField] private float moveDistanceX = 0f; // 例: 5.0f
+    // The platform's initial position
+    private Vector3 initialPosition;
+    // The target position for back-and-forth movement
+    private Vector3 targetPosition;
+    // The end position offset from the initial position
+    private Vector3 endOffsetPosition;
 
-    [Tooltip("Y軸方向への移動距離 (正の値で上、負の値で下)")]
-    [SerializeField] private float moveDistanceY = 0f; // 例: 3.0f
+    private bool movingToEnd = true;
+    private bool isPlayerOnPlatform = false;
 
-    private Vector3 initialPosition; // 足場の初期位置
-    private Vector3 targetPosition;  // 現在の目標地点 (初期位置または終点)
-    private Vector3 endOffsetPosition; // 初期位置からのオフセットを加算した終点
-
-    private bool movingToEnd = true; // trueならオフセット地点へ、falseなら初期位置へ移動中
+    // Variable to manage the movement coroutine
+    private Coroutine movementCoroutine;
 
     void Start()
     {
-        initialPosition = transform.position; // スクリプト開始時の位置を初期位置とする
-        endOffsetPosition = initialPosition + new Vector3(moveDistanceX, moveDistanceY, 0f); // 終点を計算
+        initialPosition = transform.position;
+        endOffsetPosition = initialPosition + new Vector3(moveDistanceX, moveDistanceY, 0f);
 
-        targetPosition = endOffsetPosition; // 最初は終点へ向かう
-        StartCoroutine(MovePlatform()); // コルーチンで移動を開始
-    }
-
-    // 足場の移動を制御するコルーチン
-    private IEnumerator MovePlatform()
-    {
-        while (true) // 無限ループで往復移動を続ける
+        if (moveDistanceX != 0f || moveDistanceY != 0f)
         {
-            // 目標地点に向かって移動
-            while (Vector3.Distance(transform.position, targetPosition) > 0.01f)
-            {
-                transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-                yield return null; // 1フレーム待機
-            }
-
-            // 目標地点に到達したら待機
-            yield return new WaitForSeconds(waitTimeAtPoint);
-
-            // 次の目標地点を設定（移動方向を反転）
-            movingToEnd = !movingToEnd;
-            if (movingToEnd)
-            {
-                targetPosition = endOffsetPosition;
-            }
-            else
-            {
-                targetPosition = initialPosition;
-            }
+            targetPosition = endOffsetPosition;
+            movementCoroutine = StartCoroutine(MovePlatform());
+        }
+        else
+        {
+            Debug.LogWarning("MovingPlatform: Movement distance is 0. The platform will not move.", this);
         }
     }
 
-    // プレイヤーが足場に乗った時の処理
+    private IEnumerator MovePlatform()
+    {
+        while (true)
+        {
+            while (Vector3.Distance(transform.position, targetPosition) > 0.01f)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(waitTimeAtPoint);
+
+            movingToEnd = !movingToEnd;
+            targetPosition = movingToEnd ? endOffsetPosition : initialPosition;
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // プレイヤーのタグをチェック (例: "Player")
         if (other.CompareTag("Player"))
         {
-            // プレイヤーを足場の子オブジェクトにする
-            // これにより、足場が移動するとプレイヤーも一緒に移動する
+            if (isPlayerOnPlatform) return;
+
+            isPlayerOnPlatform = true;
             other.transform.SetParent(transform);
         }
     }
 
-    // プレイヤーが足場から離れた時の処理
     private void OnTriggerExit2D(Collider2D other)
     {
-        // プレイヤーのタグをチェック (例: "Player")
         if (other.CompareTag("Player"))
         {
-            // プレイヤーの親を解除する
-            // nullを設定すると、シーンのルートに戻る
-            other.transform.SetParent(null);
+            if (!other.IsTouching(GetComponent<Collider2D>()))
+            {
+                isPlayerOnPlatform = false;
+                if (other.transform.parent == transform)
+                {
+                    other.transform.SetParent(null);
+                }
+            }
         }
     }
 
-    // Sceneビューで移動経路を可視化する
+#if UNITY_EDITOR
     void OnDrawGizmos()
     {
-        // エディタ実行中でない場合、または初期位置がまだ設定されていない場合は描画しない
-        if (!Application.isPlaying)
-        {
-            initialPosition = transform.position;
-            endOffsetPosition = initialPosition + new Vector3(moveDistanceX, moveDistanceY, 0f);
-        }
+        Vector3 gizmoInitialPos = EditorApplication.isPlayingOrWillChangePlaymode ? initialPosition : transform.position;
+        Vector3 gizmoEndOffsetPos = gizmoInitialPos + new Vector3(moveDistanceX, moveDistanceY, 0f);
 
         Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(initialPosition, endOffsetPosition);
-        Gizmos.DrawWireSphere(initialPosition, 0.2f); // 開始地点
-        Gizmos.DrawWireSphere(endOffsetPosition, 0.2f); // 終了地点
+        Gizmos.DrawLine(gizmoInitialPos, gizmoEndOffsetPos);
+        Gizmos.DrawWireSphere(gizmoInitialPos, 0.2f);
+        Gizmos.DrawWireSphere(gizmoEndOffsetPos, 0.2f);
     }
+#endif
 }

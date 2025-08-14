@@ -1,497 +1,459 @@
 using System.Collections;
-using System.ComponentModel;
-using System.Diagnostics;
-// using System.Net.Mime; // ★この行があれば削除する！★
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI; // ★ここがUnityEngine.UIであることを確認★
-using static System.Net.Mime.MediaTypeNames;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using Debug = UnityEngine.Debug;
 
 public class GameManager : MonoBehaviour
 {
-    // シーン名の定数
-    public const string TitleSceneName = "TitleScene";
-    public const string StageSelectSceneName = "StageSelect";
-    public const string UISceneName = "UI";
-    public const string MainGameSceneName = "Demo_tileset2"; // あなたのゲームプレイシーン名に合わせてください
-    public const string GameOverSceneName = "GameOverScene";
-    public const string GameClearSceneName = "GameClearScene"; // ゲームクリアシーン名を追加（もしあれば）
-
-    // シングルトンインスタンス
     public static GameManager instance { get; private set; }
 
-    // ゲームの状態
     public enum GameState
     {
-        enGameState_Init,
-        enGameState_Title,
-        enGameState_StageSelect,
-        enGameState_Play,
-        enGameState_Pause,
-        enGameState_GameOver,
-        enGameState_GameClear, // ゲームクリア状態
-        enGameState_Clear // 互換性のため（enGameState_GameClearと同じ意味合いで使われている可能性）
+        Title,
+        Gameplay,
+        StageClear,
+        GameOver,
+        Pause,
+        Cutscene,
+        StageSelect
     }
 
-    private GameState m_currentGameState = GameState.enGameState_Init;
+    private GameState m_currentGameState = GameState.Gameplay;
+    private int m_currentGemCount = 0;
+    public System.Action<int> OnGemCountChanged;
 
-    // --- フェード関連 ---
-    [Header("フェード設定")]
-    [SerializeField] private GameObject permanentCanvasPrefab;
-    [SerializeField] private GameObject globalFadeCanvasPrefab;
-    [SerializeField] private GameObject globalFadePanelPrefab;
-    [SerializeField] private GameObject permanentEventSystemPrefab;
-    [SerializeField] private Sprite fadePanelSprite;
+    [Header("UI要素 (Inspectorで設定)")]
+    [SerializeField] private GameObject m_permanentUICanvas;
+    [SerializeField] private UnityEngine.UI.Image m_globalFadePanelImage;
+    [SerializeField] private CanvasGroup m_globalFadeCanvasGroup;
+    [SerializeField] private EventSystem m_permanentEventSystem;
+    [SerializeField] private ScoreDisplay m_scoreDisplay;
+    [SerializeField] private GameObject m_scorePanel;
+    // UI要素の宣言は削除済み
 
-    private GameObject m_permanentCanvasInstance;
-    private GameObject m_globalFadeCanvasInstance;
-    private Image m_globalFadePanelImage; // ★これがUnityEngine.UI.Imageを参照していることを確認★
-    private GameObject m_permanentEventSystemInstance;
+    [Header("シーン名 (Build Settingsに登録必須)")]
+    [SerializeField] private string m_titleSceneName = "TitleScene";
+    [SerializeField] private string m_bootstrapSceneName = "Bootstrap";
+    [SerializeField] private string m_stageSelectSceneName = "StageSelect";
+    [SerializeField] private string m_gameOverSceneName = "GameOverScene";
+    [SerializeField] private string m_clearSceneName = "ClearScene";
+
+    [SerializeField] private string[] m_stageSceneNames = { "Demo_tileset", "Demo_tileset2", "Demo_tileset3" };
+    private int m_currentStageIndex = 0;
 
     private Coroutine m_fadeCoroutine;
-    private bool m_isTransitioning = false;
+    private UnityEngine.AsyncOperation m_asyncLoadOperation;
+    private GameObject m_globalFadeCanvasInstance;
+    public bool m_isGlobalTransitioning = false;
+    [SerializeField] private float m_fadeDuration = 1.0f;
+    private const string STAGE_CLEAR_KEY_PREFIX = "StageClear_";
 
-    // --- UI関連 ---
-    [Header("UI要素 (ランタイムで設定)")]
-    public ScoreDisplay scoreDisplay; // Inspectorで設定する、またはFindObjectOfTypeで探す
-    public GameObject scorePanel; // ScoreDisplayを親にするパネル
+    [Header("Time Limit Settings")]
+    [Tooltip("Enable time limit for gameplay scenes.")]
+    [SerializeField] private bool m_isTimeLimited = false;
+    [Tooltip("Total time in seconds for the time limit.")]
+    [SerializeField] private float m_timeLimitSeconds = 60.0f;
+    [Tooltip("BGM to play when time limit is active.")]
+    [SerializeField] private AudioClip m_timeLimitBGM;
+    [Tooltip("Normal gameplay BGM.")]
+    [SerializeField] private AudioClip m_normalBGM;
+    [Tooltip("BGM for Demo_tileset3 scene.")] // Demo_tileset3専用のBGMを追加
+    [SerializeField] private AudioClip m_demoTileset3BGM;
 
-    [Header("ゲームプレイ設定")]
-    [SerializeField] private int initialGemCount = 0;
-    public int currentGemCount { get; private set; }
+    private float m_currentTime;
+    private AudioSource m_audioSource;
 
-    // --- ステージ選択関連 ---
-    [Header("ステージ選択設定")]
-    // StageSelectManagerから参照される配列とインデックス
-    public string[] stageSceneNames = { "Stage1", "Stage2", "Stage3" }; // あなたの実際のステージ名に合わせる
-    public int currentStageIndex = 0;
+    public GameState GetCurrentGameState() => m_currentGameState;
+    public void SetState(GameState newState) => m_currentGameState = newState;
+    public void AddGem(int amount)
+    {
+        m_currentGemCount += amount;
+        OnGemCountChanged?.Invoke(m_currentGemCount);
+    }
+    public int currentGemCount => m_currentGemCount;
+    public string[] stageSceneNames => m_stageSceneNames;
+    public int currentStageIndex
+    {
+        get => m_currentStageIndex;
+        set => m_currentStageIndex = value;
+    }
+    public string TitleSceneName => m_titleSceneName;
+    public string StageSelectSceneName => m_stageSelectSceneName;
 
+    public void SetGameOverStateImmediately()
+    {
+        if (m_currentGameState == GameState.GameOver) return;
+        Time.timeScale = 0;
+        SetState(GameState.GameOver);
+        if (m_isGlobalTransitioning) return;
+        LoadSceneWithFade(m_gameOverSceneName);
+    }
 
-    // --- Awake ---
-    void Awake()
+    public void RestartGame()
+    {
+        Time.timeScale = 1;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    private void Awake()
     {
         if (instance == null)
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
-            Debug.Log("GameManager: Awake - DontDestroyOnLoadを設定しました。");
+            CheckUIReferences();
 
-            SetupPermanentUIElements();
-            InitializeGame();
-
-            if (SceneManager.GetActiveScene().name == "Bootstrap")
+            m_audioSource = GetComponent<AudioSource>();
+            if (m_audioSource == null)
             {
-                Debug.Log("GameManager: Bootstrapから起動しました。TitleSceneへの遷移を開始します。");
-                LoadSceneWithFade(TitleSceneName);
+                m_audioSource = gameObject.AddComponent<AudioSource>();
+            }
+            m_audioSource.loop = true;
+
+            if (m_globalFadeCanvasGroup != null)
+            {
+                m_globalFadeCanvasInstance = m_globalFadeCanvasGroup.gameObject;
+                m_globalFadeCanvasGroup.alpha = 0f;
+                m_globalFadeCanvasGroup.blocksRaycasts = false;
+                m_globalFadeCanvasGroup.interactable = false;
+            }
+            else
+            {
+                Debug.LogError("GameManager: Awake - GlobalFadeCanvasGroupが設定されていません。", this);
+            }
+            if (m_globalFadePanelImage == null)
+            {
+                Debug.LogError("GameManager: Awake - GlobalFadePanelImageが設定されていません。", this);
+            }
+
+            string currentSceneName = SceneManager.GetActiveScene().name;
+            if (currentSceneName == m_bootstrapSceneName)
+            {
+                SceneManager.LoadScene(m_titleSceneName);
+                SetState(GameState.Title);
+            }
+            else if (currentSceneName == m_titleSceneName)
+            {
+                SetState(GameState.Title);
+                if (m_globalFadeCanvasGroup != null)
+                {
+                    m_globalFadeCanvasGroup.alpha = 0f;
+                    m_globalFadeCanvasGroup.blocksRaycasts = false;
+                    m_globalFadeCanvasGroup.interactable = false;
+                }
+            }
+            else if (currentSceneName.StartsWith("Demo_tileset") || currentSceneName.StartsWith("Stage"))
+            {
+                SetState(GameState.Gameplay);
+                UpdatePermanentUIForScene(currentSceneName);
+                if (m_globalFadeCanvasGroup != null)
+                {
+                    m_globalFadeCanvasGroup.alpha = 0f;
+                    m_globalFadeCanvasGroup.blocksRaycasts = false;
+                    m_globalFadeCanvasGroup.interactable = false;
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"GameManager: 未知のシーン'{currentSceneName}'から起動しました。デフォルトのゲーム状態をGameplayに設定。", this);
+                SetState(GameState.Gameplay);
+                if (m_globalFadeCanvasGroup != null)
+                {
+                    m_globalFadeCanvasGroup.alpha = 0f;
+                    m_globalFadeCanvasGroup.blocksRaycasts = false;
+                    m_globalFadeCanvasGroup.interactable = false;
+                }
             }
         }
         else
         {
             Destroy(gameObject);
-            Debug.Log("GameManager: 既存のインスタンスがあるため、このGameManagerを破棄しました。");
         }
     }
 
-    // --- OnEnable / OnDisable ---
-    void OnEnable()
+    private void Update()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-        Debug.Log("GameManager: SceneManager.sceneLoaded イベントを登録しました。");
+        if (m_isTimeLimited && m_currentGameState == GameState.Gameplay)
+        {
+            m_currentTime -= Time.deltaTime;
+            if (m_currentTime <= 0)
+            {
+                m_currentTime = 0;
+                GameOver();
+            }
+        }
     }
 
-    void OnDisable()
+    private void CheckUIReferences()
     {
+        if (m_permanentUICanvas == null) Debug.LogError("Permanent UICanvasが割り当てられていません。", this);
+        if (m_globalFadePanelImage == null) Debug.LogError("Global Fade Panel Imageが割り当てられていません。", this);
+        if (m_globalFadeCanvasGroup == null) Debug.LogError("Global Fade Canvas Groupが割り当てられていません。", this);
+        if (m_permanentEventSystem == null) Debug.LogError("Permanent Event Systemが割り当てられていません。", this);
+        if (m_scoreDisplay == null) Debug.LogError("Score Displayが割り当てられていません。", this);
+        if (m_scorePanel == null) Debug.LogError("Score Panelが割り当てられていません。", this);
+    }
+
+    private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
+    private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
+    private void OnDestroy()
+    {
+        if (instance == this) instance = null;
         SceneManager.sceneLoaded -= OnSceneLoaded;
-        Debug.Log("GameManager: SceneManager.sceneLoaded イベントを解除しました。");
     }
 
-    // --- ゲーム初期化 ---
-    private void InitializeGame()
-    {
-        SetState(GameState.enGameState_Init);
-        currentGemCount = initialGemCount;
-    }
-
-    // --- シーンロード時のコールバック ---
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Debug.Log($"GameManager: シーン'{scene.name}'がロードされました。モード: {mode}");
-
-        if (scene.name == MainGameSceneName && mode == LoadSceneMode.Single)
+        Time.timeScale = 1;
+        if (m_globalFadeCanvasInstance != null && !m_globalFadeCanvasInstance.activeSelf) m_globalFadeCanvasInstance.SetActive(true);
+        if (m_globalFadePanelImage != null && !m_globalFadePanelImage.gameObject.activeSelf) m_globalFadePanelImage.gameObject.SetActive(true);
+        if (mode == LoadSceneMode.Single)
         {
-            Debug.Log($"GameManager: ゲームプレイシーン'{scene.name}'がロードされました。");
-            if (!SceneManager.GetSceneByName(UISceneName).isLoaded)
+            bool shouldStartFadeIn = !(scene.name == m_titleSceneName && !m_isGlobalTransitioning) && scene.name != m_bootstrapSceneName;
+            if (shouldStartFadeIn)
             {
-                Debug.Log("GameManager: UIシーンがまだロードされていないため、Additiveでロードします。");
-                SceneManager.LoadScene(UISceneName, LoadSceneMode.Additive);
-            }
-            SetState(GameState.enGameState_Play);
-            InitializeGemCount();
-
-            // メインゲームシーンがロードされたらUIを表示
-            SetScoreUIActive(true);
-        }
-        else if (scene.name == UISceneName && mode == LoadSceneMode.Additive)
-        {
-            Debug.Log("GameManager: UIシーンがロードされました。PermanentCanvasをアクティブにします。");
-            if (m_permanentCanvasInstance != null)
-            {
-                m_permanentCanvasInstance.SetActive(true);
-            }
-
-            // ScoreDisplayのインスタンスを取得して設定
-            scoreDisplay = FindObjectOfType<ScoreDisplay>();
-            if (scoreDisplay != null)
-            {
-                Debug.Log("GameManager: ScoreDisplayが見つかりました。");
-                scoreDisplay.transform.SetParent(m_permanentCanvasInstance.transform, false);
-                Debug.Log("GameManager: ScoreDisplayの親子関係を設定します。");
+                StartFadeIn();
             }
             else
             {
-                Debug.LogWarning("GameManager: ScoreDisplayが見つかりません。UI表示に問題がある可能性があります。");
+                if (m_globalFadeCanvasGroup != null)
+                {
+                    m_globalFadeCanvasGroup.alpha = 0f;
+                    m_globalFadeCanvasGroup.blocksRaycasts = false;
+                    m_globalFadeCanvasGroup.interactable = false;
+                }
             }
+        }
+        UpdatePermanentUIForScene(scene.name);
 
-            // ScorePanelのインスタンスを取得して設定
-            scorePanel = GameObject.Find("ScorePanel");
-            if (scorePanel != null)
-            {
-                scorePanel.transform.SetParent(m_permanentCanvasInstance.transform, false);
-                Debug.Log("GameManager: ScorePanelの親子関係を設定します。");
-            }
-            else
-            {
-                Debug.LogWarning("GameManager: ScorePanelが見つかりません。UI表示に問題がある可能性があります。");
-            }
+        if (scene.name == m_titleSceneName)
+        {
+            SetState(GameState.Title);
+            ResetGameData();
+            PlayBGM(m_normalBGM);
+        }
+        else if (scene.name == m_stageSelectSceneName)
+        {
+            SetState(GameState.StageSelect);
+            PlayBGM(m_normalBGM);
+        }
+        else if (scene.name == "Demo_tileset3") // Demo_tileset3のシーン名でBGMを切り替え
+        {
+            SetState(GameState.Gameplay);
+            InitializeGameplayState();
+            PlayBGM(m_demoTileset3BGM);
+        }
+        else if (scene.name.StartsWith("Demo_tileset") || scene.name.StartsWith("Stage"))
+        {
+            SetState(GameState.Gameplay);
+            InitializeGameplayState();
+            PlayBGM(m_isTimeLimited ? m_timeLimitBGM : m_normalBGM);
+        }
+        else if (scene.name == m_gameOverSceneName)
+        {
+            SetState(GameState.GameOver);
+            PlayBGM(null);
+        }
+        else if (scene.name == m_clearSceneName)
+        {
+            SetState(GameState.StageClear);
+            PlayBGM(null);
+        }
+        m_isGlobalTransitioning = false;
+    }
 
-            // UIシーンがロードされた時点では、スコアUIは非表示にしておく
-            SetScoreUIActive(false);
-        }
-        else if (scene.name == TitleSceneName && mode == LoadSceneMode.Single)
+    private void InitializeGameplayState()
+    {
+        if (m_isTimeLimited)
         {
-            Debug.Log("GameManager: TitleSceneがロードされました。");
-            SetState(GameState.enGameState_Title);
-            StartFadeIn(true);
-            // タイトルシーンではUIを非表示
-            SetScoreUIActive(false);
-        }
-        else if (scene.name == StageSelectSceneName && mode == LoadSceneMode.Single)
-        {
-            Debug.Log("GameManager: StageSelectがロードされました。");
-            SetState(GameState.enGameState_StageSelect);
-            StartFadeIn(false);
-            // ステージ選択シーンではUIを非表示
-            SetScoreUIActive(false);
-        }
-        else if (scene.name == GameOverSceneName && mode == LoadSceneMode.Single)
-        {
-            Debug.Log("GameManager: GameOverScene がロードされました。");
-            SetState(GameState.enGameState_GameOver);
-            StartFadeIn(false);
-            // ゲームオーバーシーンではUIを非表示
-            SetScoreUIActive(false);
-        }
-        else if (scene.name == GameClearSceneName && mode == LoadSceneMode.Single)
-        {
-            Debug.Log("GameManager: GameClearScene がロードされました。");
-            SetState(GameState.enGameState_GameClear);
-            StartFadeIn(false);
-            // ゲームクリアシーンではUIを非表示
-            SetScoreUIActive(false);
-        }
-        else
-        {
-            if (scene.name != "Bootstrap")
-            {
-                StartFadeIn(false);
-            }
-            else
-            {
-                Debug.Log($"GameManager: シーン'{scene.name}'ではフェードインは開始されません。");
-            }
-            // その他のシーンではUIを非表示 (必要に応じて調整)
-            SetScoreUIActive(false);
+            m_currentTime = m_timeLimitSeconds;
         }
     }
 
-    // ゲーム状態の変更
-    public void SetState(GameState newState)
+    public void PlayBGM(AudioClip clip)
     {
-        if (m_currentGameState == newState) return;
-
-        Debug.Log($"GameManager: ゲームの状態を {newState} に変更しました。");
-        m_currentGameState = newState;
-
-        // ゲームの状態に応じたタイムスケールの設定
-        switch (m_currentGameState)
+        if (m_audioSource == null)
         {
-            case GameState.enGameState_Play:
-                Time.timeScale = 1f;
-                break;
-            case GameState.enGameState_Pause:
-                Time.timeScale = 0f;
-                break;
-            case GameState.enGameState_GameOver:
-                Time.timeScale = 0f;
-                break;
-            case GameState.enGameState_GameClear:
-            case GameState.enGameState_Clear: // 既存のコード互換性のため
-                Time.timeScale = 0f;
-                break;
-            default:
-                Time.timeScale = 1f;
-                break;
-        }
-    }
-
-    // 現在のゲーム状態を取得するための public メソッド
-    public GameState GetCurrentGameState()
-    {
-        return m_currentGameState;
-    }
-
-    // ゲームオーバー状態への遷移を即座に開始
-    public void SetGameOverStateImmediately()
-    {
-        if (m_isTransitioning)
-        {
-            Debug.Log("GameManager: 既にシーン遷移中のため、SetGameOverStateImmediatelyをスキップします。");
+            Debug.LogWarning("GameManager: AudioSourceが割り当てられていません。", this);
             return;
         }
 
-        Debug.Log("GameManager: ゲームオーバー状態に設定し、GameOverSceneへの遷移を開始しました。");
-        SetState(GameState.enGameState_GameOver);
-        LoadSceneWithFade(GameOverSceneName);
+        if (m_audioSource.isPlaying)
+        {
+            m_audioSource.Stop();
+        }
+
+        if (clip != null)
+        {
+            m_audioSource.clip = clip;
+            m_audioSource.Play();
+        }
     }
 
-    // シーン遷移
-    public void LoadSceneWithFade(string sceneName)
+    private void UpdatePermanentUIForScene(string sceneName)
     {
-        if (m_isTransitioning)
+        bool isPermanentUIActive = sceneName.StartsWith("Demo_tileset") || sceneName.StartsWith("Stage");
+        if (sceneName == m_bootstrapSceneName || sceneName == m_titleSceneName ||
+            sceneName == m_gameOverSceneName || sceneName == m_clearSceneName ||
+            sceneName == m_stageSelectSceneName)
         {
-            Debug.Log($"GameManager: 既にシーン遷移中のため、'{sceneName}'へのロードをスキップします。");
+            isPermanentUIActive = false;
+        }
+        if (m_permanentUICanvas != null) m_permanentUICanvas.SetActive(isPermanentUIActive);
+        else Debug.LogWarning("GameManager: Permanent UI Canvas (ScorePanelなど) が割り当てられていません。", this);
+        bool isGameplayScene = sceneName.StartsWith("Demo_tileset") || sceneName.StartsWith("Stage");
+        SetScoreUIActive(isGameplayScene);
+    }
+
+    public void LoadSceneWithFade(string sceneName, float duration = 1.0f, System.Action onFadeOutComplete = null)
+    {
+        if (m_isGlobalTransitioning) return;
+        if (m_globalFadePanelImage == null || m_globalFadeCanvasGroup == null)
+        {
+            Debug.LogError("GameManager: フェードに必要なUI要素が割り当てられていません！フェードなしでロードします。", this);
+            SceneManager.LoadScene(sceneName);
             return;
         }
-
-        m_isTransitioning = true;
-
-        Debug.Log($"GameManager: シーン'{sceneName}'へのフェードアウトとロードを開始します。");
-
-        if (m_fadeCoroutine != null)
-        {
-            StopCoroutine(m_fadeCoroutine);
-            Debug.Log("GameManager: 既存のフェードコルーチンを停止しました (LoadSceneWithFade)。");
-        }
-        m_fadeCoroutine = StartCoroutine(FadeOutAndLoadScene(sceneName));
+        m_isGlobalTransitioning = true;
+        if (m_globalFadeCanvasInstance != null && !m_globalFadeCanvasInstance.activeSelf) m_globalFadeCanvasInstance.SetActive(true);
+        if (m_globalFadePanelImage != null && !m_globalFadePanelImage.gameObject.activeSelf) m_globalFadePanelImage.gameObject.SetActive(true);
+        m_fadeCoroutine = StartCoroutine(FadeOutAndLoadScene(sceneName, duration, onFadeOutComplete));
     }
 
-    // ジェム関連
-    public void InitializeGemCount()
+    private IEnumerator FadeOutAndLoadScene(string sceneName, float duration, System.Action onFadeOutComplete)
     {
-        currentGemCount = 0;
-        Debug.Log($"GameManager: ジェム数を初期化しました。総ジェム数: {currentGemCount}");
-        if (scoreDisplay != null)
+        if (m_globalFadeCanvasGroup != null)
         {
-            scoreDisplay.UpdateGemCount(currentGemCount);
+            m_globalFadeCanvasGroup.blocksRaycasts = true;
+            m_globalFadeCanvasGroup.interactable = true;
         }
-    }
+        yield return StartCoroutine(FadeCanvasGroup(0f, 1f, duration, () =>
+        {
+            onFadeOutComplete?.Invoke();
+            m_asyncLoadOperation = SceneManager.LoadSceneAsync(sceneName);
+            m_asyncLoadOperation.allowSceneActivation = false;
+        }));
 
-    // ジェムの収集とスコア加算を統合したメソッド
-    public void AddGem(int amount)
-    {
-        currentGemCount += amount;
-        Debug.Log($"GameManager: ジェムを拾いました。現在: {currentGemCount}");
-        if (scoreDisplay != null)
+        while (!m_asyncLoadOperation.isDone)
         {
-            scoreDisplay.UpdateGemCount(currentGemCount);
-        }
-    }
-
-    // PermanentなUI要素のセットアップ
-    private void SetupPermanentUIElements()
-    {
-        Debug.Log("GameManager: SetupPermanentUIElementsを開始します。");
-
-        // PermanentCanvasの生成と設定
-        if (permanentCanvasPrefab != null && m_permanentCanvasInstance == null)
-        {
-            m_permanentCanvasInstance = Instantiate(permanentCanvasPrefab);
-            m_permanentCanvasInstance.name = "PermanentCanvas_DontDestroy";
-            DontDestroyOnLoad(m_permanentCanvasInstance);
-            m_permanentCanvasInstance.SetActive(false); // 初期は非アクティブ
-            Debug.Log("GameManager: PermanentCanvas_DontDestroyを生成しました。");
-        }
-        else if (permanentCanvasPrefab == null)
-        {
-            Debug.LogWarning("GameManager: permanentCanvasPrefabが割り当てられていません。");
-        }
-
-        // GlobalFadeCanvasの生成と設定
-        if (globalFadeCanvasPrefab != null && m_globalFadeCanvasInstance == null)
-        {
-            m_globalFadeCanvasInstance = Instantiate(globalFadeCanvasPrefab);
-            m_globalFadeCanvasInstance.name = "GlobalFadeCanvas_DontDestroy";
-            DontDestroyOnLoad(m_globalFadeCanvasInstance);
-            m_globalFadeCanvasInstance.SetActive(false); // 初期は非アクティブ
-            Debug.Log("GameManager: GlobalFadeCanvas_DontDestroyを生成しました。");
-        }
-        else if (globalFadeCanvasPrefab == null)
-        {
-            Debug.LogWarning("GameManager: globalFadeCanvasPrefabが割り当てられていません。");
-        }
-
-        // PermanentEventSystemの生成と設定
-        if (permanentEventSystemPrefab != null && m_permanentEventSystemInstance == null)
-        {
-            m_permanentEventSystemInstance = Instantiate(permanentEventSystemPrefab);
-            m_permanentEventSystemInstance.name = "PermanentEventSystem_DontDestroy";
-            DontDestroyOnLoad(m_permanentEventSystemInstance);
-            Debug.Log("GameManager: PermanentEventSystem_DontDestroyを生成しました。");
-        }
-        else if (permanentEventSystemPrefab == null)
-        {
-            Debug.LogWarning("GameManager: permanentEventSystemPrefabが割り当てられていません。");
-        }
-
-        // GlobalFadePanelの生成と設定
-        if (globalFadePanelPrefab != null && m_globalFadeCanvasInstance != null)
-        {
-            GameObject fadePanelObject = Instantiate(globalFadePanelPrefab, m_globalFadeCanvasInstance.transform);
-            fadePanelObject.name = "GlobalFadePanel";
-            m_globalFadePanelImage = fadePanelObject.GetComponent<Image>();
-            if (m_globalFadePanelImage == null)
+            if (m_asyncLoadOperation.progress >= 0.9f)
             {
-                Debug.LogError("GameManager: GlobalFadePanelPrefabにImageコンポーネントがありません。");
+                if (m_globalFadeCanvasGroup.alpha >= 0.99f)
+                {
+                    m_asyncLoadOperation.allowSceneActivation = true;
+                }
             }
-
-            if (fadePanelSprite != null)
-            {
-                m_globalFadePanelImage.sprite = fadePanelSprite;
-                Debug.Log("GameManager: FadePanelSpriteを割り当てました。");
-            }
-            else
-            {
-                Debug.LogWarning("GameManager: FadePanelSpriteが割り当てられていません。");
-            }
-
-            m_globalFadePanelImage.color = new Color(0, 0, 0, 0); // 初期は完全に透明
-            m_globalFadePanelImage.gameObject.SetActive(false); // 初期は非アクティブ
-            Debug.Log("GameManager: GlobalFadePanelを生成しました。初期状態は透明で非アクティブです。");
+            yield return null;
         }
-        else if (globalFadePanelPrefab == null)
-        {
-            Debug.LogWarning("GameManager: globalFadePanelPrefabが割り当てられていません。");
-        }
-
-        Debug.Log("GameManager: SetupPermanentUIElementsを完了しました。");
     }
 
-    // フェードイン処理
-    private void StartFadeIn(bool isInitialLoad)
+    private IEnumerator FadeCanvasGroup(float startAlpha, float endAlpha, float duration, System.Action onComplete = null)
     {
-        if (m_globalFadePanelImage == null)
+        if (m_globalFadeCanvasGroup == null || m_globalFadePanelImage == null)
         {
-            Debug.LogError("GameManager: フェードパネルのImageがnullです。フェードインできません。");
-            m_isTransitioning = false;
-            return;
+            onComplete?.Invoke();
+            yield break;
         }
-
-        if (m_fadeCoroutine != null)
-        {
-            StopCoroutine(m_fadeCoroutine);
-            Debug.Log("GameManager: 既存のフェードコルーチンを停止しました (OnSceneLoaded / 通常)。");
-        }
-
-        Debug.Log($"GameManager: {(isInitialLoad ? "初回" : "通常")}フェードインを開始します (シーン: {SceneManager.GetActiveScene().name})。");
-        m_fadeCoroutine = StartCoroutine(FadeIn());
-    }
-
-    private IEnumerator FadeIn(float duration = 2.0f)
-    {
-        Debug.Log($"GameManager: FadeInを開始します。時間: {duration}秒");
-        m_globalFadeCanvasInstance.SetActive(true);
-        m_globalFadePanelImage.gameObject.SetActive(true);
-
-        m_globalFadePanelImage.color = new Color(0, 0, 0, 1); // 最初は不透明
-        Debug.Log("GameManager: フェードイン開始 (不透明 -> 透明)");
-
+        m_globalFadeCanvasGroup.alpha = startAlpha;
+        m_globalFadePanelImage.color = new Color(0f, 0f, 0f, m_globalFadePanelImage.color.a);
         float timer = 0f;
         while (timer < duration)
         {
             timer += Time.unscaledDeltaTime;
-            float alpha = Mathf.Lerp(1, 0, timer / duration); // 1から0へ補間
-            m_globalFadePanelImage.color = new Color(0, 0, 0, alpha);
+            float progress = timer / duration;
+            m_globalFadeCanvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, progress);
+            m_globalFadePanelImage.color = new Color(0f, 0f, 0f, m_globalFadePanelImage.color.a);
             yield return null;
         }
-
-        m_globalFadePanelImage.color = new Color(0, 0, 0, 0); // 完全に透明に
-        m_globalFadePanelImage.gameObject.SetActive(false);
-        m_globalFadeCanvasInstance.SetActive(false);
-        m_isTransitioning = false;
-        Debug.Log("GameManager: FadeIn: 完了しました。パネルと専用Canvasを非アクティブにしました。");
+        m_globalFadeCanvasGroup.alpha = endAlpha;
+        m_globalFadePanelImage.color = new Color(0f, 0f, 0f, m_globalFadePanelImage.color.a);
+        onComplete?.Invoke();
     }
 
-
-    // フェードアウトとシーンロード処理
-    private IEnumerator FadeOutAndLoadScene(string sceneName, float duration = 1.0f)
+    private void StartFadeIn()
     {
-        Debug.Log($"GameManager: FadeOutAndLoadSceneを開始します。対象シーン: {sceneName}");
-        m_globalFadeCanvasInstance.SetActive(true);
-        m_globalFadePanelImage.gameObject.SetActive(true);
-
-        m_globalFadePanelImage.color = new Color(0, 0, 0, 0); // 最初は透明
-        Debug.Log("GameManager: フェードアウト開始 (透明 -> 不透明)");
-
-        float timer = 0f;
-        while (timer < duration)
+        if (m_fadeCoroutine != null) StopCoroutine(m_fadeCoroutine);
+        if (m_globalFadeCanvasInstance != null && !m_globalFadeCanvasInstance.activeSelf) m_globalFadeCanvasInstance.SetActive(true);
+        if (m_globalFadePanelImage != null && !m_globalFadePanelImage.gameObject.activeSelf) m_globalFadePanelImage.gameObject.SetActive(true);
+        if (m_globalFadeCanvasGroup != null)
         {
-            timer += Time.unscaledDeltaTime;
-            float alpha = Mathf.Lerp(0, 1, timer / duration); // 0から1へ補間
-            m_globalFadePanelImage.color = new Color(0, 0, 0, alpha);
-            yield return null;
+            m_globalFadeCanvasGroup.blocksRaycasts = true;
+            m_globalFadeCanvasGroup.interactable = true;
         }
-
-        m_globalFadePanelImage.color = new Color(0, 0, 0, 1); // 完全に不透明に
-        Debug.Log($"GameManager: シーンロード開始: {sceneName}");
-
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
-        asyncLoad.allowSceneActivation = false; // シーンのアクティブ化を待つ
-
-        while (!asyncLoad.isDone)
+        m_fadeCoroutine = StartCoroutine(FadeCanvasGroup(1f, 0f, m_fadeDuration, () =>
         {
-            // 0.9fに達したら、シーンのアクティブ化を許可
-            if (asyncLoad.progress >= 0.9f)
+            if (m_globalFadeCanvasGroup != null)
             {
-                asyncLoad.allowSceneActivation = true;
-                Debug.Log($"GameManager: シーン '{sceneName}' のアクティブ化を許可しました。");
+                m_globalFadeCanvasGroup.alpha = 0f;
+                m_globalFadeCanvasGroup.blocksRaycasts = false;
+                m_globalFadeCanvasGroup.interactable = false;
             }
-            yield return null;
-        }
+        }));
     }
 
-    // スコアUIの表示/非表示を制御する新しいメソッド
-    private void SetScoreUIActive(bool isActive)
+    public void GameOver()
     {
-        if (scorePanel != null)
+        if (m_currentGameState == GameState.GameOver || m_isGlobalTransitioning)
         {
-            scorePanel.SetActive(isActive);
-            Debug.Log($"GameManager: ScorePanelの表示を {(isActive ? "有効" : "無効")} にしました。");
+            Debug.LogWarning("GameManager: 既にゲームオーバー状態か遷移中のため、GameOver処理をスキップしました。", this);
+            return;
+        }
+        SetState(GameState.GameOver);
+        PlayBGM(null);
+        LoadSceneWithFade(m_gameOverSceneName);
+    }
+
+    public void GameClear()
+    {
+        if (m_currentGameState == GameState.StageClear || m_isGlobalTransitioning)
+        {
+            Debug.LogWarning("GameManager: 既にゲームクリア状態か遷移中のため、GameClear処理をスキップしました。", this);
+            return;
+        }
+        SetState(GameState.StageClear);
+        PlayBGM(null);
+        LoadSceneWithFade(m_clearSceneName);
+    }
+
+    public void SetStageClear(int stageIndex)
+    {
+        PlayerPrefs.SetInt(STAGE_CLEAR_KEY_PREFIX + stageIndex, 1);
+        PlayerPrefs.Save();
+        Debug.Log($"ステージ{stageIndex + 1}をクリアしました。");
+    }
+
+    public bool IsStageClear(int stageIndex) => PlayerPrefs.GetInt(STAGE_CLEAR_KEY_PREFIX + stageIndex, 0) == 1;
+    public void ClearAllStageData()
+    {
+        for (int i = 0; i < m_stageSceneNames.Length; i++)
+        {
+            PlayerPrefs.DeleteKey(STAGE_CLEAR_KEY_PREFIX + i);
+        }
+        PlayerPrefs.Save();
+        Debug.Log("すべてのステージクリアデータを削除しました。");
+    }
+
+    public void ResetGameData()
+    {
+        m_currentGemCount = 0;
+        OnGemCountChanged?.Invoke(m_currentGemCount);
+        m_currentTime = m_timeLimitSeconds;
+    }
+
+    public void SetScoreUIActive(bool isActive)
+    {
+        if (m_scorePanel != null)
+        {
+            if (m_scorePanel.activeSelf != isActive)
+            {
+                m_scorePanel.SetActive(isActive);
+            }
         }
         else
         {
-            Debug.LogWarning("GameManager: SetScoreUIActive - scorePanelがnullです。");
+            Debug.LogWarning("GameManager: ScorePanelが割り当てられていないため、SetScoreUIActiveをスキップしました。", this);
         }
-    }
-
-    // ゲームを終了する
-    public void QuitGame()
-    {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
-        Debug.Log("GameManager: ゲームを終了します。");
     }
 }

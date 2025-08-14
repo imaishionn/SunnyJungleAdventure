@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -28,9 +27,6 @@ public class GameCamera : MonoBehaviour
     [SerializeField]
     [Tooltip("カメラが移動できる最小位置 (X, Y)")]
     Vector2 CameraMinPos = Vector2.zero; // カメラの最小位置 (X, Y)
-
-    // ★以前の StopFollowY と m_isCameraStopped は削除しました。
-    // ★これにより、カメラが完全に停止するのではなく、指定範囲内で追従するようになります。
 
     // シングルトンインスタンス (PlayerMoveなどから簡単に参照できるようにするため)
     public static GameCamera Instance { get; private set; }
@@ -65,7 +61,7 @@ public class GameCamera : MonoBehaviour
             }
             else
             {
-                UnityEngine.Debug.LogError("Playerタグのゲームオブジェクトが見つかりません！カメラ追従ができません。");
+                UnityEngine.Debug.LogError("GameCamera: Playerタグのゲームオブジェクトが見つかりません！カメラ追従ができません。", this);
             }
         }
     }
@@ -84,6 +80,8 @@ public class GameCamera : MonoBehaviour
     /// </summary>
     void CameraUpdate()
     {
+        // ここでの null チェックは、LateUpdateで既にチェックされていれば冗長ですが、
+        // CameraUpdateが他の場所から直接呼び出される可能性を考慮すると安全です。
         if (m_player == null) return;
 
         // プレイヤーの位置にオフセットを加えた目標位置を計算
@@ -104,6 +102,4 @@ public class GameCamera : MonoBehaviour
         // カメラの位置を目標位置に設定
         transform.position = targetPos;
     }
-
-    // ★以前の StopCameraFollow() と StartCameraFollow() は、このクランプ方式では不要なため削除しました。
 }
