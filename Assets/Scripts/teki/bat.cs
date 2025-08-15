@@ -1,19 +1,19 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 public class bat : Enemy
 {
-    [Header("ƒvƒŒƒCƒ„[ŒŸ’m‹——£")]
+    [Header("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æ¤œçŸ¥è·é›¢")]
     [SerializeField] float DetectRange = 5f;
 
-    [Header("”òs‘¬“x")]
+    [Header("é£›è¡Œé€Ÿåº¦")]
     [SerializeField] float FlySpeed = 5f;
 
     [SerializeField] Transform m_player;
     private bool m_isFlying = false;
 
-    // €–SƒAƒjƒ[ƒVƒ‡ƒ“Ä¶ŠÔ
+    // æ­»äº¡ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å†ç”Ÿæ™‚é–“
     [SerializeField] private float m_deathAnimationDuration = 1.0f;
 
     protected override void Awake()
@@ -27,7 +27,7 @@ public class bat : Enemy
                 m_player = playerObj.transform;
             else
             {
-                Debug.LogWarning("Vulture: 'Player'ƒ^ƒO‚ğ‚ÂGameObject‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB", this);
+                Debug.LogWarning("Vulture: 'Player'ã‚¿ã‚°ã‚’æŒã¤GameObjectãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚", this);
             }
         }
 
@@ -35,6 +35,19 @@ public class bat : Enemy
         {
             m_rb.gravityScale = 0f;
             m_rb.drag = 1f;
+        }
+    }
+
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+        // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒãƒ—ãƒ¼ãƒ«ã‹ã‚‰å†åˆ©ç”¨ã•ã‚Œã‚‹éš›ã®åˆæœŸåŒ–
+        IsDead = false;
+        m_isFlying = false;
+        if (m_rb != null) m_rb.velocity = Vector2.zero;
+        if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
+        {
+            m_animator.SetBool("fly", false);
         }
     }
 
@@ -108,22 +121,22 @@ public class bat : Enemy
     {
         if (IsDead) return;
 
-        // €–SƒAƒjƒ[ƒVƒ‡ƒ“‚ğÄ¶
+        // è¦ªã‚¯ãƒ©ã‚¹ã®Die()ã‚’å‘¼ã³å‡ºã—ã¦ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã‚’ç„¡åŠ¹åŒ–
+        base.Die();
+
+        // æ­»äº¡ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’å†ç”Ÿ
         if (m_animator != null && HasAnimatorParameter("des", AnimatorControllerParameterType.Trigger))
         {
             m_animator.SetTrigger("des");
         }
 
-        // €–SƒAƒjƒ[ƒVƒ‡ƒ“‚ªI‚í‚é‚Ü‚Å‘Ò‚Á‚Ä‚©‚ç”ñƒAƒNƒeƒBƒu‚É‚·‚é
+        // æ­»äº¡ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãŒçµ‚ã‚ã‚‹ã¾ã§å¾…ã£ã¦ã‹ã‚‰éã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã«ã™ã‚‹
         StartCoroutine(DeactivateAfterDelay(m_deathAnimationDuration));
     }
 
-    // €–SƒAƒjƒ[ƒVƒ‡ƒ“Œã‚ÉƒIƒuƒWƒFƒNƒg‚ğ”ñƒAƒNƒeƒBƒu‚É‚·‚éƒRƒ‹[ƒ`ƒ“
     private IEnumerator DeactivateAfterDelay(float delay)
     {
-        IsDead = true; // €–Só‘Ô‚Éİ’è‚µAFixedUpdate‚Ìˆ—‚ğ~‚ß‚é
         yield return new WaitForSeconds(delay);
-        gameObject.SetActive(false); // ƒv[ƒ‹‚É–ß‚·
-        IsDead = false; // •œŠˆ‚É”õ‚¦‚ÄƒŠƒZƒbƒg
+        gameObject.SetActive(false); // ãƒ—ãƒ¼ãƒ«ã«æˆ»ã™
     }
 }

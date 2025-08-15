@@ -1,8 +1,10 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TMPro; // TextMeshProを使用するために追加
 using Debug = UnityEngine.Debug;
 
 public class GameManager : MonoBehaviour
@@ -31,7 +33,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private EventSystem m_permanentEventSystem;
     [SerializeField] private ScoreDisplay m_scoreDisplay;
     [SerializeField] private GameObject m_scorePanel;
-    // UI要素の宣言は削除済み
+    // TextMeshProUGUI型に変更
+    [SerializeField] private TMPro.TextMeshProUGUI m_timeLimitText;
 
     [Header("シーン名 (Build Settingsに登録必須)")]
     [SerializeField] private string m_titleSceneName = "TitleScene";
@@ -55,15 +58,21 @@ public class GameManager : MonoBehaviour
     [SerializeField] private bool m_isTimeLimited = false;
     [Tooltip("Total time in seconds for the time limit.")]
     [SerializeField] private float m_timeLimitSeconds = 60.0f;
-    [Tooltip("BGM to play when time limit is active.")]
-    [SerializeField] private AudioClip m_timeLimitBGM;
-    [Tooltip("Normal gameplay BGM.")]
-    [SerializeField] private AudioClip m_normalBGM;
-    [Tooltip("BGM for Demo_tileset3 scene.")] // Demo_tileset3専用のBGMを追加
-    [SerializeField] private AudioClip m_demoTileset3BGM;
+
+    [Header("BGM Management")]
+    [Tooltip("シーン名とBGMのAudioClipをマッピングします。")]
+    [SerializeField] private List<SceneBGMData> m_sceneBGMList;
+    private Dictionary<string, AudioClip> m_sceneBGMMap = new Dictionary<string, AudioClip>();
 
     private float m_currentTime;
     private AudioSource m_audioSource;
+
+    [System.Serializable]
+    public class SceneBGMData
+    {
+        public string sceneName;
+        public AudioClip bgmClip;
+    }
 
     public GameState GetCurrentGameState() => m_currentGameState;
     public void SetState(GameState newState) => m_currentGameState = newState;
@@ -111,6 +120,15 @@ public class GameManager : MonoBehaviour
                 m_audioSource = gameObject.AddComponent<AudioSource>();
             }
             m_audioSource.loop = true;
+
+            // シーン名とBGMのAudioClipを辞書に変換
+            foreach (var data in m_sceneBGMList)
+            {
+                if (!m_sceneBGMMap.ContainsKey(data.sceneName))
+                {
+                    m_sceneBGMMap.Add(data.sceneName, data.bgmClip);
+                }
+            }
 
             if (m_globalFadeCanvasGroup != null)
             {
@@ -175,9 +193,29 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        // ゲームプレイ中で、時間制限が有効な場合
         if (m_isTimeLimited && m_currentGameState == GameState.Gameplay)
         {
             m_currentTime -= Time.deltaTime;
+
+            // UIに残り時間を表示
+            if (m_timeLimitText != null)
+            {
+                // 残り時間を整数に変換して表示
+                m_timeLimitText.text = "Time: " + Mathf.CeilToInt(m_currentTime).ToString();
+
+                // 時間が少なくなったらテキストの色を変えるなど視覚的な演出も可能
+                if (m_currentTime <= 10f)
+                {
+                    m_timeLimitText.color = Color.red;
+                }
+                else
+                {
+                    m_timeLimitText.color = Color.white;
+                }
+            }
+
+            // 時間切れになったらゲームオーバー
             if (m_currentTime <= 0)
             {
                 m_currentTime = 0;
@@ -194,6 +232,7 @@ public class GameManager : MonoBehaviour
         if (m_permanentEventSystem == null) Debug.LogError("Permanent Event Systemが割り当てられていません。", this);
         if (m_scoreDisplay == null) Debug.LogError("Score Displayが割り当てられていません。", this);
         if (m_scorePanel == null) Debug.LogError("Score Panelが割り当てられていません。", this);
+        if (m_timeLimitText == null) Debug.LogWarning("Time Limit Textが割り当てられていません。時間制限UIは表示されません。", this); // 新しい警告
     }
 
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
@@ -228,39 +267,38 @@ public class GameManager : MonoBehaviour
         }
         UpdatePermanentUIForScene(scene.name);
 
+        if (m_sceneBGMMap.ContainsKey(scene.name))
+        {
+            PlayBGM(m_sceneBGMMap[scene.name]);
+        }
+        else
+        {
+            PlayBGM(null);
+        }
+
         if (scene.name == m_titleSceneName)
         {
             SetState(GameState.Title);
             ResetGameData();
-            PlayBGM(m_normalBGM);
         }
         else if (scene.name == m_stageSelectSceneName)
         {
             SetState(GameState.StageSelect);
-            PlayBGM(m_normalBGM);
         }
-        else if (scene.name == "Demo_tileset3") // Demo_tileset3のシーン名でBGMを切り替え
+        else if (scene.name == m_gameOverSceneName)
         {
-            SetState(GameState.Gameplay);
-            InitializeGameplayState();
-            PlayBGM(m_demoTileset3BGM);
+            SetState(GameState.GameOver);
+        }
+        else if (scene.name == m_clearSceneName)
+        {
+            SetState(GameState.StageClear);
         }
         else if (scene.name.StartsWith("Demo_tileset") || scene.name.StartsWith("Stage"))
         {
             SetState(GameState.Gameplay);
             InitializeGameplayState();
-            PlayBGM(m_isTimeLimited ? m_timeLimitBGM : m_normalBGM);
         }
-        else if (scene.name == m_gameOverSceneName)
-        {
-            SetState(GameState.GameOver);
-            PlayBGM(null);
-        }
-        else if (scene.name == m_clearSceneName)
-        {
-            SetState(GameState.StageClear);
-            PlayBGM(null);
-        }
+
         m_isGlobalTransitioning = false;
     }
 
@@ -305,6 +343,15 @@ public class GameManager : MonoBehaviour
         else Debug.LogWarning("GameManager: Permanent UI Canvas (ScorePanelなど) が割り当てられていません。", this);
         bool isGameplayScene = sceneName.StartsWith("Demo_tileset") || sceneName.StartsWith("Stage");
         SetScoreUIActive(isGameplayScene);
+        SetTimeLimitUIActive(isGameplayScene && m_isTimeLimited);
+    }
+
+    private void SetTimeLimitUIActive(bool isActive)
+    {
+        if (m_timeLimitText != null)
+        {
+            m_timeLimitText.gameObject.SetActive(isActive);
+        }
     }
 
     public void LoadSceneWithFade(string sceneName, float duration = 1.0f, System.Action onFadeOutComplete = null)
