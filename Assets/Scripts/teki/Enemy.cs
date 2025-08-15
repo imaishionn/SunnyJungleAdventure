@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
@@ -26,18 +26,19 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// “G‚ªƒ_ƒ[ƒW‚ğó‚¯‚éˆ—‚ğ’è‹`‚·‚éB
-    /// </summary>
+    // ã“ã®ãƒ¡ã‚½ãƒƒãƒ‰ã«'virtual'ã‚’è¿½åŠ ã—ã¾ã—ãŸ
+    protected virtual void OnEnable()
+    {
+        IsDead = false;
+        if (m_collider != null) m_collider.enabled = true;
+        if (m_rb != null) m_rb.isKinematic = false;
+    }
+
     public virtual void TakeDamage()
     {
-        // qƒNƒ‰ƒX‚ÅƒI[ƒo[ƒ‰ƒCƒh‚µ‚Ä‹ï‘Ì“I‚Èˆ—‚ğ‹Lq
         Die();
     }
 
-    /// <summary>
-    /// “G‚ª€–S‚·‚éˆ—
-    /// </summary>
     public virtual void Die()
     {
         if (IsDead) return;
@@ -55,30 +56,21 @@ public class Enemy : MonoBehaviour
             m_collider.enabled = false;
         }
 
-        // Animator‚É"des"‚Æ‚¢‚¤Triggerƒpƒ‰ƒ[ƒ^‚ª‘¶İ‚·‚é‚©ƒ`ƒFƒbƒN
         if (hasAnimator && HasAnimatorParameter("des", AnimatorControllerParameterType.Trigger))
         {
             m_animator.SetTrigger("des");
         }
         else
         {
-            // ƒpƒ‰ƒ[ƒ^‚ª‚È‚¢ê‡‚Í‘¦À‚ÉƒIƒuƒWƒFƒNƒg‚ğ”jŠü
             Destroy(gameObject);
         }
     }
 
-    /// <summary>
-    /// ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒg‚©‚çŒÄ‚Ño‚³‚ê‚éƒƒ\ƒbƒhB
-    /// €–SƒAƒjƒ[ƒVƒ‡ƒ“‚ÌI—¹‚ÉƒIƒuƒWƒFƒNƒg‚ğ”jŠü‚·‚éB
-    /// </summary>
     public void OnDefeatAnimationEnd()
     {
         Destroy(gameObject);
     }
 
-    /// <summary>
-    /// Animator‚Éw’è‚³‚ê‚½ƒpƒ‰ƒ[ƒ^‚ª‘¶İ‚·‚é‚©‚Ç‚¤‚©‚ğƒ`ƒFƒbƒN‚·‚éƒwƒ‹ƒp[ƒƒ\ƒbƒhB
-    /// </summary>
     protected bool HasAnimatorParameter(string paramName, AnimatorControllerParameterType paramType)
     {
         if (!hasAnimator || m_animator.runtimeAnimatorController == null) return false;
