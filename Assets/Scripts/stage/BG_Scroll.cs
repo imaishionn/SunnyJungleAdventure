@@ -1,18 +1,26 @@
 using UnityEngine;
-using Debug = UnityEngine.Debug; // Debugの曖昧な参照を解消するため
+using Debug = UnityEngine.Debug;
 
+/// <summary>
+/// プレイヤーの横移動に応じて背景をスクロールさせるスクリプトです。
+/// </summary>
 public class BG_Scroll : MonoBehaviour
 {
-    // プレイヤーへの参照
-    // InspectorでPlayerオブジェクトを割り当てるか、Awakeで自動的に取得する
-    [SerializeField] PlayerMove m_playerMove;
+    // ----------------------------------------------------------------------------------------------------
+    // インスペクターで設定するパラメーター
+    // ----------------------------------------------------------------------------------------------------
+    [Header("コンポーネント")]
+    [Tooltip("プレイヤーの移動速度を取得するためのPlayerMoveコンポーネント")]
+    [SerializeField] private PlayerMove m_playerMove;
 
-    // 移動速度補正 (大きいほど遅くなる)
-    // ゼロ除算を防ぐため、デフォルト値を1.0fに設定
-    [SerializeField, Header("移動速度補正 (大きいほど遅くなる)")]
-    private float Division = 1.0f; // デフォルト値を0.0fから1.0fに変更
+    [Header("スクロール設定")]
+    [Tooltip("背景のスクロール速度を補正します（大きいほど遅くなる）。ゼロは不可。")]
+    [SerializeField] private float Division = 1.0f;
 
-    void Start()
+    // ----------------------------------------------------------------------------------------------------
+    // MonoBehaviourのライフサイクルメソッド
+    // ----------------------------------------------------------------------------------------------------
+    private void Awake()
     {
         // PlayerMoveがInspectorで割り当てられていない場合、タグで検索して取得
         if (m_playerMove == null)
@@ -25,33 +33,31 @@ public class BG_Scroll : MonoBehaviour
 
             if (m_playerMove == null)
             {
-                // エラーメッセージをより具体的に
-                Debug.LogError("BG_Scroll: 'Player'タグを持つオブジェクトにPlayerMoveコンポーネントが見つかりません。Inspectorで設定するか、またはPlayerオブジェクトにアタッチされているか確認してください。", this);
+                Debug.LogError("BG_Scroll: 'Player'タグを持つオブジェクトにPlayerMoveコンポーネントが見つかりません。Inspectorで設定するか、Playerオブジェクトにコンポーネントがアタッチされているか確認してください。", this);
             }
         }
 
         // Divisionが0の場合の警告と修正
         if (Division == 0.0f)
         {
-            Debug.LogWarning("BG_Scroll: Divisionの値が0です。ゼロ除算を防ぐため、1.0fに設定します。", this);
+            Debug.LogWarning("BG_Scroll: Divisionの値が0です。ゼロ除算を防ぐため、値を1.0fに設定します。", this);
             Division = 1.0f;
         }
     }
 
-    void Update()
+    private void Update()
     {
-        // 必要な参照がないか、Divisionが0の場合は処理をスキップ
+        // プレイヤーの参照がないか、Divisionが0の場合は処理をスキップ
         if (m_playerMove == null || Division == 0.0f)
         {
             return;
         }
 
-        // プレイヤーの移動速度に応じて背景をスクロールさせる
-        // PlayerMoveスクリプトの 'MoveSpeed' プロパティにアクセス
-        // 背景はプレイヤーの移動方向と逆方向に動くため、負の値を適用
+        // プレイヤーの移動方向に応じて背景を動かす
+        // PlayerMoveの速度をDivisionで割り、タイムデルタで滑らかに移動させる
         float move = (-m_playerMove.MoveSpeed / Division) * Time.deltaTime;
 
-        // 背景を移動する
+        // 背景を横方向に移動
         transform.Translate(new Vector3(move, 0.0f, 0.0f));
     }
 }

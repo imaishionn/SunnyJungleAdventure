@@ -2588,7 +2588,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectPoolManager: {fileID: 1638411209}
   spawnInterval: 1
-  spawnCount: 12
+  spawnCount: 10
 --- !u!4 &946536642
 Transform:
   m_ObjectHideFlags: 0
@@ -3590,7 +3590,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7627701451703654771, guid: 9758c6cb0e8cdf942b1613478d3ffed4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.09000015
+      value: -0.22
       objectReference: {fileID: 0}
     - target: {fileID: 7627701451703654771, guid: 9758c6cb0e8cdf942b1613478d3ffed4, type: 3}
       propertyPath: m_LocalPosition.z
@@ -5593,7 +5593,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 8032579176860218683, guid: 0502a72bcc0bfb547abf500d8f5a8977, type: 3}
-  poolSize: 12
+  poolSize: 10
 --- !u!4 &1638411210
 Transform:
   m_ObjectHideFlags: 0
@@ -6386,7 +6386,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8372330822871550074, guid: 1b22533e73ce89d46a1c9fcf54762498, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.41
+      value: 0.44
       objectReference: {fileID: 0}
     - target: {fileID: 8372330822871550074, guid: 1b22533e73ce89d46a1c9fcf54762498, type: 3}
       propertyPath: m_LocalPosition.z
@@ -52764,7 +52764,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1116545521925758385}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.388, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -52896,7 +52896,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1116545523895673446}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.011, y: -0.1651, z: 0}
+  m_LocalPosition: {x: -0.011, y: -0.179, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -52945,11 +52945,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05dfd83522e7241488de951bfbdc0bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CameraAddPos: {x: 0, y: 1, z: -10}
-  UseClampX: 0
-  UseClampY: 0
-  CameraMaxPos: {x: 1000, y: 1000}
-  CameraMinPos: {x: 0, y: 0}
+  player: {fileID: 0}
+  cameraOffset: {x: 0, y: 0, z: -10}
+  useClampX: 0
+  useClampY: 0
+  cameraMaxPos: {x: 0, y: 0}
+  cameraMinPos: {x: 0, y: 0}
 --- !u!114 &1914505515479234573
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53069,6 +53070,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameOverUI: {fileID: 2251661860890227151}
+  retryButton: {fileID: 0}
+  backToTitleButton: {fileID: 0}
+  titleSceneName: TitleScene
 --- !u!4 &2251661860890227150
 Transform:
   m_ObjectHideFlags: 0

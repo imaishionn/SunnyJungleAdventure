@@ -753,4 +753,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e597c81a422b70a4990acdf02bf289c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  firstSelected: {fileID: 825047329}
+  firstSelected: {fileID: 825047331}
+  titleSceneName: TitleScene

@@ -120,9 +120,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 327c293c2647835489aa34a8c92fd587, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DetectRange: 15
-  FlySpeed: 6
-  m_player: {fileID: 0}
+  DetectRange: 12
+  FlySpeed: 5
   m_deathAnimationDuration: 1
 --- !u!70 &2790815756443884054
 CapsuleCollider2D:

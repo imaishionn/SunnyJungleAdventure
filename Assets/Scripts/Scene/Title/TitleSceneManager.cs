@@ -1,48 +1,56 @@
 using UnityEngine;
-using UnityEngine.EventSystems; // ボタンの初期選択用
-using UnityEngine.SceneManagement; // SceneManager を使用 (直接呼び出しは減らすが念のため)
+using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // Debugの曖昧な参照を解消するため明示的に指定
 using Debug = UnityEngine.Debug;
 
+/// <summary>
+/// タイトルシーンのUIとイベントを管理するスクリプトです。
+/// ボタンクリックによるシーン遷移を制御します。
+/// </summary>
 public class TitleSceneManager : MonoBehaviour
 {
-    [SerializeField] private Button startButton; // インスペクターで設定してください
-    [SerializeField] private GameObject titleCanvas; // タイトルシーンのメインCanvas（表示/非表示用）
+    // ----------------------------------------------------------------------------------------------------
+    // インスペクターで設定するパラメーター
+    // ----------------------------------------------------------------------------------------------------
+    [Header("UI設定")]
+    [Tooltip("ゲーム開始ボタン")]
+    [SerializeField] private Button startButton;
+    [Tooltip("タイトルシーンのメインCanvas")]
+    [SerializeField] private GameObject titleCanvas;
 
+    // ----------------------------------------------------------------------------------------------------
+    // MonoBehaviourのライフサイクルメソッド
+    // ----------------------------------------------------------------------------------------------------
     private void Start()
     {
-        // GameManagerからのAwake/OnSceneLoadedで状態は既にTitleに設定されているはず
-        // なので、ここでSetStateを呼び出す必要はないが、念のため状態確認はOK
- 
+        // Canvasの存在チェック
         if (titleCanvas != null)
         {
-            // 既にフェードイン完了後なので、Startではアクティブにしておく
-            // フェードインはGameManagerのOnSceneLoadedで制御されるため、
-            // ここでCanvasのActive/Deactiveを直接制御する必要は基本的にない
+            // Canvasをアクティブにする。フェードインはGameManagerが担当。
             titleCanvas.SetActive(true);
-  
         }
         else
         {
             Debug.LogError("TitleSceneManager: Title Canvas が割り当てられていません！", this);
         }
 
-
+        // スタートボタンの存在チェックとリスナーの登録
         if (startButton != null)
         {
+            // ボタンがクリックされたときのイベントを登録
             startButton.onClick.AddListener(OnStartButtonClicked);
 
-
-            // ゲームパッド/キーボード操作のために初期選択を設定
-            // ボタンにButtonSoundEffectが付いている場合、ここでSetSelectedGameObjectを呼ぶと
-            // OnSelectが発火してサウンドが鳴る可能性があります。
-            // 必要に応じて、サウンド再生ロジックを調整してください。
+            // ゲームパッドやキーボード操作のために、初期選択をStartボタンに設定
             if (EventSystem.current != null)
             {
                 EventSystem.current.SetSelectedGameObject(startButton.gameObject);
-                // Debug.Log("TitleSceneManager: 初期選択をStartボタンに設定しました。", this); // 削除
+            }
+            else
+            {
+                Debug.LogWarning("TitleSceneManager: EventSystemが見つかりません。ボタンの初期選択に失敗しました。", this);
             }
         }
         else
@@ -51,19 +59,32 @@ public class TitleSceneManager : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        // シーン遷移時にボタンのイベントリスナーを解除する
+        if (startButton != null)
+        {
+            startButton.onClick.RemoveListener(OnStartButtonClicked);
+        }
+    }
+
+    // ----------------------------------------------------------------------------------------------------
+    // UIイベントハンドラー
+    // ----------------------------------------------------------------------------------------------------
+    /// <summary>
+    /// スタートボタンがクリックされたときに呼ばれます。
+    /// </summary>
     private void OnStartButtonClicked()
     {
-
-
-        // GameManagerのフェード付きシーンロードを呼び出す
+        // GameManagerのインスタンスを介してフェード付きでシーンをロード
         if (GameManager.instance != null)
         {
             GameManager.instance.LoadSceneWithFade(GameManager.instance.StageSelectSceneName);
         }
         else
         {
-            Debug.LogError("TitleSceneManager: GameManagerが見つかりません！フェードなしで遷移します。", this);
-            SceneManager.LoadScene(GameManager.instance.StageSelectSceneName); // フォールバック
+            Debug.LogError("TitleSceneManager: GameManagerが見つかりません！フェードなしでシーン遷移します。", this);
+            SceneManager.LoadScene(GameManager.instance.StageSelectSceneName); // フォールバック処理
         }
     }
 }
