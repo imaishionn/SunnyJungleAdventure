@@ -157,9 +157,9 @@ MonoBehaviour:
   detectRange: 5
   bombPrefab: {fileID: 4789463544227173950, guid: 03026989f00004f4d8ed41b280823de4, type: 3}
   launchPoint: {fileID: 5465275800340486311}
-  bombLaunchSpeed: 4
-  attackInterval: 4
-  verticalMoveSpeed: 2
+  bombLaunchSpeed: 5
+  attackInterval: 3
+  verticalMoveSpeed: 3
   verticalMoveRange: 2
 --- !u!114 &1287032410877810327
 MonoBehaviour:

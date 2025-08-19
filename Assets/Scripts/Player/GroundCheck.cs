@@ -1,33 +1,55 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Debug = UnityEngine.Debug; // 曖昧な参照を解消
 
-
+/// <summary>
+/// 2Dプラットフォームゲームで、キャラクターが地面に接地しているかを判定するスクリプトです。
+/// プレイヤーの足元の子オブジェクトにアタッチして使用します。
+/// </summary>
 public class GroundCheck : MonoBehaviour
 {
-    // 接地しているかを格納する変数
-    bool m_isGround;
-    // 地面に触れているかを返す関数
+    // ----------------------------------------------------------------------------------------------------
+    // プライベート変数 (Inspectorで設定する必要はありません)
+    // ----------------------------------------------------------------------------------------------------
+    private bool m_isGround = false;
+
+    // ----------------------------------------------------------------------------------------------------
+    // パブリックメソッド
+    // ----------------------------------------------------------------------------------------------------
+    /// <summary>
+    /// キャラクターが地面に接地しているかどうかの状態を返します。
+    /// </summary>
+    /// <returns>地面に接地していればtrue、そうでなければfalse</returns>
     public bool GetIsGround()
     {
         return m_isGround;
     }
 
-
-    // 毎フレーム最初に接地判定をリセットする
-    private void FixedUpdate()
-    {
-        m_isGround = false;
-    }
-
-
-    // 2Dがつくので注意！
+    // ----------------------------------------------------------------------------------------------------
+    // トリガーイベントメソッド
+    // ----------------------------------------------------------------------------------------------------
+    /// <summary>
+    /// このトリガーコライダーが他の2Dコライダーと接触している間、毎フレーム呼び出されます。
+    /// </summary>
+    /// <param name="collision">接触している他のコライダー</param>
     private void OnTriggerStay2D(Collider2D collision)
     {
-        // 地面のタグが付いたオブジェクトに衝突している
+        // 接触しているオブジェクトが「Ground」タグを持つかチェック
         if (collision.CompareTag("Ground"))
         {
             m_isGround = true;
+        }
+    }
+
+    /// <summary>
+    /// このトリガーコライダーが他の2Dコライダーとの接触を終了したときに呼び出されます。
+    /// </summary>
+    /// <param name="collision">接触を終了した他のコライダー</param>
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        // 接触を終了したオブジェクトが「Ground」タグを持つかチェック
+        if (collision.CompareTag("Ground"))
+        {
+            m_isGround = false;
         }
     }
 }

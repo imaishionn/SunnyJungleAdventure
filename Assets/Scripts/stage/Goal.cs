@@ -1,41 +1,54 @@
 using UnityEngine;
-// using System.Diagnostics; // ★この行があったら削除またはコメントアウト！★
+using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug; // 曖昧な参照を解消するため
 
+/// <summary>
+/// ゴールオブジェクトのスクリプト。
+/// プレイヤーが接触した際にゲームクリア処理を呼び出します。
+/// </summary>
 public class Goal : MonoBehaviour
 {
-    [SerializeField, Header("ゲームクリア時に遷移するシーン名")]
-    private string gameClearSceneName = "GameClearScene"; // GameManagerの定数を使用するように推奨
+    // ----------------------------------------------------------------------------------------------------
+    // インスペクターで設定するパラメーター
+    // ----------------------------------------------------------------------------------------------------
+    [Header("シーン遷移設定")]
+    [Tooltip("ゲームクリア時に遷移するシーンの名前")]
+    [SerializeField] private string gameClearSceneName = "GameClearScene";
 
-    void OnTriggerEnter2D(Collider2D other)
+    // ----------------------------------------------------------------------------------------------------
+    // トリガーイベントメソッド
+    // ----------------------------------------------------------------------------------------------------
+    /// <summary>
+    /// このコライダーが他の2Dコライダーと接触したときに呼び出されます。
+    /// </summary>
+    /// <param name="other">接触した他のコライダー</param>
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        // プレイヤーがゴールに触れたら
+        // 接触したオブジェクトがプレイヤーかチェック
         if (other.CompareTag("Player"))
         {
-            UnityEngine.Debug.Log("Goal: プレイヤーがゴールしました！", this);
+            Debug.Log("Goal: プレイヤーがゴールに到達しました！", this);
 
             // GameManagerが存在するか確認
             if (GameManager.instance != null)
             {
-                // GameManagerの現在の状態がプレイ中（Gameplay）であることを確認
-                // これにより、既にゲームオーバーやクリア状態になっている場合は多重処理を防ぐ
+                // ゲームの状態が「プレイ中」の場合のみ処理を実行
                 if (GameManager.instance.GetCurrentGameState() == GameManager.GameState.Gameplay)
                 {
-                    UnityEngine.Debug.Log("Goal: GameManagerにゲームクリアを通知します。", this);
+                    Debug.Log("Goal: GameManagerにゲームクリアを通知します。", this);
                     GameManager.instance.SetState(GameManager.GameState.StageClear);
                     GameManager.instance.LoadSceneWithFade(gameClearSceneName);
                 }
                 else
                 {
-                    // 修正点: ここに閉じ丸かっこ`)`を追加
-                    UnityEngine.Debug.Log("Goal: ゲームが既にプレイ状態でないため、ゲームクリア処理をスキップしました。", this);
+                    Debug.Log("Goal: ゲームがプレイ状態ではないため、ゲームクリア処理をスキップしました。", this);
                 }
             }
             else
             {
-                // GameManagerが存在しない場合のフォールバック（望ましくないが、エラー回避のため）
-                UnityEngine.Debug.LogWarning("Goal: GameManagerのインスタンスが見つかりません。直接シーンをロードします。", this);
-                UnityEngine.Debug.Log($"Goal: シーン'{gameClearSceneName}'をロードします。", this);
-                UnityEngine.SceneManagement.SceneManager.LoadScene(gameClearSceneName);
+                // GameManagerが見つからない場合のフォールバック処理
+                Debug.LogWarning("Goal: GameManagerのインスタンスが見つかりません。直接シーンをロードします。", this);
+                SceneManager.LoadScene(gameClearSceneName);
             }
         }
     }

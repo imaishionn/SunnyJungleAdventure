@@ -1,102 +1,98 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 /// <summary>
-/// プレイヤーを追従するゲームカメラのスクリプト。
-/// X軸とY軸の追従範囲をInspectorから設定できるようにします。
+/// プレイヤーを追跡し、設定された範囲内でカメラの移動を制限するスクリプトです。
 /// </summary>
 public class GameCamera : MonoBehaviour
 {
-    GameObject m_player; // 追従するプレイヤーオブジェクト
+    // ----------------------------------------------------------------------------------------------------
+    // インスペクターで設定するパラメーター
+    // ----------------------------------------------------------------------------------------------------
+    [Header("追跡対象")]
+    [Tooltip("追跡するプレイヤーオブジェクト")]
+    [SerializeField] private GameObject player;
 
-    [SerializeField]
-    [Tooltip("カメラのオフセット（プレイヤーからの相対位置）。Zは通常負の値でカメラの奥行きを設定します。")]
-    Vector3 CameraAddPos = new Vector3(0f, 0f, -10f); // プレイヤーからのカメラの相対位置
+    [Header("カメラ設定")]
+    [Tooltip("プレイヤーからのカメラの相対位置。Zは通常負の値でカメラの奥行きを設定します。")]
+    [SerializeField] private Vector3 cameraOffset = new Vector3(0f, 0f, -10f);
 
-    [Header("カメラ追従範囲の制限")]
-    [SerializeField]
-    [Tooltip("カメラのX座標の追従を制限するかどうか")]
-    bool UseClampX = false; // X座標の制限を使用するか
-    [SerializeField]
-    [Tooltip("カメラのY座標の追従を制限するかどうか")]
-    bool UseClampY = false; // Y座標の制限を使用するか
-
-    [SerializeField]
+    [Header("カメラ追跡範囲の制限")]
+    [Tooltip("X座標の追跡を制限するかどうか")]
+    [SerializeField] private bool useClampX = false;
+    [Tooltip("Y座標の追跡を制限するかどうか")]
+    [SerializeField] private bool useClampY = false;
     [Tooltip("カメラが移動できる最大位置 (X, Y)")]
-    Vector2 CameraMaxPos = Vector2.zero; // カメラの最大位置 (X, Y)
-    [SerializeField]
+    [SerializeField] private Vector2 cameraMaxPos = Vector2.zero;
     [Tooltip("カメラが移動できる最小位置 (X, Y)")]
-    Vector2 CameraMinPos = Vector2.zero; // カメラの最小位置 (X, Y)
+    [SerializeField] private Vector2 cameraMinPos = Vector2.zero;
 
-    // シングルトンインスタンス (PlayerMoveなどから簡単に参照できるようにするため)
-    public static GameCamera Instance { get; private set; }
+    // ----------------------------------------------------------------------------------------------------
+    // プライベート変数
+    // ----------------------------------------------------------------------------------------------------
+    // カメラをシングルトンとして管理する場合
+    // public static GameCamera Instance { get; private set; }
 
-    void Awake()
+    // ----------------------------------------------------------------------------------------------------
+    // MonoBehaviourのライフサイクルメソッド
+    // ----------------------------------------------------------------------------------------------------
+    private void Start()
     {
-        // シングルトンインスタンスの設定
-        if (Instance == null)
+        // "Player"タグを持つオブジェクトを検索して設定
+        if (player == null)
         {
-            Instance = this;
-            // DontDestroyOnLoad(gameObject); // カメラが常に存在する必要がなければ不要。シーンごとに配置する場合はコメントアウトのまま。
+            player = GameObject.FindGameObjectWithTag("Player");
         }
-        else
-        {
-            Destroy(gameObject); // 既にインスタンスが存在する場合は、新しい方を破棄
-        }
-    }
 
-    void Start()
-    {
+        // カメラ追跡の有効性をチェック
+        if (player == null)
+        {
+            Debug.LogError("GameCamera: 'Player'タグのゲームオブジェクトが見つかりません！カメラ追跡ができません。", this);
+            return;
+        }
+
+        // シーン名に基づいて追跡を無効化
         string currentSceneName = SceneManager.GetActiveScene().name;
-
-        // ClearSceneではプレイヤー追尾しない
-        if (currentSceneName != "ClearScene")
+        if (currentSceneName == "ClearScene")
         {
-            m_player = GameObject.FindGameObjectWithTag("Player"); // "Player"タグのオブジェクトを検索
-
-            if (m_player != null)
-            {
-                // ゲーム開始時にカメラをプレイヤーの初期位置に合わせる
-                CameraUpdate();
-            }
-            else
-            {
-                UnityEngine.Debug.LogError("GameCamera: Playerタグのゲームオブジェクトが見つかりません！カメラ追従ができません。", this);
-            }
+            Debug.Log("GameCamera: ClearSceneのため、カメラの追跡を無効化します。");
+            player = null; // 追跡を停止するため、参照をクリア
+            return;
         }
-    }
 
-    void LateUpdate()
-    {
-        // LateUpdateでカメラを更新することで、プレイヤーの移動後にカメラが追従し、滑らかな動きになります。
-        if (m_player == null) return;
-
-        // カメラの追従ロジックを実行
+        // ゲーム開始時にカメラをプレイヤーの初期位置に合わせる
         CameraUpdate();
     }
 
+    private void LateUpdate()
+    {
+        // LateUpdateでカメラを更新することで、プレイヤーの移動後に追跡し、より滑らかな動きになります。
+        if (player == null) return;
+
+        // カメラの追跡ロジックを実行
+        CameraUpdate();
+    }
+
+    // ----------------------------------------------------------------------------------------------------
+    // プライベートメソッド
+    // ----------------------------------------------------------------------------------------------------
     /// <summary>
     /// カメラの位置を更新し、設定された範囲内でクランプします。
     /// </summary>
-    void CameraUpdate()
+    private void CameraUpdate()
     {
-        // ここでの null チェックは、LateUpdateで既にチェックされていれば冗長ですが、
-        // CameraUpdateが他の場所から直接呼び出される可能性を考慮すると安全です。
-        if (m_player == null) return;
-
         // プレイヤーの位置にオフセットを加えた目標位置を計算
-        Vector3 targetPos = m_player.transform.position + CameraAddPos;
+        Vector3 targetPos = player.transform.position + cameraOffset;
 
-        // X座標の制限
-        if (UseClampX)
+        // 追跡範囲の制限を適用
+        if (useClampX)
         {
-            targetPos.x = Mathf.Clamp(targetPos.x, CameraMinPos.x, CameraMaxPos.x);
+            targetPos.x = Mathf.Clamp(targetPos.x, cameraMinPos.x, cameraMaxPos.x);
         }
-
-        // Y座標の制限
-        if (UseClampY)
+        if (useClampY)
         {
-            targetPos.y = Mathf.Clamp(targetPos.y, CameraMinPos.y, CameraMaxPos.y);
+            targetPos.y = Mathf.Clamp(targetPos.y, cameraMinPos.y, cameraMaxPos.y);
         }
 
         // カメラの位置を目標位置に設定
