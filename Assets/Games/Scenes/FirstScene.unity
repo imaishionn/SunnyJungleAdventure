@@ -591,15 +591,15 @@ MonoBehaviour:
   m_scorePanel: {fileID: 558137469}
   m_timeLimitText: {fileID: 26130366}
   m_titleSceneName: TitleScene
-  m_bootstrapSceneName: Bootstrap
-  m_stageSelectSceneName: StageSelect
+  m_bootstrapSceneName: FirstScene
+  m_stageSelectSceneName: StageSelectScene
   m_gameOverSceneName: GameOverScene
   m_clearSceneName: ClearScene
   m_stageSceneNames:
-  - Demo_tileset
-  - Demo_tileset2
-  - Demo_tileset3
-  m_scoreSceneName: ScoreScene
+  - Stage1Scene
+  - Stage2Scene
+  - Stage3Scene
+  m_scoreSceneName: Resultscene
   m_isGlobalTransitioning: 0
   m_fadeDuration: 1
   m_isTimeLimited: 1
@@ -607,18 +607,20 @@ MonoBehaviour:
   m_sceneBGMList:
   - sceneName: TitleScene
     bgmClip: {fileID: 8300000, guid: 6979d52fda0579441a2122b95abaf337, type: 3}
-  - sceneName: Demo_tileset
+  - sceneName: Stage1Scene
     bgmClip: {fileID: 8300000, guid: b6dc04f2884eb5b46b675390b1e75e84, type: 3}
-  - sceneName: Demo_tileset2
+  - sceneName: Stage2Scene
     bgmClip: {fileID: 8300000, guid: 0c2f5e196afe4644d9b1ffb8d644851d, type: 3}
-  - sceneName: Demo_tileset3
+  - sceneName: Stage2Scene
     bgmClip: {fileID: 8300000, guid: 9e972459eddc5964081d0c2d813320d8, type: 3}
   - sceneName: ClearScene
     bgmClip: {fileID: 8300000, guid: be32cc3454e0aae4abdc89209994930f, type: 3}
   - sceneName: GameOverScene
     bgmClip: {fileID: 8300000, guid: 2213a9cacad754d4c934719bcda7293d, type: 3}
-  - sceneName: StageSelect
+  - sceneName: StageSelectScene
     bgmClip: {fileID: 8300000, guid: 6979d52fda0579441a2122b95abaf337, type: 3}
+  - sceneName: Resultscene
+    bgmClip: {fileID: 8300000, guid: faad9009b1a8a1a42aaab4b7b0411138, type: 3}
   m_initialBGMVolume: 1
 --- !u!1 &957534962
 GameObject:

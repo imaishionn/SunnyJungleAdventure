@@ -168,7 +168,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firstSelected: {fileID: 1648741139}
-  scoreSceneName: ScoreScene
+  scoreSceneName: Resultscene
 --- !u!1 &929078957
 GameObject:
   m_ObjectHideFlags: 0
