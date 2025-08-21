@@ -85097,8 +85097,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gemClip: {fileID: 8300000, guid: 6b8cb689e45169448a899c1b6bd79dd0, type: 3}
   jumpClip: {fileID: 8300000, guid: 8fb731e3e4e9fc3448d8795b6ffe4c50, type: 3}
-  gameOverClip: {fileID: 8300000, guid: 2d21f7dd9c189b945a8782c662b98aab, type: 3}
-  enemyDefeatClip: {fileID: 8300000, guid: b7db36b7c4a149e44a31a7586874f044, type: 3}
+  gameOverClip: {fileID: 8300000, guid: 7ef16f65f4f334845969b2e840fbce67, type: 3}
+  enemyDefeatClip: {fileID: 8300000, guid: 4c8ae844b590e4744a639b37826aa73f, type: 3}
   enemyDefeatVolume: 1
   gameOverVolume: 1
 --- !u!4 &1608549246

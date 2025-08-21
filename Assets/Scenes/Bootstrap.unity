@@ -595,11 +595,11 @@ MonoBehaviour:
   m_stageSelectSceneName: StageSelect
   m_gameOverSceneName: GameOverScene
   m_clearSceneName: ClearScene
-  m_scoreSceneName: ScoreScene
   m_stageSceneNames:
   - Demo_tileset
   - Demo_tileset2
   - Demo_tileset3
+  m_scoreSceneName: ScoreScene
   m_isGlobalTransitioning: 0
   m_fadeDuration: 1
   m_isTimeLimited: 1
@@ -619,6 +619,7 @@ MonoBehaviour:
     bgmClip: {fileID: 8300000, guid: 2213a9cacad754d4c934719bcda7293d, type: 3}
   - sceneName: StageSelect
     bgmClip: {fileID: 8300000, guid: 6979d52fda0579441a2122b95abaf337, type: 3}
+  m_initialBGMVolume: 1
 --- !u!1 &957534962
 GameObject:
   m_ObjectHideFlags: 0
