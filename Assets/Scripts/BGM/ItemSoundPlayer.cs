@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+
 public class ItemSoundPlayer : MonoBehaviour
 {
-    // ★修正点: AudioSourceコンポーネントの参照を自動で取得するようにする
     private AudioSource audioSource;
 
     [Header("宝石獲得音")]
@@ -18,7 +18,15 @@ public class ItemSoundPlayer : MonoBehaviour
     [Header("敵撃破音")]
     public AudioClip enemyDefeatClip;
 
-    // ★修正点: Awakeメソッドを追加してAudioSourceを取得する
+    // ★追加: 敵撃破音とゲームオーバー音の音量設定
+    [Header("音量設定")]
+    [Tooltip("敵撃破音の再生音量")]
+    [Range(0f, 1f)]
+    [SerializeField] private float enemyDefeatVolume = 1.0f;
+    [Tooltip("ゲームオーバー音の再生音量")]
+    [Range(0f, 1f)]
+    [SerializeField] private float gameOverVolume = 1.0f;
+
     void Awake()
     {
         audioSource = GetComponent<AudioSource>();
@@ -48,7 +56,8 @@ public class ItemSoundPlayer : MonoBehaviour
     {
         if (audioSource != null && gameOverClip != null)
         {
-            audioSource.PlayOneShot(gameOverClip);
+            // ★修正: gameOverVolumeを引数として渡す
+            audioSource.PlayOneShot(gameOverClip, gameOverVolume);
         }
     }
 
@@ -56,7 +65,8 @@ public class ItemSoundPlayer : MonoBehaviour
     {
         if (audioSource != null && enemyDefeatClip != null)
         {
-            audioSource.PlayOneShot(enemyDefeatClip);
+            // ★修正: enemyDefeatVolumeを引数として渡す
+            audioSource.PlayOneShot(enemyDefeatClip, enemyDefeatVolume);
         }
     }
 }

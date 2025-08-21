@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 6772339124832537175}
   - component: {fileID: 257284552657333505}
   - component: {fileID: 7266816844761238991}
+  - component: {fileID: 5407940427505359804}
   m_Layer: 0
   m_Name: dog
   m_TagString: Enemy
@@ -173,6 +174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4353c4005f6beac48b117c43fca978ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreValue: 100
   detectRange: 10
   runSpeed: 7
   runAnimationTrigger: run
@@ -208,3 +210,16 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.28, y: 0.26}
   m_EdgeRadius: 0
+--- !u!114 &5407940427505359804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5508742176212838559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5991d52fefd0ca44f889db35a6d2984f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scoreValue: 100

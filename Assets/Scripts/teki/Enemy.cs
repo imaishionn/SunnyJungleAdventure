@@ -11,6 +11,12 @@ public class Enemy : MonoBehaviour
 
     private bool hasAnimator = false;
 
+    // --- 修正箇所 ---
+    [Header("スコア設定")]
+    [Tooltip("この敵を倒したときに加算されるスコア")]
+    [SerializeField] private int scoreValue = 100;
+    // --- 修正箇所 ---
+
     protected virtual void Awake()
     {
         m_rb = GetComponent<Rigidbody2D>();
@@ -26,7 +32,6 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // このメソッドに'virtual'を追加しました
     protected virtual void OnEnable()
     {
         IsDead = false;
@@ -43,6 +48,21 @@ public class Enemy : MonoBehaviour
     {
         if (IsDead) return;
         IsDead = true;
+
+        // --- 修正箇所 ---
+        // スコア加算
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.AddGem(scoreValue);
+        }
+        // --- 修正箇所 ---
+
+        // ★追加: 敵撃破音を再生する
+        ItemSoundPlayer soundPlayer = FindObjectOfType<ItemSoundPlayer>();
+        if (soundPlayer != null)
+        {
+            soundPlayer.PlayEnemyDefeatSound();
+        }
 
         if (m_rb != null)
         {

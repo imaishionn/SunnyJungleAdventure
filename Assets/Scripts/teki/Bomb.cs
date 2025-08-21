@@ -52,7 +52,7 @@ public class Bomb : MonoBehaviour
         if (bombCollider != null)
         {
             bombCollider.radius = startRadius;
-            bombCollider.isTrigger = true; // プレイヤーに触れたことを検知するため、Is Triggerを有効にする
+            bombCollider.isTrigger = true;
         }
     }
 
@@ -74,12 +74,40 @@ public class Bomb : MonoBehaviour
     /// </summary>
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (hasExploded) return; // 既に爆発済みなら処理をスキップ
+        // 既に爆発済みなら処理をスキップ
+        if (hasExploded) return;
 
-        // プレイヤーまたは地面に触れたら爆発
-        if (other.CompareTag(playerTag) || other.CompareTag("Ground"))
+        // 地面またはプレイヤーに触れたら爆発処理を開始
+        if (other.CompareTag("Ground") || other.CompareTag(playerTag))
         {
-            Explode(other);
+            Explode();
+
+            // プレイヤーに当たった場合の処理（爆発開始時のみ）
+            if (other.CompareTag(playerTag))
+            {
+                PlayerMove playerMove = other.GetComponent<PlayerMove>();
+                if (playerMove != null && !playerMove.IsDead)
+                {
+                    playerMove.Die();
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 他のコライダーと接触している間、毎フレーム呼び出されます。
+    /// </summary>
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        // 爆発処理中（コライダーが拡大中）にプレイヤーが範囲内にいるかチェック
+        if (hasExploded && other.CompareTag(playerTag))
+        {
+            // プレイヤーのDie()メソッドを呼び出す
+            PlayerMove playerMove = other.GetComponent<PlayerMove>();
+            if (playerMove != null && !playerMove.IsDead)
+            {
+                playerMove.Die();
+            }
         }
     }
 
@@ -89,10 +117,9 @@ public class Bomb : MonoBehaviour
     /// <summary>
     /// ボムの爆発処理を開始します。
     /// </summary>
-    /// <param name="target">接触したコライダー</param>
-    private void Explode(Collider2D target)
+    private void Explode()
     {
-        hasExploded = true;
+        hasExploded = true; // 爆発フラグを立てて、二重に爆発しないようにする
 
         // ボムの移動を停止
         if (rb != null)
@@ -103,19 +130,7 @@ public class Bomb : MonoBehaviour
         // 爆発アニメーションを再生
         if (anim != null)
         {
-            // ここで"Explode"トリガーを呼び出す
             anim.SetTrigger("Explode");
-        }
-
-        // 接触したのがプレイヤーだった場合の処理
-        if (target.CompareTag(playerTag))
-        {
-            // プレイヤーのDie()メソッドを呼び出す
-            PlayerMove playerMove = target.GetComponent<PlayerMove>();
-            if (playerMove != null && !playerMove.IsDead)
-            {
-                playerMove.Die();
-            }
         }
 
         // 爆発コルーチンを開始
@@ -124,7 +139,6 @@ public class Bomb : MonoBehaviour
 
     /// <summary>
     /// 爆発のアニメーションとコライダーの拡大を制御するコルーチン。
-    /// 爆発後、オブジェクトを破棄します。
     /// </summary>
     private IEnumerator ExplosionRoutine()
     {
@@ -141,8 +155,16 @@ public class Bomb : MonoBehaviour
             }
             yield return null;
         }
+    }
 
-        // 爆発アニメーション終了後、オブジェクトを破棄
+    /// <summary>
+    /// オブジェクトを破棄する。アニメーションイベントから呼び出される。
+    /// </summary>
+    public void DestroyBomb()
+    {
+        // 既に爆発している場合は何もしない
+        if (hasExploded) return;
+
         Destroy(gameObject);
     }
 }
