@@ -20,13 +20,13 @@ public class GameManager : MonoBehaviour
     // ゲームの状態を定義する列挙型
     public enum GameState
     {
-        Title,        // タイトル画面
-        Gameplay,     // ゲームプレイ中
-        StageClear,   // ステージクリア画面
-        GameOver,     // ゲームオーバー画面
-        Pause,        // 一時停止中
-        Cutscene,     // カットシーン再生中
-        StageSelect   // ステージ選択画面
+        Title,       // タイトル画面
+        Gameplay,    // ゲームプレイ中
+        StageClear,  // ステージクリア画面
+        GameOver,    // ゲームオーバー画面
+        Pause,       // 一時停止中
+        Cutscene,    // カットシーン再生中
+        StageSelect  // ステージ選択画面
     }
 
     // ゲームの現在の状態
@@ -39,6 +39,19 @@ public class GameManager : MonoBehaviour
     // 最終スコアと最終時間を保存する変数
     public int finalScore { get; private set; }
     public float finalTime { get; private set; }
+
+    // BGMの音量を調整するプロパティ (UI用)
+    public float BGMVolume
+    {
+        get => m_audioSource != null ? m_audioSource.volume : 0f;
+        set
+        {
+            if (m_audioSource != null)
+            {
+                m_audioSource.volume = Mathf.Clamp01(value);
+            }
+        }
+    }
 
     // ----------------------------------------------------------------------------------------------------
     // インスペクターで設定するUI要素
@@ -73,10 +86,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private string m_gameOverSceneName = "GameOverScene";
     [Tooltip("ゲームクリアシーンの名前")]
     [SerializeField] private string m_clearSceneName = "ClearScene";
-    [Tooltip("スコア表示シーンの名前")]
-    [SerializeField] private string m_scoreSceneName = "ScoreScene";
     [Tooltip("ステージシーンの配列")]
     [SerializeField] private string[] m_stageSceneNames = { "Demo_tileset", "Demo_tileset2", "Demo_tileset3" };
+    [Tooltip("スコア表示シーンの名前")]
+    [SerializeField] private string m_scoreSceneName = "ScoreScene";
 
     // 現在のステージインデックス
     private int m_currentStageIndex = 0;
@@ -107,6 +120,11 @@ public class GameManager : MonoBehaviour
     [Tooltip("シーン名とBGMのAudioClipをマッピングします。")]
     [SerializeField] private List<SceneBGMData> m_sceneBGMList;
     private Dictionary<string, AudioClip> m_sceneBGMMap = new Dictionary<string, AudioClip>();
+
+    // ★追加：インスペクターで設定できるBGMの初期音量
+    [Tooltip("BGMの初期音量 (0.0fから1.0f)")]
+    [Range(0f, 1f)]
+    [SerializeField] private float m_initialBGMVolume = 0.5f;
 
     // 時間制限の現在時間
     private float m_currentTime;
@@ -162,8 +180,6 @@ public class GameManager : MonoBehaviour
     public void RestartGame()
     {
         Time.timeScale = 1;
-        // 再開時にデータをリセット
-        ResetGameData();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
@@ -175,8 +191,6 @@ public class GameManager : MonoBehaviour
         if (m_isGlobalTransitioning) return;
 
         Time.timeScale = 1;
-        // 再開時にデータをリセット
-        ResetGameData();
 
         // m_currentStageIndexを使用して、最後にプレイしたシーンをロード
         if (m_currentStageIndex >= 0 && m_currentStageIndex < m_stageSceneNames.Length)
@@ -186,9 +200,18 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            UnityEngine.Debug.LogError("GameManager: 再プレイするステージが見つかりません。ステージ選択へ戻ります。", this);
+            Debug.LogError("GameManager: 再プレイするステージが見つかりません。ステージ選択へ戻ります。", this);
             LoadSceneWithFade(m_stageSelectSceneName);
         }
+    }
+
+    /// <summary>
+    /// BGMの音量を設定します。
+    /// </summary>
+    /// <param name="volume">設定する音量 (0.0fから1.0f)</param>
+    public void SetBGMVolume(float volume)
+    {
+        BGMVolume = volume;
     }
 
     // ----------------------------------------------------------------------------------------------------
@@ -201,7 +224,7 @@ public class GameManager : MonoBehaviour
             instance = this;
             // シーンをまたいでオブジェクトを保持
             DontDestroyOnLoad(gameObject);
-            UnityEngine.Debug.Log("GameManagerインスタンスが作成され、DontDestroyOnLoadに設定されました。", this);
+            Debug.Log("GameManagerインスタンスが作成され、DontDestroyOnLoadに設定されました。", this);
 
             // 必要なUI要素が設定されているかチェック
             CheckUIReferences();
@@ -213,6 +236,8 @@ public class GameManager : MonoBehaviour
                 m_audioSource = gameObject.AddComponent<AudioSource>();
             }
             m_audioSource.loop = true;
+            // ★追加：Awake時に初期音量を設定
+            m_audioSource.volume = m_initialBGMVolume;
 
             // リストを辞書に変換して、BGMへのアクセスを高速化
             foreach (var data in m_sceneBGMList)
@@ -254,7 +279,7 @@ public class GameManager : MonoBehaviour
             {
                 // ゲームプレイシーンから直接起動した場合
                 SetState(GameState.Gameplay);
-                InitializeGameplayState(); // ゲームプレイ状態の初期化
+                UpdatePermanentUIForScene(currentSceneName);
                 if (m_globalFadeCanvasGroup != null)
                 {
                     m_globalFadeCanvasGroup.alpha = 0f;
@@ -265,7 +290,7 @@ public class GameManager : MonoBehaviour
             else
             {
                 // 未知のシーンからの起動
-                UnityEngine.Debug.LogWarning($"GameManager: 未知のシーン'{currentSceneName}'から起動しました。デフォルトのゲーム状態をGameplayに設定。", this);
+                Debug.LogWarning($"GameManager: 未知のシーン'{currentSceneName}'から起動しました。デフォルトのゲーム状態をGameplayに設定。", this);
                 SetState(GameState.Gameplay);
                 if (m_globalFadeCanvasGroup != null)
                 {
@@ -278,7 +303,7 @@ public class GameManager : MonoBehaviour
         else
         {
             // 既にインスタンスが存在する場合は、新しいインスタンスを破棄
-            UnityEngine.Debug.LogWarning("GameManagerのインスタンスが既に存在するため、このオブジェクトは破棄されました。", this);
+            Debug.LogWarning("GameManagerのインスタンスが既に存在するため、このオブジェクトは破棄されました。", this);
             Destroy(gameObject);
         }
     }
@@ -369,11 +394,11 @@ public class GameManager : MonoBehaviour
             PlayBGM(null);
         }
 
-        // シーン名に基づいてゲーム状態を正確に設定
-        // ※ InitializeGameplayState()は特定のシーンでのみ呼び出すように厳密に制御する
+        // シーン名に応じてゲーム状態を設定
         if (scene.name == m_titleSceneName)
         {
             SetState(GameState.Title);
+            ResetGameData(); // ゲームデータをリセット
         }
         else if (scene.name == m_stageSelectSceneName)
         {
@@ -383,20 +408,17 @@ public class GameManager : MonoBehaviour
         {
             SetState(GameState.GameOver);
         }
-        else if (scene.name.StartsWith("Demo_tileset") || scene.name.StartsWith("Stage"))
-        {
-            // ゲームプレイシーンをロードする際にのみ初期化
-            SetState(GameState.Gameplay);
-            InitializeGameplayState();
-        }
         else if (scene.name == m_clearSceneName)
         {
-            // ゲームクリア画面
             SetState(GameState.StageClear);
         }
-        else if (scene.name == m_scoreSceneName)
+        else if (scene.name.StartsWith("Demo_tileset") || scene.name.StartsWith("Stage"))
         {
-            // スコア表示画面では状態をStageClearに設定するだけで、初期化はしない
+            SetState(GameState.Gameplay);
+            InitializeGameplayState(); // ゲームプレイ状態の初期化
+        }
+        else if (scene.name == m_scoreSceneName) // スコアシーン
+        {
             SetState(GameState.StageClear);
         }
 
@@ -409,10 +431,6 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void InitializeGameplayState()
     {
-        // スコアとジェムカウントは、ゲームプレイが始まるたびにリセットされる
-        m_currentGemCount = 0;
-        OnGemCountChanged?.Invoke(m_currentGemCount);
-
         if (m_isTimeLimited)
         {
             m_currentTime = m_timeLimitSeconds;
@@ -426,7 +444,7 @@ public class GameManager : MonoBehaviour
     {
         if (m_audioSource == null)
         {
-            UnityEngine.Debug.LogWarning("GameManager: BGM再生用のAudioSourceが割り当てられていません。", this);
+            Debug.LogWarning("GameManager: BGM再生用のAudioSourceが割り当てられていません。", this);
             return;
         }
 
@@ -446,6 +464,8 @@ public class GameManager : MonoBehaviour
         if (clip != null)
         {
             m_audioSource.clip = clip;
+            // インスペクターで設定した初期音量を適用
+            m_audioSource.volume = m_initialBGMVolume;
             m_audioSource.Play();
         }
     }
@@ -467,7 +487,7 @@ public class GameManager : MonoBehaviour
         }
 
         if (m_permanentUICanvas != null) m_permanentUICanvas.SetActive(isPermanentUIActive);
-        else UnityEngine.Debug.LogWarning("GameManager: Permanent UI Canvasが割り当てられていないため、UIの表示/非表示をスキップしました。", this);
+        else Debug.LogWarning("GameManager: Permanent UI Canvasが割り当てられていないため、UIの表示/非表示をスキップしました。", this);
 
         // スコアUIと時間制限UIの表示を個別に設定
         bool isGameplayScene = sceneName.StartsWith("Demo_tileset") || sceneName.StartsWith("Stage");
@@ -494,7 +514,7 @@ public class GameManager : MonoBehaviour
         if (m_isGlobalTransitioning) return;
         if (m_globalFadePanelImage == null || m_globalFadeCanvasGroup == null)
         {
-            UnityEngine.Debug.LogError("GameManager: フェードに必要なUI要素が割り当てられていません！フェードなしでロードします。", this);
+            Debug.LogError("GameManager: フェードに必要なUI要素が割り当てられていません！フェードなしでロードします。", this);
             SceneManager.LoadScene(sceneName);
             return;
         }
@@ -604,11 +624,11 @@ public class GameManager : MonoBehaviour
     {
         if (m_currentGameState == GameState.GameOver || m_isGlobalTransitioning)
         {
-            UnityEngine.Debug.LogWarning("GameManager: 既にゲームオーバー状態か、シーン遷移中のため、GameOver処理をスキップしました。", this);
+            Debug.LogWarning("GameManager: 既にゲームオーバー状態か、シーン遷移中のため、GameOver処理をスキップしました。", this);
             return;
         }
         SetState(GameState.GameOver);
-        PlayBGM(null);
+        PlayBGM(null); // BGMを停止
 
         // 最後にプレイしたシーンのインデックスを保存
         string currentSceneName = SceneManager.GetActiveScene().name;
@@ -621,6 +641,9 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        // ここでスコアとその他のゲームデータをリセット
+        ResetGameData();
+
         LoadSceneWithFade(m_gameOverSceneName);
     }
 
@@ -631,20 +654,16 @@ public class GameManager : MonoBehaviour
     {
         if (m_currentGameState == GameState.StageClear || m_isGlobalTransitioning)
         {
-            UnityEngine.Debug.LogWarning("GameManager: 既にゲームクリア状態か、シーン遷移中のため、GameClear処理をスキップしました。", this);
+            Debug.LogWarning("GameManager: 既にゲームクリア状態か、シーン遷移中のため、GameClear処理をスキップしました。", this);
             return;
         }
-
-        Time.timeScale = 0;
         SetState(GameState.StageClear);
-        PlayBGM(null);
+        PlayBGM(null); // BGMを停止
 
+        // ここでスコアと時間を保存
         finalScore = m_currentGemCount;
         finalTime = m_currentTime;
 
-        Debug.Log($"ゲームクリア！最終スコア: {finalScore}, 最終時間: {finalTime}");
-
-        // ゲームクリア画面に遷移
         LoadSceneWithFade(m_clearSceneName);
     }
 
@@ -663,11 +682,10 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            UnityEngine.Debug.Log("すべてのステージをクリアしました！タイトルシーンに戻ります。");
+            Debug.Log("すべてのステージをクリアしました！タイトルシーンに戻ります。");
             LoadSceneWithFade(m_titleSceneName);
         }
     }
-
 
     /// <summary>
     /// 指定したステージのクリア状態を保存します。
@@ -676,7 +694,7 @@ public class GameManager : MonoBehaviour
     {
         PlayerPrefs.SetInt(STAGE_CLEAR_KEY_PREFIX + stageIndex, 1);
         PlayerPrefs.Save();
-        UnityEngine.Debug.Log($"ステージ{stageIndex + 1}をクリアしました。");
+        Debug.Log($"ステージ{stageIndex + 1}をクリアしました。");
     }
 
     /// <summary>
@@ -694,7 +712,7 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.DeleteKey(STAGE_CLEAR_KEY_PREFIX + i);
         }
         PlayerPrefs.Save();
-        UnityEngine.Debug.Log("すべてのステージクリアデータを削除しました。");
+        Debug.Log("すべてのステージクリアデータを削除しました。");
     }
 
     /// <summary>
@@ -721,7 +739,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            UnityEngine.Debug.LogWarning("GameManager: ScorePanelが割り当てられていないため、SetScoreUIActiveをスキップしました。", this);
+            Debug.LogWarning("GameManager: ScorePanelが割り当てられていないため、SetScoreUIActiveをスキップしました。", this);
         }
     }
 
@@ -730,12 +748,12 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void CheckUIReferences()
     {
-        if (m_permanentUICanvas == null) UnityEngine.Debug.LogError("GameManager: Permanent UICanvasが割り当てられていません。", this);
-        if (m_globalFadePanelImage == null) UnityEngine.Debug.LogError("GameManager: Global Fade Panel Imageが割り当てられていません。", this);
-        if (m_globalFadeCanvasGroup == null) UnityEngine.Debug.LogError("GameManager: Global Fade Canvas Groupが割り当てられていません。", this);
-        if (m_permanentEventSystem == null) UnityEngine.Debug.LogError("GameManager: Permanent Event Systemが割り当てられていません。", this);
-        if (m_scoreDisplay == null) UnityEngine.Debug.LogError("GameManager: Score Displayが割り当てられていません。", this);
-        if (m_scorePanel == null) UnityEngine.Debug.LogError("GameManager: Score Panelが割り当てられていません。", this);
-        if (m_timeLimitText == null) UnityEngine.Debug.LogWarning("GameManager: Time Limit Textが割り当てられていません。時間制限UIは表示されません。", this);
+        if (m_permanentUICanvas == null) Debug.LogError("GameManager: Permanent UICanvasが割り当てられていません。", this);
+        if (m_globalFadePanelImage == null) Debug.LogError("GameManager: Global Fade Panel Imageが割り当てられていません。", this);
+        if (m_globalFadeCanvasGroup == null) Debug.LogError("GameManager: Global Fade Canvas Groupが割り当てられていません。", this);
+        if (m_permanentEventSystem == null) Debug.LogError("GameManager: Permanent Event Systemが割り当てられていません。", this);
+        if (m_scoreDisplay == null) Debug.LogError("GameManager: Score Displayが割り当てられていません。", this);
+        if (m_scorePanel == null) Debug.LogError("GameManager: Score Panelが割り当てられていません。", this);
+        if (m_timeLimitText == null) Debug.LogWarning("GameManager: Time Limit Textが割り当てられていません。時間制限UIは表示されません。", this);
     }
 }
