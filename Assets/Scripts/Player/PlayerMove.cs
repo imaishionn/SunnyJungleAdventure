@@ -223,8 +223,10 @@ public class PlayerMove : MonoBehaviour
     /// </summary>
     public void OnGameOverAnimationEnd()
     {
-        // アニメーションイベントから呼ばれた場合にシーン遷移を最終化
+        // プレイヤーオブジェクトを無効化する
         gameObject.SetActive(false);
+
+        // シーン遷移を最終化
         FinalizeDeathAndSceneTransition();
     }
 
@@ -298,14 +300,16 @@ public class PlayerMove : MonoBehaviour
     /// </summary>
     private void FinalizeDeathAndSceneTransition()
     {
+        gameObject.SetActive(false);
+
         if (GameManager.instance != null)
         {
             GameManager.instance.SetGameOverStateImmediately();
         }
         else
         {
-            Debug.LogError("GameManagerのインスタンスが見つかりません。直接シーンをロードします。");
-            SceneManager.LoadScene("GameOverScene");
+            Debug.LogError("PlayerMove: GameManagerのインスタンスが見つかりません！タイトルシーンへ直接遷移します。");
+            SceneManager.LoadScene("TitleScene");
         }
     }
 

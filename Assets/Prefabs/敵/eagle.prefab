@@ -121,6 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 493a2731c7b9a9e4392bf5ea6227861b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreValue: 500
   DetectRange: 8
   FlySpeed: 6
   FlashDuration: 1
@@ -138,6 +139,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5991d52fefd0ca44f889db35a6d2984f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreValue: 500
 --- !u!70 &1898939383255242599
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

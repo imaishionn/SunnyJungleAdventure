@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 72160702}
   - component: {fileID: 72160701}
   - component: {fileID: 72160704}
+  - component: {fileID: 72160706}
   - component: {fileID: 72160705}
   m_Layer: 5
   m_Name: STAGE1
@@ -358,6 +359,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &72160706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 72160698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23775c7130733e24f8634f545a2823ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleFactor: 1.1
+  transitionDuration: 0.1
+  blinkCount: 3
+  blinkSpeed: 0.5
+  blinkColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &397993385
 GameObject:
   m_ObjectHideFlags: 0
@@ -670,6 +688,7 @@ GameObject:
   - component: {fileID: 602326059}
   - component: {fileID: 602326058}
   - component: {fileID: 602326061}
+  - component: {fileID: 602326063}
   - component: {fileID: 602326062}
   m_Layer: 5
   m_Name: STAGE3
@@ -892,6 +911,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &602326063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 602326055}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23775c7130733e24f8634f545a2823ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleFactor: 1.1
+  transitionDuration: 0.1
+  blinkCount: 3
+  blinkSpeed: 0.5
+  blinkColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &763515400
 GameObject:
   m_ObjectHideFlags: 0
@@ -1040,6 +1076,7 @@ GameObject:
   - component: {fileID: 943157055}
   - component: {fileID: 943157054}
   - component: {fileID: 943157057}
+  - component: {fileID: 943157059}
   - component: {fileID: 943157058}
   m_Layer: 5
   m_Name: STAGE2
@@ -1262,6 +1299,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &943157059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943157052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23775c7130733e24f8634f545a2823ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleFactor: 1.1
+  transitionDuration: 0.1
+  blinkCount: 3
+  blinkSpeed: 0.5
+  blinkColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1155231479
 GameObject:
   m_ObjectHideFlags: 0
@@ -2116,12 +2170,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1552eb6a93de430479a95ee4d39f7278, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stageSelectCanvas: {fileID: 1225926390}
   stageButtons:
   - {fileID: 72160701}
   - {fileID: 943157054}
   - {fileID: 602326058}
   backButton: {fileID: 72160701}
-  stageSelectCanvas: {fileID: 1225926390}
   titleSceneName: TitleScene
   clearIndicators:
   - {fileID: 1260533472}

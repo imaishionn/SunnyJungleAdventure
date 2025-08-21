@@ -1,0 +1,106 @@
+using System.Collections;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+
+
+/// <summary>
+/// UIボタンに視覚的なフィードバック効果を追加するスクリプトです。
+/// 選択時の拡大/縮小、クリック時の点滅効果を管理します。
+/// </summary>
+public class ButtonVisualEffect : MonoBehaviour, ISelectHandler, IDeselectHandler, IPointerClickHandler
+{
+    private Vector3 originalScale; // 元の大きさを保存
+    private Image buttonImage;
+    private Color originalColor;
+    private Coroutine blinkCoroutine;
+
+    [Header("拡大/縮小設定")]
+    [Tooltip("拡大率")]
+    [SerializeField] private float scaleFactor = 1.1f;
+    [Tooltip("拡大/縮小にかかる時間")]
+    [SerializeField] private float transitionDuration = 0.1f;
+
+    [Header("点滅設定")]
+    [Tooltip("点滅回数")]
+    [SerializeField] private int blinkCount = 3;
+    [Tooltip("点滅速度（短いほど速い）")]
+    [SerializeField] private float blinkSpeed = 0.1f;
+    [Tooltip("点滅時の色")]
+    [SerializeField] private Color blinkColor = Color.white;
+
+    private void Awake()
+    {
+        originalScale = transform.localScale;
+        buttonImage = GetComponent<Image>();
+        if (buttonImage != null)
+        {
+            originalColor = buttonImage.color;
+        }
+    }
+
+    /// <summary>
+    /// UIが選択されたときに呼び出されます。（キーボード、ゲームパッド、マウスホバー）
+    /// </summary>
+    public void OnSelect(BaseEventData eventData)
+    {
+        // 拡大を開始
+        StopAllCoroutines();
+        StartCoroutine(ScaleButton(transform.localScale, originalScale * scaleFactor));
+    }
+
+    /// <summary>
+    /// UIの選択が外れたときに呼び出されます。
+    /// </summary>
+    public void OnDeselect(BaseEventData eventData)
+    {
+        // 元の大きさに戻す
+        StopAllCoroutines();
+        StartCoroutine(ScaleButton(transform.localScale, originalScale));
+    }
+
+    /// <summary>
+    /// ボタンがクリックされたときに呼び出されます。
+    /// </summary>
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (gameObject.activeInHierarchy)
+        {
+            if (blinkCoroutine != null)
+            {
+                StopCoroutine(blinkCoroutine);
+            }
+            blinkCoroutine = StartCoroutine(BlinkEffect());
+        }
+    }
+
+    /// <summary>
+    /// ボタンの拡大/縮小を滑らかに行うコルーチン
+    /// </summary>
+    private IEnumerator ScaleButton(Vector3 startScale, Vector3 endScale)
+    {
+        float timer = 0f;
+        while (timer < transitionDuration)
+        {
+            timer += Time.unscaledDeltaTime;
+            transform.localScale = Vector3.Lerp(startScale, endScale, timer / transitionDuration);
+            yield return null;
+        }
+        transform.localScale = endScale;
+    }
+
+    /// <summary>
+    /// ボタンを点滅させるコルーチン
+    /// </summary>
+    private IEnumerator BlinkEffect()
+    {
+        for (int i = 0; i < blinkCount; i++)
+        {
+            buttonImage.color = blinkColor;
+            yield return new WaitForSecondsRealtime(blinkSpeed);
+            buttonImage.color = originalColor;
+            yield return new WaitForSecondsRealtime(blinkSpeed);
+        }
+    }
+}

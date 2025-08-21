@@ -158,7 +158,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 734, y: 24}
+  m_AnchoredPosition: {x: 685, y: 39}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &26130366
@@ -337,7 +337,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 999
+  m_SortingOrder: 100
   m_TargetDisplay: 0
 --- !u!224 &92730283
 RectTransform:
@@ -498,8 +498,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -710, y: 439}
-  m_SizeDelta: {x: 250, y: 100}
+  m_AnchoredPosition: {x: -611, y: 411}
+  m_SizeDelta: {x: 350, y: 130}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &558137471
 MonoBehaviour:
@@ -595,6 +595,7 @@ MonoBehaviour:
   m_stageSelectSceneName: StageSelect
   m_gameOverSceneName: GameOverScene
   m_clearSceneName: ClearScene
+  m_scoreSceneName: ScoreScene
   m_stageSceneNames:
   - Demo_tileset
   - Demo_tileset2
@@ -616,6 +617,8 @@ MonoBehaviour:
     bgmClip: {fileID: 8300000, guid: be32cc3454e0aae4abdc89209994930f, type: 3}
   - sceneName: GameOverScene
     bgmClip: {fileID: 8300000, guid: 2213a9cacad754d4c934719bcda7293d, type: 3}
+  - sceneName: StageSelect
+    bgmClip: {fileID: 8300000, guid: 6979d52fda0579441a2122b95abaf337, type: 3}
 --- !u!1 &957534962
 GameObject:
   m_ObjectHideFlags: 0
@@ -719,7 +722,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -160, y: -50}
+  m_AnchoredPosition: {x: -263, y: -64}
   m_SizeDelta: {x: 100, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1685015533

@@ -1,39 +1,55 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// プレイヤーが触れるとスコアに加算される宝石の挙動を制御します。
+/// </summary>
 public class Gem : MonoBehaviour
 {
     [Header("スコア設定")]
     [SerializeField] private int scoreValue = 1;
 
-    // Gem.csからはAudioSourceとAudioClipの参照を削除
+    // 既に回収されたかどうかのフラグ
     private bool m_isCollected = false;
 
-    // Awake()からAudioSource関連のコードを削除
-    void Awake()
+    // シングルトン化されたItemSoundPlayerへの参照をキャッシュ
+    private static ItemSoundPlayer s_itemSoundPlayer;
+
+    private void Awake()
     {
-        // AudioSource関連のコードは不要になる
+        // GameManagerと同様に、ItemSoundPlayerがシングルトンであることを前提とする
+        if (s_itemSoundPlayer == null)
+        {
+            s_itemSoundPlayer = FindObjectOfType<ItemSoundPlayer>();
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        // 既に回収済みの場合は何もしない
         if (m_isCollected) return;
 
+        // プレイヤーに触れたかチェック
         if (other.CompareTag("Player"))
         {
             m_isCollected = true;
 
+            // GameManagerにスコアを加算
             if (GameManager.instance != null)
             {
                 GameManager.instance.AddGem(scoreValue);
             }
 
-            // ★修正点1: ItemSoundPlayerをシーンから見つける
-            ItemSoundPlayer itemSoundPlayer = FindObjectOfType<ItemSoundPlayer>();
-            if (itemSoundPlayer != null)
+            // 効果音を再生
+            if (s_itemSoundPlayer != null)
             {
-                // ★修正点2: ItemSoundPlayerに音の再生を依頼
-                itemSoundPlayer.PlayGemSound();
+                s_itemSoundPlayer.PlayGemSound();
+            }
+
+            // オブジェクトの見た目を即座に非表示にする
+            if (TryGetComponent<SpriteRenderer>(out SpriteRenderer sr))
+            {
+                sr.enabled = false;
             }
 
             // コライダーを無効化
@@ -42,14 +58,10 @@ public class Gem : MonoBehaviour
                 col.enabled = false;
             }
 
-            // スプライトを非表示にする
-            if (TryGetComponent<SpriteRenderer>(out SpriteRenderer sr))
-            {
-                sr.enabled = false;
-            }
-
-            // オブジェクトをすぐに破壊する
-            Destroy(gameObject);
+            // 効果音の再生が完了した後にオブジェクトを破棄
+            // ここではオーディオクリップの長さを取得して待機するのが理想的
+            // 例として1秒後に破棄する
+            Destroy(gameObject, 1.0f);
         }
     }
 }

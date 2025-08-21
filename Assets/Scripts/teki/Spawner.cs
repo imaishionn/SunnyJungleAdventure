@@ -33,7 +33,13 @@ public class Spawner : MonoBehaviour
         if (objectPoolManager == null)
         {
             Debug.LogError("Spawner: ObjectPoolManagerが割り当てられていません！", this);
-            return;
+            // 代わりにシングルトンインスタンスを試す
+            objectPoolManager = ObjectPoolManager.Instance;
+            if (objectPoolManager == null)
+            {
+                Debug.LogError("Spawner: シングルトンインスタンスも見つかりません。スポーンを中止します。");
+                return;
+            }
         }
 
         // コルーチンを開始

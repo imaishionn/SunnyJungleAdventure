@@ -153,13 +153,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25d7551988bb32b418191f012c942afd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreValue: 200
   playerTransform: {fileID: 0}
   detectRange: 5
   bombPrefab: {fileID: 4789463544227173950, guid: 03026989f00004f4d8ed41b280823de4, type: 3}
   launchPoint: {fileID: 5465275800340486311}
-  bombLaunchSpeed: 5
+  bombLaunchSpeed: 4
   attackInterval: 3
-  verticalMoveSpeed: 3
+  verticalMoveSpeed: 2
   verticalMoveRange: 2
 --- !u!114 &1287032410877810327
 MonoBehaviour:
@@ -173,6 +174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5991d52fefd0ca44f889db35a6d2984f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreValue: 200
 --- !u!70 &-3884128057256326879
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -187,7 +189,7 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.3, y: 0.4}
+  m_Size: {x: 0.3, y: 0.3}
   m_Direction: 0
 --- !u!50 &8334184645378948283
 Rigidbody2D:

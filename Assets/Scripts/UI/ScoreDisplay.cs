@@ -1,3 +1,4 @@
+
 using TMPro; // TextMeshProUGUIを使用するために追加
 using UnityEngine;
 
@@ -65,7 +66,8 @@ public class ScoreDisplay : MonoBehaviour
     {
         if (gemCountText != null)
         {
-            gemCountText.text = "Gems: " + newCount;
+            // ★修正: テキストを短くして1行に収まるように変更
+            gemCountText.text = "Score " + newCount;
         }
     }
 }

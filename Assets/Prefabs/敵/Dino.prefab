@@ -121,6 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c4101a09f37fe142b4c1bcafc9e4740, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreValue: 356
   moveSpeed: 4
   patrolRange: 4
   groundCheckDistance: 0.6
@@ -139,6 +140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5991d52fefd0ca44f889db35a6d2984f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scoreValue: 356
 --- !u!70 &283787232873110609
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
