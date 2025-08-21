@@ -738,7 +738,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Fire_II_Flame_C_48x48_24: 214087873964637727
+      Fire_II_Flame_C_48x48_6: 6054594766713075618
       Fire_II_Flame_C_48x48_19: 4844220839271571853
       Fire_II_Flame_C_48x48_23: 8393214000671580459
       Fire_II_Flame_C_48x48_2: 2119440349919338959
@@ -761,7 +761,7 @@ TextureImporter:
       Fire_II_Flame_C_48x48_20: 3004959561161369365
       Fire_II_Flame_C_48x48_11: 6839021757586877804
       Fire_II_Flame_C_48x48_17: -6992928472505867452
-      Fire_II_Flame_C_48x48_6: 6054594766713075618
+      Fire_II_Flame_C_48x48_24: 214087873964637727
       Fire_II_Flame_C_48x48_22: -3108109726672328387
   spritePackingTag: 
   pSDRemoveMatte: 0
