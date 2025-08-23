@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25d7551988bb32b418191f012c942afd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 200
+  scoreValue: 300
   playerTransform: {fileID: 0}
   detectRange: 5
   bombPrefab: {fileID: 4789463544227173950, guid: 03026989f00004f4d8ed41b280823de4, type: 3}
