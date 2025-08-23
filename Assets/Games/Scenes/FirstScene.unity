@@ -498,8 +498,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -611, y: 411}
-  m_SizeDelta: {x: 350, y: 130}
+  m_AnchoredPosition: {x: -611, y: 440}
+  m_SizeDelta: {x: 350, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &558137471
 MonoBehaviour:
@@ -611,7 +611,7 @@ MonoBehaviour:
     bgmClip: {fileID: 8300000, guid: b6dc04f2884eb5b46b675390b1e75e84, type: 3}
   - sceneName: Stage2Scene
     bgmClip: {fileID: 8300000, guid: 0c2f5e196afe4644d9b1ffb8d644851d, type: 3}
-  - sceneName: Stage2Scene
+  - sceneName: Stage3Scene
     bgmClip: {fileID: 8300000, guid: 9e972459eddc5964081d0c2d813320d8, type: 3}
   - sceneName: ClearScene
     bgmClip: {fileID: 8300000, guid: be32cc3454e0aae4abdc89209994930f, type: 3}
@@ -725,8 +725,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -263, y: -64}
-  m_SizeDelta: {x: 100, y: 30}
+  m_AnchoredPosition: {x: -236.6, y: -50}
+  m_SizeDelta: {x: 150, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1685015533
 MonoBehaviour:
