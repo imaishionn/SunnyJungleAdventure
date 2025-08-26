@@ -9,7 +9,7 @@ using Debug = UnityEngine.Debug;
 /// UIボタンにクリック音とホバー音（選択音）を付けるためのスクリプトです。
 /// ISelectHandlerインターフェースを実装し、UIの選択イベントを処理します。
 /// </summary>
-public class ButtonSoundEffect : MonoBehaviour, ISelectHandler, IDeselectHandler // IDeselectHandlerを追加
+public class ButtonSoundEffect : MonoBehaviour, ISelectHandler, IDeselectHandler
 {
     // ----------------------------------------------------------------------------------------------------
     // インスペクターで設定するパラメーター
@@ -19,6 +19,10 @@ public class ButtonSoundEffect : MonoBehaviour, ISelectHandler, IDeselectHandler
     [SerializeField] private AudioClip clickSound;
     [Tooltip("ボタンにカーソルが乗ったとき、または選択されたときに再生する効果音")]
     [SerializeField] private AudioClip hoverSound;
+    [Tooltip("クリック音の音量 (0.0 から 1.0)")]
+    [SerializeField, Range(0f, 1f)] private float clickVolume = 1.0f;
+    [Tooltip("ホバー音の音量 (0.0 から 1.0)")]
+    [SerializeField, Range(0f, 1f)] private float hoverVolume = 1.0f;
 
     // ----------------------------------------------------------------------------------------------------
     // プライベート変数
@@ -37,7 +41,7 @@ public class ButtonSoundEffect : MonoBehaviour, ISelectHandler, IDeselectHandler
         {
             m_audioSource = gameObject.AddComponent<AudioSource>();
             m_audioSource.playOnAwake = false; // シーン開始時に自動再生しない
-            m_audioSource.loop = false;       // ループ再生しない
+            m_audioSource.loop = false;        // ループ再生しない
         }
 
         // Buttonコンポーネントの参照を取得し、クリックイベントに登録
@@ -84,7 +88,7 @@ public class ButtonSoundEffect : MonoBehaviour, ISelectHandler, IDeselectHandler
     {
         if (m_audioSource != null && m_audioSource.isActiveAndEnabled && clickSound != null)
         {
-            m_audioSource.PlayOneShot(clickSound);
+            m_audioSource.PlayOneShot(clickSound, clickVolume);
         }
         else
         {
@@ -103,7 +107,7 @@ public class ButtonSoundEffect : MonoBehaviour, ISelectHandler, IDeselectHandler
     {
         if (m_audioSource != null && m_audioSource.isActiveAndEnabled && hoverSound != null)
         {
-            m_audioSource.PlayOneShot(hoverSound);
+            m_audioSource.PlayOneShot(hoverSound, hoverVolume);
         }
     }
 }
