@@ -3,7 +3,7 @@ using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// 敵キャラクター「恐竜」のAIと動作を制御するスクリプトです。
-/// 地面をパトロールし、崖や指定された移動範囲の端に到達すると向きを変えます。
+/// 地面をパトロールし、指定された移動範囲の端に到達すると向きを変えます。
 /// Enemyクラスを継承しています。
 /// </summary>
 public class Dino : Enemy
@@ -16,12 +16,6 @@ public class Dino : Enemy
     [SerializeField] private float moveSpeed = 3f;
     [Tooltip("初期位置からのパトロール範囲")]
     [SerializeField] private float patrolRange = 5f;
-
-    [Header("崖の検知設定")]
-    [Tooltip("崖を検知するために下にRayを飛ばす距離")]
-    [SerializeField] private float groundCheckDistance = 0.6f;
-    [Tooltip("地面として認識するレイヤー")]
-    [SerializeField] private LayerMask groundLayer;
 
     // ----------------------------------------------------------------------------------------------------
     // プライベート変数
@@ -58,22 +52,10 @@ public class Dino : Enemy
         if (IsDead) return;
 
         // ------------------
-        // 地面・崖の検知
-        // ------------------
-        // 移動方向の足元から下向きにRayを飛ばす
-        Vector2 startPoint = (Vector2)transform.position + new Vector2(moveDirection * 0.5f, -0.5f);
-        RaycastHit2D groundHit = Physics2D.Raycast(startPoint, Vector2.down, groundCheckDistance, groundLayer);
-
-        // デバッグ用にRayを可視化
-        Debug.DrawRay(startPoint, Vector2.down * groundCheckDistance, Color.red);
-
-        // ------------------
         // 移動方向の決定
         // ------------------
-        // Rayが地面に当たらなかった（＝崖にいる）場合、または
         // パトロール範囲の端に到達した場合、向きを変える
-        if (groundHit.collider == null ||
-            (moveDirection == 1 && transform.position.x > initialPosition.x + patrolRange) ||
+        if ((moveDirection == 1 && transform.position.x > initialPosition.x + patrolRange) ||
             (moveDirection == -1 && transform.position.x < initialPosition.x - patrolRange))
         {
             moveDirection *= -1; // 進行方向を反転

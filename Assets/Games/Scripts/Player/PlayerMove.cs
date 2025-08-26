@@ -4,7 +4,8 @@ using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
 
 /// <summary>
-/// プレイヤーキャラクターの移動、ジャンプ、敵との相互作用、およびゲームオーバーを管理するスクリプトです。
+/// プレイヤーキャラクターの移動とジャンプを管理するスクリプトです。
+/// 敵との相互作用、ゲームオーバー処理も含まれます。
 /// </summary>
 public class PlayerMove : MonoBehaviour
 {
@@ -96,8 +97,53 @@ public class PlayerMove : MonoBehaviour
             jumpsRemaining = maxJumps;
         }
 
-        // 水平方向の移動処理
-        float moveInput = Input.GetAxis("Horizontal");
+        // ★★★ 統合された入力処理 ★★★
+        HandlePlayerInput();
+        // ★★★ -------------------- ★★★
+
+        // アニメーターパラメーターの更新
+        UpdateAnimatorParameters(rb.velocity.x);
+
+        // ゲームオーバー条件のチェック
+        if (transform.position.y < m_gameOverFallHeight)
+        {
+            Die();
+        }
+    }
+
+    /// <summary>
+    /// プレイヤーの入力処理を行います。
+    /// PCとモバイルの両方に対応します。
+    /// </summary>
+    private void HandlePlayerInput()
+    {
+        // 横移動の処理
+        float moveInput = 0;
+        // モバイルプラットフォームでのタップ移動
+        if (UnityEngine.Application.isMobilePlatform)
+        {
+            // 画面をタップしている場合
+            if (Input.touchCount > 0)
+            {
+                Touch touch = Input.GetTouch(0);
+                if (touch.position.x < Screen.width / 2f)
+                {
+                    // 画面の左半分をタップしたら左に移動
+                    moveInput = -1;
+                }
+                else
+                {
+                    // 画面の右半分をタップしたら右に移動
+                    moveInput = 1;
+                }
+            }
+        }
+        else
+        {
+            // PC用のキーボード入力
+            moveInput = Input.GetAxis("Horizontal");
+        }
+
         if (rb != null)
         {
             rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
@@ -114,7 +160,23 @@ public class PlayerMove : MonoBehaviour
         }
 
         // ジャンプ処理
-        if (Input.GetButtonDown("Jump") && jumpsRemaining > 0)
+        bool jumpInput = false;
+        // モバイルプラットフォームでのジャンプ入力
+        if (UnityEngine.Application.isMobilePlatform)
+        {
+            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+            {
+                // タップでジャンプ
+                jumpInput = true;
+            }
+        }
+        else
+        {
+            // PC用のジャンプキー入力
+            jumpInput = Input.GetButtonDown("Jump");
+        }
+
+        if (jumpInput && jumpsRemaining > 0)
         {
             if (rb != null)
             {
@@ -140,15 +202,6 @@ public class PlayerMove : MonoBehaviour
                     animator.SetTrigger("DoubleJumpTrigger");
                 }
             }
-        }
-
-        // アニメーターパラメーターの更新
-        UpdateAnimatorParameters(moveInput);
-
-        // ゲームオーバー条件のチェック
-        if (transform.position.y < m_gameOverFallHeight)
-        {
-            Die();
         }
     }
 
