@@ -1,7 +1,9 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 /// <summary>
 /// プレイヤーキャラクターの移動とジャンプを管理するスクリプトです。
@@ -9,9 +11,6 @@ using Debug = UnityEngine.Debug;
 /// </summary>
 public class PlayerMove : MonoBehaviour
 {
-    // ----------------------------------------------------------------------------------------------------
-    // インスペクターで設定するパラメーター
-    // ----------------------------------------------------------------------------------------------------
     [Header("移動設定")]
     [Tooltip("プレイヤーの横移動速度")]
     [SerializeField] private float moveSpeed = 5f;
@@ -30,13 +29,14 @@ public class PlayerMove : MonoBehaviour
     [Tooltip("地面判定を行う子オブジェクトのコンポーネント")]
     [SerializeField] private GroundCheck m_groundCheckComponent;
 
+    // Mobile Control Canvasから参照を受け取るためのプライベート変数
+    private VirtualJoystick m_joystick;
+    private JumpButtonController m_jumpButton;
+
     [Header("ゲームオーバー条件")]
     [Tooltip("プレイヤーがこのY座標より下に落ちるとゲームオーバー")]
     [SerializeField] private float m_gameOverFallHeight = -10f;
 
-    // ----------------------------------------------------------------------------------------------------
-    // プライベート変数
-    // ----------------------------------------------------------------------------------------------------
     private Rigidbody2D rb;
     private Animator animator;
     private ItemSoundPlayer itemSoundPlayer;
@@ -46,26 +46,17 @@ public class PlayerMove : MonoBehaviour
     private int jumpsRemaining;
     private bool isInvincible = false;
 
-    // ----------------------------------------------------------------------------------------------------
-    // パブリックプロパティ
-    // ----------------------------------------------------------------------------------------------------
     public bool IsDead { get; private set; } = false;
     public float MoveSpeed => moveSpeed;
 
-    // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviourのライフサイクルメソッド
-    // ----------------------------------------------------------------------------------------------------
     private void Awake()
     {
-        // コンポーネントの参照を取得
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
 
-        // コンポーネントの存在チェック
         if (rb == null) Debug.LogError("PlayerMove: Rigidbody2Dがアタッチされていません。", this);
         if (animator == null) Debug.LogError("PlayerMove: Animatorがアタッチされていません。", this);
 
-        // GroundCheckコンポーネントの参照を取得
         if (m_groundCheckComponent == null)
         {
             m_groundCheckComponent = GetComponentInChildren<GroundCheck>();
@@ -75,81 +66,72 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        // シーン内のItemSoundPlayerのインスタンスを検索
         itemSoundPlayer = FindObjectOfType<ItemSoundPlayer>();
-
-        // 初期化
         jumpsRemaining = maxJumps;
+    }
+
+    /// <summary>
+    /// GameManagerからモバイル操作用のボタンを参照として受け取ります。
+    /// </summary>
+    public void SetMobileControls(VirtualJoystick joystick, JumpButtonController jump)
+    {
+        m_joystick = joystick;
+        m_jumpButton = jump;
+
+        if (m_joystick == null || m_jumpButton == null)
+        {
+            Debug.LogError("PlayerMove: ジョイスティックまたはジャンプボタンの割り当てに失敗しました。GameManagerからの参照を確認してください。", this);
+        }
     }
 
     private void Update()
     {
-        // 死亡状態の場合は、これ以上の処理を行わない
         if (IsDead) return;
 
-        // 地面判定の更新
         bool previousIsGrounded = isGrounded;
         isGrounded = m_groundCheckComponent != null && m_groundCheckComponent.GetIsGround();
 
-        // 地面に接地した瞬間、ジャンプ回数をリセット
         if (!previousIsGrounded && isGrounded)
         {
             jumpsRemaining = maxJumps;
         }
 
-        // ★★★ 統合された入力処理 ★★★
-        HandlePlayerInput();
-        // ★★★ -------------------- ★★★
+        // 入力処理を統合
+        float moveInput = 0f;
+        if (!UnityEngine.Application.isMobilePlatform)
+        {
+            moveInput = Input.GetAxisRaw("Horizontal");
+        }
+        else
+        {
+            if (m_joystick != null)
+            {
+                moveInput = m_joystick.InputDirection.x;
+            }
+        }
 
-        // アニメーターパラメーターの更新
+        HandleMovementInput(moveInput);
+
+        if (!UnityEngine.Application.isMobilePlatform && Input.GetButtonDown("Jump"))
+        {
+            Jump();
+        }
+
         UpdateAnimatorParameters(rb.velocity.x);
 
-        // ゲームオーバー条件のチェック
         if (transform.position.y < m_gameOverFallHeight)
         {
             Die();
         }
     }
 
-    /// <summary>
-    /// プレイヤーの入力処理を行います。
-    /// PCとモバイルの両方に対応します。
-    /// </summary>
-    private void HandlePlayerInput()
+    private void HandleMovementInput(float moveInput)
     {
-        // 横移動の処理
-        float moveInput = 0;
-        // モバイルプラットフォームでのタップ移動
-        if (UnityEngine.Application.isMobilePlatform)
-        {
-            // 画面をタップしている場合
-            if (Input.touchCount > 0)
-            {
-                Touch touch = Input.GetTouch(0);
-                if (touch.position.x < Screen.width / 2f)
-                {
-                    // 画面の左半分をタップしたら左に移動
-                    moveInput = -1;
-                }
-                else
-                {
-                    // 画面の右半分をタップしたら右に移動
-                    moveInput = 1;
-                }
-            }
-        }
-        else
-        {
-            // PC用のキーボード入力
-            moveInput = Input.GetAxis("Horizontal");
-        }
-
         if (rb != null)
         {
             rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
         }
 
-        // キャラクターの向きを更新
         if (moveInput > 0 && !isFacingRight)
         {
             Flip();
@@ -158,72 +140,46 @@ public class PlayerMove : MonoBehaviour
         {
             Flip();
         }
+    }
 
-        // ジャンプ処理
-        bool jumpInput = false;
-        // モバイルプラットフォームでのジャンプ入力
-        if (UnityEngine.Application.isMobilePlatform)
+    public void Jump()
+    {
+        if (IsDead) return;
+        if (jumpsRemaining <= 0) return;
+
+        if (rb != null)
         {
-            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
-            {
-                // タップでジャンプ
-                jumpInput = true;
-            }
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
-        else
+        jumpsRemaining--;
+
+        if (itemSoundPlayer != null)
         {
-            // PC用のジャンプキー入力
-            jumpInput = Input.GetButtonDown("Jump");
+            itemSoundPlayer.PlayJumpSound();
         }
-
-        if (jumpInput && jumpsRemaining > 0)
+        if (animator != null)
         {
-            if (rb != null)
+            if (isGrounded && HasAnimatorParameter("JumpTrigger", AnimatorControllerParameterType.Trigger))
             {
-                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                animator.SetTrigger("JumpTrigger");
             }
-            jumpsRemaining--;
-
-            // サウンド再生
-            if (itemSoundPlayer != null)
+            else if (!isGrounded && HasAnimatorParameter("DoubleJumpTrigger", AnimatorControllerParameterType.Trigger))
             {
-                itemSoundPlayer.PlayJumpSound();
-            }
-
-            // アニメーション制御
-            if (animator != null)
-            {
-                if (isGrounded && HasAnimatorParameter("JumpTrigger", AnimatorControllerParameterType.Trigger))
-                {
-                    animator.SetTrigger("JumpTrigger");
-                }
-                else if (!isGrounded && HasAnimatorParameter("DoubleJumpTrigger", AnimatorControllerParameterType.Trigger))
-                {
-                    animator.SetTrigger("DoubleJumpTrigger");
-                }
+                animator.SetTrigger("DoubleJumpTrigger");
             }
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // 死亡状態または無敵状態の場合は処理を停止
         if (IsDead || isInvincible) return;
 
-        // 敵との衝突判定
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            // 踏みつけ以外の衝突は即座にダメージを受ける（ここでは死亡）
             Die();
         }
     }
 
-    // ----------------------------------------------------------------------------------------------------
-    // パブリックメソッド
-    // ----------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// 敵を踏みつけたときに呼び出されます。
-    /// </summary>
     public void StompEnemy(GameObject enemyObject)
     {
         if (IsDead) return;
@@ -231,7 +187,6 @@ public class PlayerMove : MonoBehaviour
         Enemy enemy = enemyObject.GetComponent<Enemy>();
         if (enemy == null) return;
 
-        // 踏みつけ成功
         if (rb != null)
         {
             rb.velocity = new Vector2(rb.velocity.x, m_stompBounceForce);
@@ -240,9 +195,6 @@ public class PlayerMove : MonoBehaviour
         StartCoroutine(BecomeInvincible(invincibleDuration));
     }
 
-    /// <summary>
-    /// プレイヤーを死亡状態にします。
-    /// </summary>
     public void Die()
     {
         if (IsDead) return;
@@ -250,7 +202,6 @@ public class PlayerMove : MonoBehaviour
 
         if (itemSoundPlayer != null) itemSoundPlayer.PlayGameOverSound();
 
-        // 物理挙動と当たり判定を無効化
         if (rb != null)
         {
             rb.velocity = Vector2.zero;
@@ -259,36 +210,22 @@ public class PlayerMove : MonoBehaviour
         Collider2D playerCollider = GetComponent<Collider2D>();
         if (playerCollider != null) playerCollider.enabled = false;
 
-        // ゲームオーバーアニメーションを再生
         if (animator != null && HasAnimatorParameter("GameOver", AnimatorControllerParameterType.Trigger))
         {
             animator.SetTrigger("GameOver");
         }
         else
         {
-            // アニメーションがない場合のフォールバック処理
             StartCoroutine(FallbackDeathSequence());
         }
     }
 
-    /// <summary>
-    /// ゲームオーバーアニメーションの最後に呼び出されるイベントメソッドです。
-    /// </summary>
     public void OnGameOverAnimationEnd()
     {
-        // プレイヤーオブジェクトを無効化する
         gameObject.SetActive(false);
-
-        // シーン遷移を最終化
         FinalizeDeathAndSceneTransition();
     }
 
-    // ----------------------------------------------------------------------------------------------------
-    // プライベートメソッド
-    // ----------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// プレイヤーの向きを反転させます。
-    /// </summary>
     private void Flip()
     {
         isFacingRight = !isFacingRight;
@@ -297,35 +234,26 @@ public class PlayerMove : MonoBehaviour
         transform.localScale = scaler;
     }
 
-    /// <summary>
-    /// アニメーターのパラメーターを更新します。
-    /// </summary>
     private void UpdateAnimatorParameters(float moveInput)
     {
         if (animator == null) return;
 
-        // 走るアニメーション
         if (HasAnimatorParameter("run", AnimatorControllerParameterType.Bool))
         {
             animator.SetBool("run", Mathf.Abs(moveInput) > 0.01f);
         }
 
-        // 地面に着地しているか
         if (HasAnimatorParameter("isGrounded", AnimatorControllerParameterType.Bool))
         {
             animator.SetBool("isGrounded", isGrounded);
         }
 
-        // Y軸の速度（ジャンプ/落下）
         if (HasAnimatorParameter("velocityY", AnimatorControllerParameterType.Float) && rb != null)
         {
             animator.SetFloat("velocityY", rb.velocity.y);
         }
     }
 
-    /// <summary>
-    /// 指定された名前とタイプのAnimatorパラメーターが存在するか確認します。
-    /// </summary>
     private bool HasAnimatorParameter(string paramName, AnimatorControllerParameterType paramType)
     {
         if (animator == null) return false;
@@ -339,25 +267,19 @@ public class PlayerMove : MonoBehaviour
         return false;
     }
 
-    /// <summary>
-    /// ゲームオーバーアニメーションがない場合のフォールバック処理です。
-    /// </summary>
     private IEnumerator FallbackDeathSequence()
     {
-        yield return new WaitForSeconds(1.0f); // 1秒待機
+        yield return new WaitForSeconds(1.0f);
         FinalizeDeathAndSceneTransition();
     }
 
-    /// <summary>
-    /// 死亡処理とシーン遷移を最終化します。
-    /// </summary>
     private void FinalizeDeathAndSceneTransition()
     {
         gameObject.SetActive(false);
 
-        if (GameManager.instance != null)
+        if (GameManager.Instance != null)
         {
-            GameManager.instance.SetGameOverStateImmediately();
+            GameManager.Instance.SetGameOverStateImmediately();
         }
         else
         {
@@ -366,9 +288,6 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// プレイヤーを一時的に無敵状態にするコルーチンです。
-    /// </summary>
     private IEnumerator BecomeInvincible(float duration)
     {
         isInvincible = true;

@@ -21,9 +21,11 @@ public class Goal : MonoBehaviour
 
         m_isTriggered = true;
 
-        if (GameManager.instance != null)
+        // GameManager.instance ‚ğ GameManager.Instance ‚ÉC³
+        if (GameManager.Instance != null)
         {
-            GameManager.instance.GameClear();
+            // GameManager.instance.GameClear() ‚ğ GameManager.Instance.GameClear() ‚ÉC³
+            GameManager.Instance.GameClear();
         }
         else
         {

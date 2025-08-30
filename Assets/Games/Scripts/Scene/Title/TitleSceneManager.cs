@@ -76,15 +76,15 @@ public class TitleSceneManager : MonoBehaviour
     /// </summary>
     private void OnStartButtonClicked()
     {
-        // GameManagerのインスタンスを介してフェード付きでシーンをロード
-        if (GameManager.instance != null)
+        if (GameManager.Instance != null)
         {
-            GameManager.instance.LoadSceneWithFade(GameManager.instance.StageSelectSceneName);
+            GameManager.Instance.LoadSceneWithFade(GameManager.Instance.StageSelectSceneName);
         }
         else
         {
-            Debug.LogError("TitleSceneManager: GameManagerが見つかりません！フェードなしでシーン遷移します。", this);
-            SceneManager.LoadScene(GameManager.instance.StageSelectSceneName); // フォールバック処理
+            // GameManager.Instanceがnullのため、StageSelectSceneNameに直接アクセスせず、エラーログを出力
+            // フォールバック処理が必要な場合は、予め設定したシーン名などを使用する
+            Debug.LogError("TitleSceneManager: GameManagerが見つかりません！シーン遷移できません。", this);
         }
     }
 }

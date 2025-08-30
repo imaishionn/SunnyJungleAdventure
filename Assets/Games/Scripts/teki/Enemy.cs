@@ -51,9 +51,11 @@ public class Enemy : MonoBehaviour
 
         // --- 修正箇所 ---
         // スコア加算
-        if (GameManager.instance != null)
+        // GameManager.instance を GameManager.Instance に修正
+        if (GameManager.Instance != null)
         {
-            GameManager.instance.AddGem(scoreValue);
+            // GameManager.instance.AddGem(scoreValue) を GameManager.Instance.AddGem(scoreValue) に修正
+            GameManager.Instance.AddGem(scoreValue);
         }
         // --- 修正箇所 ---
 

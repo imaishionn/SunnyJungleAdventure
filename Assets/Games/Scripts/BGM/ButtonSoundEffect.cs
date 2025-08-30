@@ -7,7 +7,7 @@ using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// UIボタンにクリック音とホバー音（選択音）を付けるためのスクリプトです。
-/// ISelectHandlerインターフェースを実装し、UIの選択イベントを処理します。
+/// ISelectHandlerインターフェースを実装し、UIのイベントを処理します。
 /// </summary>
 public class ButtonSoundEffect : MonoBehaviour, ISelectHandler, IDeselectHandler
 {
@@ -44,16 +44,20 @@ public class ButtonSoundEffect : MonoBehaviour, ISelectHandler, IDeselectHandler
             m_audioSource.loop = false;        // ループ再生しない
         }
 
-        // Buttonコンポーネントの参照を取得し、クリックイベントに登録
+        // Buttonコンポーネントを取得し、onClickイベントにリスナーを登録
         m_button = GetComponent<Button>();
         if (m_button != null)
         {
-            m_button.onClick.RemoveAllListeners(); // 既存のonClickイベントリスナーを全て削除
             m_button.onClick.AddListener(PlayClickSound);
         }
-        else
+    }
+
+    private void OnDestroy()
+    {
+        // オブジェクトが破棄されるときにリスナーを解除
+        if (m_button != null)
         {
-            Debug.LogWarning("ButtonSoundEffect: Buttonコンポーネントが見つかりません。クリック音は再生されません。", this);
+            m_button.onClick.RemoveListener(PlayClickSound);
         }
     }
 
@@ -75,8 +79,10 @@ public class ButtonSoundEffect : MonoBehaviour, ISelectHandler, IDeselectHandler
     /// <param name="eventData">イベントデータ</param>
     public void OnDeselect(BaseEventData eventData)
     {
-        // 必要に応じて選択が外れたときの効果音やロジックを追加
+        // このイベントで何か処理が必要な場合はここに追加
     }
+
+    // OnPointerClickメソッドは不要になったため削除
 
     // ----------------------------------------------------------------------------------------------------
     // サウンド再生メソッド

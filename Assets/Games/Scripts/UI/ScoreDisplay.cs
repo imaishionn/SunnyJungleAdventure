@@ -32,13 +32,14 @@ public class ScoreDisplay : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
-        if (GameManager.instance != null)
+        // GameManager.instance を GameManager.Instance に修正
+        if (GameManager.Instance != null)
         {
-            // GameManagerのOnGemCountChangedイベントに、スコア更新メソッドを購読
-            GameManager.instance.OnGemCountChanged += UpdateGemCount;
+            // GameManager.instance.OnGemCountChanged を GameManager.Instance.OnGemCountChanged に修正
+            GameManager.Instance.OnGemCountChanged += UpdateGemCount;
 
-            // スクリプトが有効になった時点で、現在のジェム数を表示に反映
-            UpdateGemCount(GameManager.instance.currentGemCount);
+            // GameManager.instance.currentGemCount を GameManager.Instance.currentGemCount に修正
+            UpdateGemCount(GameManager.Instance.currentGemCount);
         }
     }
 
@@ -47,10 +48,12 @@ public class ScoreDisplay : MonoBehaviour
     /// </summary>
     private void OnDisable()
     {
-        if (GameManager.instance != null)
+        // GameManager.instance を GameManager.Instance に修正
+        if (GameManager.Instance != null)
         {
             // イベントの購読を解除。メモリリークを防ぐための重要な処理です。
-            GameManager.instance.OnGemCountChanged -= UpdateGemCount;
+            // GameManager.instance.OnGemCountChanged を GameManager.Instance.OnGemCountChanged に修正
+            GameManager.Instance.OnGemCountChanged -= UpdateGemCount;
         }
     }
 
@@ -67,7 +70,7 @@ public class ScoreDisplay : MonoBehaviour
         if (gemCountText != null)
         {
             // ★修正: テキストを短くして1行に収まるように変更
-            gemCountText.text = "Score " + newCount;
+            gemCountText.text = ":" + newCount;
         }
     }
 }

@@ -123,9 +123,11 @@ public class TilemapSwitchPlatform : MonoBehaviour
         }
 
         // ê—pBGM‚ğÄ¶
-        if (GameManager.instance != null && platformBGM != null)
+        // GameManager.instance ‚ğ GameManager.Instance ‚ÉC³
+        if (GameManager.Instance != null && platformBGM != null)
         {
-            GameManager.instance.PlayBGM(platformBGM);
+            // GameManager.instance.PlayBGM(platformBGM) ‚ğ GameManager.Instance.PlayBGM(platformBGM) ‚ÉC³
+            GameManager.Instance.PlayBGM(platformBGM);
         }
 
         StartCoroutine(FadeIn());
@@ -143,9 +145,11 @@ public class TilemapSwitchPlatform : MonoBehaviour
         }
 
         // Œ³‚ÌBGM‚É–ß‚·
-        if (GameManager.instance != null && normalBGM != null)
+        // GameManager.instance ‚ğ GameManager.Instance ‚ÉC³
+        if (GameManager.Instance != null && normalBGM != null)
         {
-            GameManager.instance.PlayBGM(normalBGM);
+            // GameManager.instance.PlayBGM(normalBGM) ‚ğ GameManager.Instance.PlayBGM(normalBGM) ‚ÉC³
+            GameManager.Instance.PlayBGM(normalBGM);
         }
 
         StartCoroutine(FadeOut());

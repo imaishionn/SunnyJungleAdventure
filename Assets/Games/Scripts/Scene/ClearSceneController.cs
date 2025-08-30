@@ -51,9 +51,11 @@ public class ClearSceneController : MonoBehaviour
         if (m_isTransitioning) return;
         m_isTransitioning = true;
 
-        if (GameManager.instance != null)
+        // GameManager.instance ‚ğ GameManager.Instance ‚ÉC³
+        if (GameManager.Instance != null)
         {
-            GameManager.instance.LoadSceneWithFade(scoreSceneName);
+            // GameManager.instance.LoadSceneWithFade ‚ğ GameManager.Instance.LoadSceneWithFade ‚ÉC³
+            GameManager.Instance.LoadSceneWithFade(scoreSceneName);
         }
         else
         {
