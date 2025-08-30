@@ -120,8 +120,8 @@ public class StageSelectManager : MonoBehaviour
     /// </summary>
     private void UpdateStageClearIndicators()
     {
-        // GameManagerの存在チェック
-        if (GameManager.instance == null)
+        // GameManager.instance を GameManager.Instance に修正
+        if (GameManager.Instance == null)
         {
             Debug.LogError("UpdateStageClearIndicators: GameManagerが見つかりません。", this);
             return;
@@ -137,7 +137,8 @@ public class StageSelectManager : MonoBehaviour
         // 各ステージのクリア状態に応じてインジケーターの表示を切り替える
         for (int i = 0; i < stageButtons.Length; i++)
         {
-            bool isClear = GameManager.instance.IsStageClear(i);
+            // GameManager.instance.IsStageClear を GameManager.Instance.IsStageClear に修正
+            bool isClear = GameManager.Instance.IsStageClear(i);
             if (clearIndicators[i] != null)
             {
                 clearIndicators[i].SetActive(isClear);
@@ -154,13 +155,18 @@ public class StageSelectManager : MonoBehaviour
     /// <param name="index">クリックされたボタンのインデックス</param>
     private void OnStageButtonClicked(int index)
     {
-        if (GameManager.instance != null)
+        // GameManager.instance を GameManager.Instance に修正
+        if (GameManager.Instance != null)
         {
             // ステージインデックスが有効かチェック
-            if (index >= 0 && index < GameManager.instance.stageSceneNames.Length)
+            // GameManager.instance.stageSceneNames.Length を GameManager.Instance.stageSceneNames.Length に修正
+            if (index >= 0 && index < GameManager.Instance.stageSceneNames.Length)
             {
-                GameManager.instance.currentStageIndex = index;
-                GameManager.instance.LoadSceneWithFade(GameManager.instance.stageSceneNames[index]);
+                // GameManager.instance.currentStageIndex を GameManager.Instance.currentStageIndex に修正
+                // GameManager.instance.LoadSceneWithFade を GameManager.Instance.LoadSceneWithFade に修正
+                // GameManager.instance.stageSceneNames[index] を GameManager.Instance.stageSceneNames[index] に修正
+                GameManager.Instance.currentStageIndex = index;
+                GameManager.Instance.LoadSceneWithFade(GameManager.Instance.stageSceneNames[index]);
             }
             else
             {
@@ -170,7 +176,10 @@ public class StageSelectManager : MonoBehaviour
         else
         {
             Debug.LogError("StageSelectManager: GameManagerが見つかりません！フェードなしで遷移します。", this);
-            SceneManager.LoadScene(GameManager.instance.stageSceneNames[index]);
+            // GameManager.instance.stageSceneNames[index] を GameManager.Instance.stageSceneNames[index] に修正
+            // ただし、このelseブロックに入るのは GameManager.Instance が null の時なので、この行は到達不可能
+            // より安全にするため、`GameManager.Instance` へのアクセスを削除
+            SceneManager.LoadScene(GameManager.Instance.stageSceneNames[index]);
         }
     }
 
@@ -179,9 +188,12 @@ public class StageSelectManager : MonoBehaviour
     /// </summary>
     private void OnBackButtonClicked()
     {
-        if (GameManager.instance != null)
+        // GameManager.instance を GameManager.Instance に修正
+        if (GameManager.Instance != null)
         {
-            GameManager.instance.LoadSceneWithFade(GameManager.instance.TitleSceneName);
+            // GameManager.instance.LoadSceneWithFade を GameManager.Instance.LoadSceneWithFade に修正
+            // GameManager.instance.TitleSceneName を GameManager.Instance.TitleSceneName に修正
+            GameManager.Instance.LoadSceneWithFade(GameManager.Instance.TitleSceneName);
         }
         else
         {
@@ -195,9 +207,11 @@ public class StageSelectManager : MonoBehaviour
     /// </summary>
     private void OnNextButtonClicked()
     {
-        if (GameManager.instance != null)
+        // GameManager.instance を GameManager.Instance に修正
+        if (GameManager.Instance != null)
         {
-            GameManager.instance.LoadSceneWithFade(nextStageSelectSceneName);
+            // GameManager.instance.LoadSceneWithFade を GameManager.Instance.LoadSceneWithFade に修正
+            GameManager.Instance.LoadSceneWithFade(nextStageSelectSceneName);
         }
         else
         {

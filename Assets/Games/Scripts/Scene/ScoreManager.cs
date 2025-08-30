@@ -41,7 +41,8 @@ public class ScoreManager : MonoBehaviour
     void OnEnable()
     {
         // GameManagerのインスタンスが存在するか確認
-        if (GameManager.instance == null)
+        // GameManager.instance を GameManager.Instance に修正
+        if (GameManager.Instance == null)
         {
             UnityEngine.Debug.LogError("GameManagerのインスタンスが見つかりません。スコア表示はできません。");
             // GameManagerがない場合は、ダミーデータで表示
@@ -50,8 +51,10 @@ public class ScoreManager : MonoBehaviour
         else
         {
             // GameManagerから最終スコアと時間を取得
-            int finalScore = GameManager.instance.finalScore;
-            float finalTime = GameManager.instance.finalTime;
+            // GameManager.instance.finalScore を GameManager.Instance.finalScore に修正
+            // GameManager.instance.finalTime を GameManager.Instance.finalTime に修正
+            int finalScore = GameManager.Instance.finalScore;
+            float finalTime = GameManager.Instance.finalTime;
 
             // スコアと時間をUIに表示
             DisplayResults(finalScore, finalTime);
@@ -216,9 +219,12 @@ public class ScoreManager : MonoBehaviour
     void OnTitleButtonClicked()
     {
         // GameManagerのインスタンスを使用してタイトルシーンに遷移
-        if (GameManager.instance != null && !string.IsNullOrEmpty(GameManager.instance.TitleSceneName))
+        // GameManager.instance を GameManager.Instance に修正
+        if (GameManager.Instance != null && !string.IsNullOrEmpty(GameManager.Instance.TitleSceneName))
         {
-            GameManager.instance.LoadSceneWithFade(GameManager.instance.TitleSceneName);
+            // GameManager.instance.LoadSceneWithFade を GameManager.Instance.LoadSceneWithFade に修正
+            // GameManager.instance.TitleSceneName を GameManager.Instance.TitleSceneName に修正
+            GameManager.Instance.LoadSceneWithFade(GameManager.Instance.TitleSceneName);
         }
         else if (!string.IsNullOrEmpty(titleSceneName))
         {

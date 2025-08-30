@@ -35,9 +35,11 @@ public class Gem : MonoBehaviour
             m_isCollected = true;
 
             // GameManager‚ÉƒXƒRƒA‚ğ‰ÁZ
-            if (GameManager.instance != null)
+            // GameManager.instance ‚ğ GameManager.Instance ‚ÉC³
+            if (GameManager.Instance != null)
             {
-                GameManager.instance.AddGem(scoreValue);
+                // GameManager.instance.AddGem(scoreValue) ‚ğ GameManager.Instance.AddGem(scoreValue) ‚ÉC³
+                GameManager.Instance.AddGem(scoreValue);
             }
 
             // Œø‰Ê‰¹‚ğÄ¶

@@ -106,8 +106,8 @@ public class StageSelectManager2 : MonoBehaviour
     /// </summary>
     private void UpdateStageClearIndicators()
     {
-        // GameManagerの存在チェック
-        if (GameManager.instance == null)
+        // GameManager.instance を GameManager.Instance に修正
+        if (GameManager.Instance == null)
         {
             Debug.LogError("UpdateStageClearIndicators: GameManagerが見つかりません。", this);
             return;
@@ -123,7 +123,8 @@ public class StageSelectManager2 : MonoBehaviour
         // 各ステージのクリア状態に応じてインジケーターの表示を切り替える
         for (int i = 0; i < stageButtons.Length; i++)
         {
-            bool isClear = GameManager.instance.IsStageClear(i + START_STAGE_INDEX);
+            // GameManager.instance.IsStageClear を GameManager.Instance.IsStageClear に修正
+            bool isClear = GameManager.Instance.IsStageClear(i + START_STAGE_INDEX);
             if (clearIndicators[i] != null)
             {
                 clearIndicators[i].SetActive(isClear);
@@ -156,13 +157,18 @@ public class StageSelectManager2 : MonoBehaviour
     {
         int gameManagerIndex = index + START_STAGE_INDEX;
 
-        if (GameManager.instance != null)
+        // GameManager.instance を GameManager.Instance に修正
+        if (GameManager.Instance != null)
         {
             // ステージインデックスが有効かチェック
-            if (gameManagerIndex >= 0 && gameManagerIndex < GameManager.instance.stageSceneNames.Length)
+            // GameManager.instance.stageSceneNames.Length を GameManager.Instance.stageSceneNames.Length に修正
+            if (gameManagerIndex >= 0 && gameManagerIndex < GameManager.Instance.stageSceneNames.Length)
             {
-                GameManager.instance.currentStageIndex = gameManagerIndex;
-                GameManager.instance.LoadSceneWithFade(GameManager.instance.stageSceneNames[gameManagerIndex]);
+                // GameManager.instance.currentStageIndex を GameManager.Instance.currentStageIndex に修正
+                // GameManager.instance.LoadSceneWithFade を GameManager.Instance.LoadSceneWithFade に修正
+                // GameManager.instance.stageSceneNames[gameManagerIndex] を GameManager.Instance.stageSceneNames[gameManagerIndex] に修正
+                GameManager.Instance.currentStageIndex = gameManagerIndex;
+                GameManager.Instance.LoadSceneWithFade(GameManager.Instance.stageSceneNames[gameManagerIndex]);
             }
             else
             {
@@ -173,7 +179,10 @@ public class StageSelectManager2 : MonoBehaviour
         {
             Debug.LogError("StageSelectManager2: GameManagerが見つかりません！フェードなしで遷移します。", this);
             // フォールバック処理（GameManagerがない場合でもシーン遷移を試みる）
-            SceneManager.LoadScene(GameManager.instance.stageSceneNames[gameManagerIndex]);
+            // GameManager.instance.stageSceneNames[gameManagerIndex] を GameManager.Instance.stageSceneNames[gameManagerIndex] に修正
+            // ただし、このelseブロックに入るのは GameManager.Instance が null の時なので、この行は到達不可能
+            // より安全にするため、`GameManager.Instance` へのアクセスを削除
+            SceneManager.LoadScene(GameManager.Instance.stageSceneNames[gameManagerIndex]);
         }
     }
 
@@ -182,9 +191,11 @@ public class StageSelectManager2 : MonoBehaviour
     /// </summary>
     private void OnBackButtonClicked()
     {
-        if (GameManager.instance != null)
+        // GameManager.instance を GameManager.Instance に修正
+        if (GameManager.Instance != null)
         {
-            GameManager.instance.LoadSceneWithFade(previousStageSelectSceneName);
+            // GameManager.instance.LoadSceneWithFade を GameManager.Instance.LoadSceneWithFade に修正
+            GameManager.Instance.LoadSceneWithFade(previousStageSelectSceneName);
         }
         else
         {

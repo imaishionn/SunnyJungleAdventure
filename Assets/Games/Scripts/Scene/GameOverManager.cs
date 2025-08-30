@@ -89,9 +89,11 @@ public class GameOverManager : MonoBehaviour
         m_isTransitioning = true;
         Time.timeScale = 1f;
 
-        if (GameManager.instance != null)
+        // GameManager.instance を GameManager.Instance に修正
+        if (GameManager.Instance != null)
         {
-            GameManager.instance.LoadSceneWithFade(titleSceneName);
+            // GameManager.instance.LoadSceneWithFade を GameManager.Instance.LoadSceneWithFade に修正
+            GameManager.Instance.LoadSceneWithFade(titleSceneName);
         }
         else
         {
@@ -108,11 +110,14 @@ public class GameOverManager : MonoBehaviour
         m_isTransitioning = true;
         Time.timeScale = 1f;
 
-        if (GameManager.instance != null)
+        // GameManager.instance を GameManager.Instance に修正
+        if (GameManager.Instance != null)
         {
             // ここでゲームデータをリセットする
-            GameManager.instance.ResetGameData();
-            GameManager.instance.RetryLastStage(); // GameManagerのメソッドを呼び出す
+            // GameManager.instance.ResetGameData() を GameManager.Instance.ResetGameData() に修正
+            // GameManager.instance.RetryLastStage() を GameManager.Instance.RetryLastStage() に修正
+            GameManager.Instance.ResetGameData();
+            GameManager.Instance.RetryLastStage(); // GameManagerのメソッドを呼び出す
         }
         else
         {
