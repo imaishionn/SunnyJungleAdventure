@@ -1,6 +1,9 @@
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
+/// <summary>
+/// ゲームがモバイルプラットフォームで実行されている場合に、UIを有効/無効にするスクリプト。
+/// </summary>
 public class MobileUIController : MonoBehaviour
 {
     private void Awake()
@@ -13,7 +16,7 @@ public class MobileUIController : MonoBehaviour
         }
         else
         {
-            // それ以外の場合はUIを無効にする
+            // それ以外（PCなど）の場合はUIを無効にする
             gameObject.SetActive(false);
         }
     }

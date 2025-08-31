@@ -702,13 +702,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_permanentUICanvas: {fileID: 1700652245}
-  m_globalFadePanelImage: {fileID: 387811462}
   m_globalFadeCanvasGroup: {fileID: 387811464}
+  m_globalFadePanelImage: {fileID: 387811462}
   m_permanentEventSystem: {fileID: 957534964}
   m_scoreDisplay: {fileID: 1685015533}
   m_scorePanel: {fileID: 558137469}
   m_timeLimitText: {fileID: 26130366}
-  mobileControlCanvas: {fileID: 311696879}
+  m_mobileControlCanvas: {fileID: 311696879}
   m_titleSceneName: TitleScene
   m_bootstrapSceneName: FirstScene
   m_stageSelectSceneName: StageSelectScene
@@ -720,8 +720,6 @@ MonoBehaviour:
   - Stage3Scene
   - For open campus
   m_scoreSceneName: Resultscene
-  m_isGlobalTransitioning: 0
-  m_fadeDuration: 1
   m_isTimeLimited: 1
   m_timeLimitSeconds: 180
   m_sceneBGMList:
@@ -746,6 +744,7 @@ MonoBehaviour:
   - sceneName: For open campus
     bgmClip: {fileID: 8300000, guid: b6dc04f2884eb5b46b675390b1e75e84, type: 3}
   m_initialBGMVolume: 1
+  m_fadeDuration: 1
 --- !u!1 &617814593
 GameObject:
   m_ObjectHideFlags: 0
