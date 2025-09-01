@@ -8,16 +8,25 @@ using System.Collections.Generic;
 /// </summary>
 public class JumpButtonController : MonoBehaviour, IPointerDownHandler
 {
+    private PlayerMove m_playerMove;
+
+    /// <summary>
+    /// GameManagerからPlayerMoveの参照を受け取るためのメソッド
+    /// </summary>
+    public void SetPlayerMove(PlayerMove player)
+    {
+        m_playerMove = player;
+    }
+
     /// <summary>
     /// ボタンがタップされたときに呼び出されます。
     /// </summary>
     public void OnPointerDown(PointerEventData eventData)
     {
-        // GameManagerのインスタンスとプレイヤーの参照が有効か確認
-        if (GameManager.Instance != null && GameManager.Instance.GetPlayerMove() != null)
+        // プレイヤーオブジェクトが存在し、アクティブな場合のみジャンプを呼び出す
+        if (m_playerMove != null && m_playerMove.gameObject.activeInHierarchy)
         {
-            // GameManager経由でプレイヤーのジャンプ関数を呼び出す
-            GameManager.Instance.GetPlayerMove().Jump();
+            m_playerMove.Jump();
         }
     }
 }
