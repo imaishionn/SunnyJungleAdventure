@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
 /// <summary>
@@ -33,7 +32,6 @@ public class PlayerMove : MonoBehaviour
 
     // Mobile Control Canvasから参照を受け取るためのプライベート変数
     private VirtualJoystick m_joystick;
-    private JumpButtonController m_jumpButton;
 
     [Header("ゲームオーバー条件")]
     [Tooltip("プレイヤーがこのY座標より下に落ちるとゲームオーバー")]
@@ -93,12 +91,6 @@ public class PlayerMove : MonoBehaviour
     public void SetMobileControls(VirtualJoystick joystick, JumpButtonController jump)
     {
         m_joystick = joystick;
-        m_jumpButton = jump;
-
-        if (m_joystick == null || m_jumpButton == null)
-        {
-            UnityEngine.Debug.LogError("PlayerMove: ジョイスティックまたはジャンプボタンの割り当てに失敗しました。GameManagerからの参照を確認してください。", this);
-        }
     }
 
     /// <summary>
@@ -121,25 +113,23 @@ public class PlayerMove : MonoBehaviour
 
         // 2. 入力処理
         float moveInput = 0f;
-        // プラットフォームがモバイルでない場合（PCなど）はキーボード入力を取得
-        if (!UnityEngine.Application.isMobilePlatform)
+
+        // モバイルプラットフォームで実行されている場合はジョイスティックの入力を優先
+        if (UnityEngine.Application.isMobilePlatform && m_joystick != null)
         {
-            moveInput = Input.GetAxisRaw("Horizontal");
+            moveInput = m_joystick.InputDirection.x;
         }
-        // モバイルプラットフォームの場合はジョイスティック入力を取得
         else
         {
-            if (m_joystick != null)
-            {
-                moveInput = m_joystick.InputDirection.x;
-            }
+            // PCの場合はキーボードとコントローラーの入力を受け付ける
+            moveInput = Input.GetAxis("Horizontal");
         }
 
         // 入力に基づいて移動と向きの反転を処理
         HandleMovementInput(moveInput);
 
         // PCでジャンプボタンが押されたらジャンプを実行
-        if (!UnityEngine.Application.isMobilePlatform && Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump"))
         {
             Jump();
         }
@@ -215,6 +205,14 @@ public class PlayerMove : MonoBehaviour
     }
 
     /// <summary>
+    /// モバイルジャンプボタンがクリックされたときに呼び出されるメソッド
+    /// </summary>
+    public void OnMobileJumpButtonPressed()
+    {
+        Jump();
+    }
+
+    /// <summary>
     /// 衝突発生時に実行される処理
     /// </summary>
     private void OnCollisionEnter2D(Collision2D collision)
@@ -222,10 +220,20 @@ public class PlayerMove : MonoBehaviour
         // 死亡時や無敵状態では衝突処理をスキップ
         if (IsDead || isInvincible) return;
 
-        // 衝突したオブジェクトが"Enemy"タグを持つ場合、死亡処理を実行
+        // 衝突したオブジェクトが"Enemy"タグを持つ場合
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            Die();
+            // 敵との接触位置を判定
+            // プレイヤーのy座標が敵のy座標より高い場合、踏みつけたと判定
+            if (transform.position.y > collision.transform.position.y)
+            {
+                StompEnemy(collision.gameObject);
+            }
+            else
+            {
+                // プレイヤーが敵の横または下から衝突した場合、死亡処理
+                Die();
+            }
         }
     }
 

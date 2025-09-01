@@ -28,9 +28,6 @@ public class StageSelectManager2 : MonoBehaviour
     [Tooltip("各ステージに対応する「クリア」表示のゲームオブジェクト")]
     [SerializeField] private GameObject[] clearIndicators;
 
-    // GameManagerのステージ配列のどこからこのシーンのステージが始まるか
-    // 例：Stage1Scene, Stage2Scene, Stage3Scene... の場合、
-    // StageSelectSceneが0から2、StageSelect2Sceneが3から始まる
     private const int START_STAGE_INDEX = 3;
 
     // ----------------------------------------------------------------------------------------------------
@@ -38,7 +35,6 @@ public class StageSelectManager2 : MonoBehaviour
     // ----------------------------------------------------------------------------------------------------
     private void Start()
     {
-        // Canvasの存在チェックとアクティブ化
         if (stageSelectCanvas != null)
         {
             stageSelectCanvas.SetActive(true);
@@ -48,12 +44,10 @@ public class StageSelectManager2 : MonoBehaviour
             Debug.LogError("StageSelectManager2: StageSelect Canvas が割り当てられていません！", this);
         }
 
-        // ステージボタンのリスナー登録
         if (stageButtons != null && stageButtons.Length > 0)
         {
             for (int i = 0; i < stageButtons.Length; i++)
             {
-                // クロージャの問題を回避するため、ループ変数をローカル変数にコピー
                 int stageIndex = i;
                 if (stageButtons[i] != null)
                 {
@@ -61,27 +55,27 @@ public class StageSelectManager2 : MonoBehaviour
                 }
             }
 
-            // 初期選択の設定をコルーチンで遅延実行
-            StartCoroutine(SetInitialSelectionDelayed());
+            // 初期選択を設定
+            if (EventSystem.current != null && stageButtons[0] != null)
+            {
+                EventSystem.current.SetSelectedGameObject(stageButtons[0].gameObject);
+            }
         }
         else
         {
             Debug.LogWarning("StageSelectManager2: ステージボタンが割り当てられていません！", this);
         }
 
-        // 戻るボタンのリスナー登録
         if (backButton != null)
         {
             backButton.onClick.AddListener(OnBackButtonClicked);
         }
 
-        // ステージクリア表示の更新
         UpdateStageClearIndicators();
     }
 
     private void OnDestroy()
     {
-        // シーン遷移時にボタンのイベントリスナーを解除する
         if (stageButtons != null)
         {
             foreach (var button in stageButtons)
@@ -101,29 +95,22 @@ public class StageSelectManager2 : MonoBehaviour
     // ----------------------------------------------------------------------------------------------------
     // プライベートメソッド
     // ----------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// ステージクリアの情報をチェックし、クリアインジケーターの表示を更新します。
-    /// </summary>
     private void UpdateStageClearIndicators()
     {
-        // GameManager.instance を GameManager.Instance に修正
         if (GameManager.Instance == null)
         {
             Debug.LogError("UpdateStageClearIndicators: GameManagerが見つかりません。", this);
             return;
         }
 
-        // 配列の数の一致チェック
         if (clearIndicators == null || stageButtons == null || clearIndicators.Length != stageButtons.Length)
         {
             Debug.LogWarning("UpdateStageClearIndicators: clearIndicators配列とstageButtons配列の数が一致しません。または設定されていません。", this);
             return;
         }
 
-        // 各ステージのクリア状態に応じてインジケーターの表示を切り替える
         for (int i = 0; i < stageButtons.Length; i++)
         {
-            // GameManager.instance.IsStageClear を GameManager.Instance.IsStageClear に修正
             bool isClear = GameManager.Instance.IsStageClear(i + START_STAGE_INDEX);
             if (clearIndicators[i] != null)
             {
@@ -132,41 +119,17 @@ public class StageSelectManager2 : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 初期選択を次のフレームで設定するコルーチン
-    /// </summary>
-    private IEnumerator SetInitialSelectionDelayed()
-    {
-        // 1フレーム待機してUIの描画を待つ
-        yield return null;
-
-        if (EventSystem.current != null && stageButtons != null && stageButtons.Length > 0 && stageButtons[0] != null)
-        {
-            EventSystem.current.SetSelectedGameObject(stageButtons[0].gameObject);
-        }
-    }
-
     // ----------------------------------------------------------------------------------------------------
     // UIイベントハンドラー
     // ----------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// ステージ選択ボタンがクリックされたときに呼ばれます。
-    /// </summary>
-    /// <param name="index">クリックされたボタンのインデックス</param>
     private void OnStageButtonClicked(int index)
     {
         int gameManagerIndex = index + START_STAGE_INDEX;
 
-        // GameManager.instance を GameManager.Instance に修正
         if (GameManager.Instance != null)
         {
-            // ステージインデックスが有効かチェック
-            // GameManager.instance.stageSceneNames.Length を GameManager.Instance.stageSceneNames.Length に修正
             if (gameManagerIndex >= 0 && gameManagerIndex < GameManager.Instance.stageSceneNames.Length)
             {
-                // GameManager.instance.currentStageIndex を GameManager.Instance.currentStageIndex に修正
-                // GameManager.instance.LoadSceneWithFade を GameManager.Instance.LoadSceneWithFade に修正
-                // GameManager.instance.stageSceneNames[gameManagerIndex] を GameManager.Instance.stageSceneNames[gameManagerIndex] に修正
                 GameManager.Instance.currentStageIndex = gameManagerIndex;
                 GameManager.Instance.LoadSceneWithFade(GameManager.Instance.stageSceneNames[gameManagerIndex]);
             }
@@ -178,23 +141,15 @@ public class StageSelectManager2 : MonoBehaviour
         else
         {
             Debug.LogError("StageSelectManager2: GameManagerが見つかりません！フェードなしで遷移します。", this);
-            // フォールバック処理（GameManagerがない場合でもシーン遷移を試みる）
-            // GameManager.instance.stageSceneNames[gameManagerIndex] を GameManager.Instance.stageSceneNames[gameManagerIndex] に修正
-            // ただし、このelseブロックに入るのは GameManager.Instance が null の時なので、この行は到達不可能
-            // より安全にするため、`GameManager.Instance` へのアクセスを削除
-            SceneManager.LoadScene(GameManager.Instance.stageSceneNames[gameManagerIndex]);
+            // GameManagerがない場合、ステージ名がわからないため遷移できない
+            // 処理を中止
         }
     }
 
-    /// <summary>
-    /// 戻るボタンがクリックされたときに呼ばれます。
-    /// </summary>
     private void OnBackButtonClicked()
     {
-        // GameManager.instance を GameManager.Instance に修正
         if (GameManager.Instance != null)
         {
-            // GameManager.instance.LoadSceneWithFade を GameManager.Instance.LoadSceneWithFade に修正
             GameManager.Instance.LoadSceneWithFade(previousStageSelectSceneName);
         }
         else

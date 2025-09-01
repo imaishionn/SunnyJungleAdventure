@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -7,68 +7,68 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
-/// ƒQ[ƒ€‘S‘Ì‚Ìisó‹µAó‘ÔAƒf[ƒ^AUIABGM‚È‚Ç‚ğŠÇ—‚·‚éƒVƒ“ƒOƒ‹ƒgƒ“ƒNƒ‰ƒXB
-/// ƒV[ƒ“‚ğ‚Ü‚½‚¢‚Å‘¶İ‚µAƒQ[ƒ€‚Ì’†S“I‚È§Œä‚ğ’S‚¢‚Ü‚·B
+/// ã‚²ãƒ¼ãƒ å…¨ä½“ã®é€²è¡ŒçŠ¶æ³ã€çŠ¶æ…‹ã€ãƒ‡ãƒ¼ã‚¿ã€UIã€BGMãªã©ã‚’ç®¡ç†ã™ã‚‹ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã‚¯ãƒ©ã‚¹ã€‚
+/// ã‚·ãƒ¼ãƒ³ã‚’ã¾ãŸã„ã§å­˜åœ¨ã—ã€ã‚²ãƒ¼ãƒ ã®ä¸­å¿ƒçš„ãªåˆ¶å¾¡ã‚’æ‹…ã„ã¾ã™ã€‚
 /// </summary>
 public class GameManager : MonoBehaviour
 {
     // ====================================================================================================
-    // #region: ƒVƒ“ƒOƒ‹ƒgƒ“
+    // #region: ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³
     // ====================================================================================================
     public static GameManager Instance { get; private set; }
 
     // ====================================================================================================
-    // #region: ƒƒ“ƒo•Ï”iƒCƒ“ƒXƒyƒNƒ^[‚©‚çİ’èj
+    // #region: ãƒ¡ãƒ³ãƒå¤‰æ•°ï¼ˆã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã‹ã‚‰è¨­å®šï¼‰
     // ====================================================================================================
-    [Header("UI—v‘f")]
-    [Tooltip("ƒV[ƒ“‘JˆÚ‚É”j‰ó‚³‚ê‚È‚¢‰i‘±“I‚ÈUIƒLƒƒƒ“ƒoƒX")]
+    [Header("UIè¦ç´ ")]
+    [Tooltip("ã‚·ãƒ¼ãƒ³é·ç§»æ™‚ã«ç ´å£Šã•ã‚Œãªã„æ°¸ç¶šçš„ãªUIã‚­ãƒ£ãƒ³ãƒã‚¹")]
     [SerializeField] private GameObject m_permanentUICanvas;
-    [Tooltip("ƒV[ƒ“ƒtƒF[ƒh‚Ég—p‚·‚éƒLƒƒƒ“ƒoƒXƒOƒ‹[ƒv")]
+    [Tooltip("ã‚·ãƒ¼ãƒ³ãƒ•ã‚§ãƒ¼ãƒ‰ã«ä½¿ç”¨ã™ã‚‹ã‚­ãƒ£ãƒ³ãƒã‚¹ã‚°ãƒ«ãƒ¼ãƒ—")]
     [SerializeField] private CanvasGroup m_globalFadeCanvasGroup;
-    [Tooltip("ƒV[ƒ“ƒtƒF[ƒh‚Ég—p‚·‚éƒpƒlƒ‹‚ÌImageƒRƒ“ƒ|[ƒlƒ“ƒg")]
+    [Tooltip("ã‚·ãƒ¼ãƒ³ãƒ•ã‚§ãƒ¼ãƒ‰ã«ä½¿ç”¨ã™ã‚‹ãƒ‘ãƒãƒ«ã®Imageã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ")]
     [SerializeField] private UnityEngine.UI.Image m_globalFadePanelImage;
-    [Tooltip("‰i‘±“I‚ÈEventSystem")]
+    [Tooltip("æ°¸ç¶šçš„ãªEventSystem")]
     [SerializeField] private UnityEngine.EventSystems.EventSystem m_permanentEventSystem;
-    [Tooltip("ƒXƒRƒA•\¦‚ğŠÇ—‚·‚éƒNƒ‰ƒX (•K—v‚É‰‚¶‚Ä)")]
+    [Tooltip("ã‚¹ã‚³ã‚¢è¡¨ç¤ºã‚’ç®¡ç†ã™ã‚‹ã‚¯ãƒ©ã‚¹ (å¿…è¦ã«å¿œã˜ã¦)")]
     [SerializeField] private ScoreDisplay m_scoreDisplay;
-    [Tooltip("ƒXƒRƒAƒpƒlƒ‹‚ÌGameObject")]
+    [Tooltip("ã‚¹ã‚³ã‚¢ãƒ‘ãƒãƒ«ã®GameObject")]
     [SerializeField] private GameObject m_scorePanel;
-    [Tooltip("ŠÔ§ŒÀ‚ğ•\¦‚·‚éTextMeshPro‚ÌƒeƒLƒXƒg")]
+    [Tooltip("æ™‚é–“åˆ¶é™ã‚’è¡¨ç¤ºã™ã‚‹TextMeshProã®ãƒ†ã‚­ã‚¹ãƒˆ")]
     [SerializeField] private TMPro.TextMeshProUGUI m_timeLimitText;
-    [Tooltip("ƒ‚ƒoƒCƒ‹‘€ì—p‚ÌUIƒLƒƒƒ“ƒoƒX")]
+    [Tooltip("ãƒ¢ãƒã‚¤ãƒ«æ“ä½œç”¨ã®UIã‚­ãƒ£ãƒ³ãƒã‚¹")]
     [SerializeField] private GameObject m_mobileControlCanvas;
 
-    [Header("ƒV[ƒ“–¼ (Build Settings‚É“o˜^•K{)")]
-    [Tooltip("ƒ^ƒCƒgƒ‹ƒV[ƒ“‚Ì–¼‘O")]
+    [Header("ã‚·ãƒ¼ãƒ³å (Build Settingsã«ç™»éŒ²å¿…é ˆ)")]
+    [Tooltip("ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³ã®åå‰")]
     [SerializeField] private string m_titleSceneName = "TitleScene";
-    [Tooltip("Å‰‚Éƒ[ƒh‚³‚ê‚é‹N“®—pƒV[ƒ“‚Ì–¼‘O")]
+    [Tooltip("æœ€åˆã«ãƒ­ãƒ¼ãƒ‰ã•ã‚Œã‚‹èµ·å‹•ç”¨ã‚·ãƒ¼ãƒ³ã®åå‰")]
     [SerializeField] private string m_bootstrapSceneName = "Bootstrap";
-    [Tooltip("ƒXƒe[ƒW‘I‘ğƒV[ƒ“‚Ì–¼‘O")]
+    [Tooltip("ã‚¹ãƒ†ãƒ¼ã‚¸é¸æŠã‚·ãƒ¼ãƒ³ã®åå‰")]
     [SerializeField] private string m_stageSelectSceneName = "StageSelect";
-    [Tooltip("ƒQ[ƒ€ƒI[ƒo[ƒV[ƒ“‚Ì–¼‘O")]
+    [Tooltip("ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ã‚·ãƒ¼ãƒ³ã®åå‰")]
     [SerializeField] private string m_gameOverSceneName = "GameOverScene";
-    [Tooltip("ƒQ[ƒ€ƒNƒŠƒAƒV[ƒ“‚Ì–¼‘O")]
+    [Tooltip("ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢ã‚·ãƒ¼ãƒ³ã®åå‰")]
     [SerializeField] private string m_clearSceneName = "ClearScene";
-    [Tooltip("ƒXƒe[ƒWƒV[ƒ“‚Ì”z—ñ")]
+    [Tooltip("ã‚¹ãƒ†ãƒ¼ã‚¸ã‚·ãƒ¼ãƒ³ã®é…åˆ—")]
     [SerializeField] private string[] m_stageSceneNames = { "Demo_tileset", "Demo_tileset2", "Demo_tileset3", "Stage1Scene", "Stage2Scene", "Stage3Scene", "For open campus" };
-    [Tooltip("ƒXƒRƒA•\¦ƒV[ƒ“‚Ì–¼‘O")]
+    [Tooltip("ã‚¹ã‚³ã‚¢è¡¨ç¤ºã‚·ãƒ¼ãƒ³ã®åå‰")]
     [SerializeField] private string m_scoreSceneName = "ScoreScene";
 
-    [Header("ŠÔ§ŒÀİ’è")]
-    [Tooltip("ƒQ[ƒ€ƒvƒŒƒCƒV[ƒ“‚ÅŠÔ§ŒÀ‚ğ—LŒø‚É‚·‚é‚©")]
+    [Header("æ™‚é–“åˆ¶é™è¨­å®š")]
+    [Tooltip("ã‚²ãƒ¼ãƒ ãƒ—ãƒ¬ã‚¤ã‚·ãƒ¼ãƒ³ã§æ™‚é–“åˆ¶é™ã‚’æœ‰åŠ¹ã«ã™ã‚‹ã‹")]
     [SerializeField] private bool m_isTimeLimited = false;
-    [Tooltip("ŠÔ§ŒÀ‚Ì‡ŒvŠÔ (•b)")]
+    [Tooltip("æ™‚é–“åˆ¶é™ã®åˆè¨ˆæ™‚é–“ (ç§’)")]
     [SerializeField] private float m_timeLimitSeconds = 60.0f;
 
-    [Header("BGMŠÇ—")]
-    [Tooltip("ƒV[ƒ“–¼‚ÆBGM‚ÌAudioClip‚ğƒ}ƒbƒsƒ“ƒO‚µ‚Ü‚·B")]
+    [Header("BGMç®¡ç†")]
+    [Tooltip("ã‚·ãƒ¼ãƒ³åã¨BGMã®AudioClipã‚’ãƒãƒƒãƒ”ãƒ³ã‚°ã—ã¾ã™ã€‚")]
     [SerializeField] private List<SceneBGMData> m_sceneBGMList;
-    [Tooltip("BGM‚Ì‰Šú‰¹—Ê (0.0f‚©‚ç1.0f)")]
+    [Tooltip("BGMã®åˆæœŸéŸ³é‡ (0.0fã‹ã‚‰1.0f)")]
     [Range(0f, 1f)]
     [SerializeField] private float m_initialBGMVolume = 0.5f;
 
     // ====================================================================================================
-    // #region: ƒƒ“ƒo•Ï”iƒXƒNƒŠƒvƒg“à•”‚ÅŠÇ—j
+    // #region: ãƒ¡ãƒ³ãƒå¤‰æ•°ï¼ˆã‚¹ã‚¯ãƒªãƒ—ãƒˆå†…éƒ¨ã§ç®¡ç†ï¼‰
     // ====================================================================================================
     private GameState m_currentGameState = GameState.Gameplay;
     private int m_currentGemCount = 0;
@@ -81,11 +81,12 @@ public class GameManager : MonoBehaviour
     private AudioSource m_audioSource;
     private PlayerMove m_player;
     private Dictionary<string, AudioClip> m_sceneBGMMap = new Dictionary<string, AudioClip>();
+    private bool m_isInitialStartup = true;
 
     private const string STAGE_CLEAR_KEY_PREFIX = "StageClear_";
 
     // ====================================================================================================
-    // #region: —ñ‹“Œ^‚ÆƒNƒ‰ƒX
+    // #region: åˆ—æŒ™å‹ã¨ã‚¯ãƒ©ã‚¹
     // ====================================================================================================
     public enum GameState
     {
@@ -106,7 +107,7 @@ public class GameManager : MonoBehaviour
     }
 
     // ====================================================================================================
-    // #region: ƒvƒƒpƒeƒB‚ÆƒpƒuƒŠƒbƒNƒCƒxƒ“ƒg
+    // #region: ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã¨ãƒ‘ãƒ–ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆ
     // ====================================================================================================
     public float BGMVolume
     {
@@ -129,7 +130,7 @@ public class GameManager : MonoBehaviour
     public System.Action<int> OnGemCountChanged;
 
     // ====================================================================================================
-    // #region: MonoBehaviour ƒ‰ƒCƒtƒTƒCƒNƒ‹
+    // #region: MonoBehaviour ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«
     // ====================================================================================================
     private void Awake()
     {
@@ -137,23 +138,29 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            UnityEngine.Debug.Log("GameManagerƒCƒ“ƒXƒ^ƒ“ƒX‚ªì¬‚³‚êADontDestroyOnLoad‚Éİ’è‚³‚ê‚Ü‚µ‚½B", this);
+            UnityEngine.Debug.Log("GameManagerã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒä½œæˆã•ã‚Œã€DontDestroyOnLoadã«è¨­å®šã•ã‚Œã¾ã—ãŸã€‚", this);
 
             CheckUIReferences();
             InitializeAudioSource();
             InitializeBGMMap();
             InitializeFadeCanvas();
 
-            // ‰‰ñ‹N“®‚ÌƒV[ƒ“‚É‰‚¶‚Äó‘Ôİ’è
+            // åˆå›èµ·å‹•æ™‚ã®ã‚·ãƒ¼ãƒ³ã«å¿œã˜ã¦çŠ¶æ…‹è¨­å®š
             string currentSceneName = SceneManager.GetActiveScene().name;
-            if (currentSceneName == m_bootstrapSceneName || currentSceneName == "FirstScene")
+            if (m_isInitialStartup && (currentSceneName == m_bootstrapSceneName || currentSceneName == "FirstScene"))
             {
+                // åˆå›èµ·å‹•æ™‚ã®ã¿ãƒ•ã‚§ãƒ¼ãƒ‰ã‚’ã›ãšã«ã‚·ãƒ¼ãƒ³ã‚’ãƒ­ãƒ¼ãƒ‰
+                SceneManager.LoadScene(m_titleSceneName);
+            }
+            else
+            {
+                // ãã‚Œä»¥å¤–ã®å ´åˆã¯é€šå¸¸é€šã‚Šãƒ•ã‚§ãƒ¼ãƒ‰ã‚’ä¼´ã£ã¦ãƒ­ãƒ¼ãƒ‰
                 LoadSceneWithFade(m_titleSceneName);
             }
         }
         else
         {
-            UnityEngine.Debug.LogWarning("GameManager‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ªŠù‚É‘¶İ‚·‚é‚½‚ßA‚±‚ÌƒIƒuƒWƒFƒNƒg‚Í”jŠü‚³‚ê‚Ü‚µ‚½B", this);
+            UnityEngine.Debug.LogWarning("GameManagerã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒæ—¢ã«å­˜åœ¨ã™ã‚‹ãŸã‚ã€ã“ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¯ç ´æ£„ã•ã‚Œã¾ã—ãŸã€‚", this);
             Destroy(gameObject);
         }
     }
@@ -182,7 +189,7 @@ public class GameManager : MonoBehaviour
     }
 
     // ====================================================================================================
-    // #region: ƒpƒuƒŠƒbƒNƒƒ\ƒbƒh
+    // #region: ãƒ‘ãƒ–ãƒªãƒƒã‚¯ãƒ¡ã‚½ãƒƒãƒ‰
     // ====================================================================================================
     public GameState GetCurrentGameState() => m_currentGameState;
     public void SetState(GameState newState)
@@ -232,7 +239,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            UnityEngine.Debug.LogError("GameManager: ÄƒvƒŒƒC‚·‚éƒXƒe[ƒW‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBƒXƒe[ƒW‘I‘ğ‚Ö–ß‚è‚Ü‚·B", this);
+            UnityEngine.Debug.LogError("GameManager: å†ãƒ—ãƒ¬ã‚¤ã™ã‚‹ã‚¹ãƒ†ãƒ¼ã‚¸ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚ã‚¹ãƒ†ãƒ¼ã‚¸é¸æŠã¸æˆ»ã‚Šã¾ã™ã€‚", this);
             LoadSceneWithFade(m_stageSelectSceneName);
         }
     }
@@ -243,7 +250,7 @@ public class GameManager : MonoBehaviour
         if (m_isGlobalTransitioning) return;
         if (m_globalFadePanelImage == null || m_globalFadeCanvasGroup == null)
         {
-            UnityEngine.Debug.LogError("GameManager: ƒtƒF[ƒh‚É•K—v‚ÈUI—v‘f‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñIƒtƒF[ƒh‚È‚µ‚Åƒ[ƒh‚µ‚Ü‚·B", this);
+            UnityEngine.Debug.LogError("GameManager: ãƒ•ã‚§ãƒ¼ãƒ‰ã«å¿…è¦ãªUIè¦ç´ ãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ï¼ãƒ•ã‚§ãƒ¼ãƒ‰ãªã—ã§ãƒ­ãƒ¼ãƒ‰ã—ã¾ã™ã€‚", this);
             SceneManager.LoadScene(sceneName);
             return;
         }
@@ -257,7 +264,7 @@ public class GameManager : MonoBehaviour
     {
         if (m_currentGameState == GameState.GameOver || m_isGlobalTransitioning)
         {
-            UnityEngine.Debug.LogWarning("GameManager: Šù‚ÉƒQ[ƒ€ƒI[ƒo[ó‘Ô‚©AƒV[ƒ“‘JˆÚ’†‚Ì‚½‚ßAGameOverˆ—‚ğƒXƒLƒbƒv‚µ‚Ü‚µ‚½B", this);
+            UnityEngine.Debug.LogWarning("GameManager: æ—¢ã«ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼çŠ¶æ…‹ã‹ã€ã‚·ãƒ¼ãƒ³é·ç§»ä¸­ã®ãŸã‚ã€GameOverå‡¦ç†ã‚’ã‚¹ã‚­ãƒƒãƒ—ã—ã¾ã—ãŸã€‚", this);
             return;
         }
         SetState(GameState.GameOver);
@@ -270,7 +277,7 @@ public class GameManager : MonoBehaviour
     {
         if (m_currentGameState == GameState.StageClear || m_isGlobalTransitioning)
         {
-            UnityEngine.Debug.LogWarning("GameManager: Šù‚ÉƒQ[ƒ€ƒNƒŠƒAó‘Ô‚©AƒV[ƒ“‘JˆÚ’†‚Ì‚½‚ßAGameClearˆ—‚ğƒXƒLƒbƒv‚µ‚Ü‚µ‚½B", this);
+            UnityEngine.Debug.LogWarning("GameManager: æ—¢ã«ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢çŠ¶æ…‹ã‹ã€ã‚·ãƒ¼ãƒ³é·ç§»ä¸­ã®ãŸã‚ã€GameClearå‡¦ç†ã‚’ã‚¹ã‚­ãƒƒãƒ—ã—ã¾ã—ãŸã€‚", this);
             return;
         }
         SetState(GameState.StageClear);
@@ -289,7 +296,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            UnityEngine.Debug.Log("‚·‚×‚Ä‚ÌƒXƒe[ƒW‚ğƒNƒŠƒA‚µ‚Ü‚µ‚½Iƒ^ƒCƒgƒ‹ƒV[ƒ“‚É–ß‚è‚Ü‚·B");
+            UnityEngine.Debug.Log("ã™ã¹ã¦ã®ã‚¹ãƒ†ãƒ¼ã‚¸ã‚’ã‚¯ãƒªã‚¢ã—ã¾ã—ãŸï¼ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³ã«æˆ»ã‚Šã¾ã™ã€‚");
             LoadSceneWithFade(m_titleSceneName);
         }
     }
@@ -297,7 +304,7 @@ public class GameManager : MonoBehaviour
     {
         PlayerPrefs.SetInt(STAGE_CLEAR_KEY_PREFIX + stageIndex, 1);
         PlayerPrefs.Save();
-        UnityEngine.Debug.Log($"ƒXƒe[ƒW{stageIndex + 1}‚ğƒNƒŠƒA‚µ‚Ü‚µ‚½B");
+        UnityEngine.Debug.Log($"ã‚¹ãƒ†ãƒ¼ã‚¸{stageIndex + 1}ã‚’ã‚¯ãƒªã‚¢ã—ã¾ã—ãŸã€‚");
     }
     public bool IsStageClear(int stageIndex) => PlayerPrefs.GetInt(STAGE_CLEAR_KEY_PREFIX + stageIndex, 0) == 1;
     public void ClearAllStageData()
@@ -307,7 +314,7 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.DeleteKey(STAGE_CLEAR_KEY_PREFIX + i);
         }
         PlayerPrefs.Save();
-        UnityEngine.Debug.Log("‚·‚×‚Ä‚ÌƒXƒe[ƒWƒNƒŠƒAƒf[ƒ^‚ğíœ‚µ‚Ü‚µ‚½B");
+        UnityEngine.Debug.Log("ã™ã¹ã¦ã®ã‚¹ãƒ†ãƒ¼ã‚¸ã‚¯ãƒªã‚¢ãƒ‡ãƒ¼ã‚¿ã‚’å‰Šé™¤ã—ã¾ã—ãŸã€‚");
     }
     public void ResetGameData()
     {
@@ -317,7 +324,7 @@ public class GameManager : MonoBehaviour
     }
 
     // ====================================================================================================
-    // #region: ƒvƒ‰ƒCƒx[ƒgƒƒ\ƒbƒhiƒwƒ‹ƒp[j
+    // #region: ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆãƒ¡ã‚½ãƒƒãƒ‰ï¼ˆãƒ˜ãƒ«ãƒ‘ãƒ¼ï¼‰
     // ====================================================================================================
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
@@ -325,9 +332,25 @@ public class GameManager : MonoBehaviour
         UpdateSceneReferences(scene.name);
         PlayBGMForScene(scene.name);
 
-        if (mode == LoadSceneMode.Single)
+        // åˆå›ãƒ­ãƒ¼ãƒ‰æ™‚ã®ã¿ãƒ•ã‚§ãƒ¼ãƒ‰ã‚’ç„¡åŠ¹ã«ã™ã‚‹
+        if (m_isInitialStartup)
         {
-            StartFadeIn();
+            // ãƒ•ã‚§ãƒ¼ãƒ‰çŠ¶æ…‹ã‚’ãƒªã‚»ãƒƒãƒˆã—ã¦ã€å³åº§ã«ç”»é¢ã‚’è¡¨ç¤ºã™ã‚‹
+            if (m_globalFadeCanvasGroup != null)
+            {
+                m_globalFadeCanvasGroup.alpha = 0f;
+                m_globalFadeCanvasGroup.blocksRaycasts = false;
+                m_globalFadeCanvasGroup.interactable = false;
+            }
+            m_isInitialStartup = false; // åˆå›ãƒ­ãƒ¼ãƒ‰ãƒ•ãƒ©ã‚°ã‚’è§£é™¤
+        }
+        else
+        {
+            // 2å›ç›®ä»¥é™ã®ãƒ­ãƒ¼ãƒ‰ã§ã¯é€šå¸¸é€šã‚Šãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ã‚’è¡Œã†
+            if (mode == LoadSceneMode.Single)
+            {
+                StartFadeIn();
+            }
         }
         m_isGlobalTransitioning = false;
     }
@@ -340,15 +363,21 @@ public class GameManager : MonoBehaviour
             var joystick = m_mobileControlCanvas.transform.Find("JoystickBase")?.GetComponent<VirtualJoystick>();
             var jumpButton = m_mobileControlCanvas.transform.Find("JumpButton")?.GetComponent<JumpButtonController>();
             m_player.SetMobileControls(joystick, jumpButton);
+
+            // è¿½åŠ : ã‚¸ãƒ£ãƒ³ãƒ—ãƒœã‚¿ãƒ³ã«ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å‚ç…§ã‚’æ¸¡ã™
+            if (jumpButton != null)
+            {
+                jumpButton.SetPlayerMove(m_player);
+            }
         }
         UpdatePermanentUIForScene(sceneName);
     }
     private bool IsGameplayScene(string sceneName)
     {
         return (sceneName == "Stage1Scene" ||
-                sceneName == "Stage2Scene" ||
-                sceneName == "Stage3Scene" ||
-                sceneName == "For open campus");
+            sceneName == "Stage2Scene" ||
+            sceneName == "Stage3Scene" ||
+            sceneName == "For open campus");
     }
     private void SetGameStateByScene(string sceneName)
     {
@@ -376,7 +405,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            UnityEngine.Debug.LogWarning($"GameManager: –¢’m‚ÌƒV[ƒ“'{sceneName}'‚©‚ç‹N“®‚µ‚Ü‚µ‚½BƒfƒtƒHƒ‹ƒg‚ÌƒQ[ƒ€ó‘Ô‚ğGameplay‚Éİ’èB", this);
+            UnityEngine.Debug.LogWarning($"GameManager: æœªçŸ¥ã®ã‚·ãƒ¼ãƒ³'{sceneName}'ã‹ã‚‰èµ·å‹•ã—ã¾ã—ãŸã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚²ãƒ¼ãƒ çŠ¶æ…‹ã‚’Gameplayã«è¨­å®šã€‚", this);
             SetState(GameState.Gameplay);
         }
     }
@@ -391,13 +420,13 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// BGM‚ğÄ¶‚µ‚Ü‚·Bclip‚ªnull‚Ìê‡‚Í’â~‚µ‚Ü‚·B
+    /// BGMã‚’å†ç”Ÿã—ã¾ã™ã€‚clipãŒnullã®å ´åˆã¯åœæ­¢ã—ã¾ã™ã€‚
     /// </summary>
-    public void PlayBGM(AudioClip clip) // ƒAƒNƒZƒXCüq‚ğ public ‚É•ÏX
+    public void PlayBGM(AudioClip clip)
     {
         if (m_audioSource == null)
         {
-            UnityEngine.Debug.LogWarning("GameManager: BGMÄ¶—p‚ÌAudioSource‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
+            UnityEngine.Debug.LogWarning("GameManager: BGMå†ç”Ÿç”¨ã®AudioSourceãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
             return;
         }
         if (m_audioSource.clip == clip && m_audioSource.isPlaying) return;
@@ -483,14 +512,14 @@ public class GameManager : MonoBehaviour
     }
     private void CheckUIReferences()
     {
-        if (m_permanentUICanvas == null) UnityEngine.Debug.LogError("GameManager: Permanent UICanvas‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
-        if (m_globalFadePanelImage == null) UnityEngine.Debug.LogError("GameManager: Global Fade Panel Image‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
-        if (m_globalFadeCanvasGroup == null) UnityEngine.Debug.LogError("GameManager: Global Fade Canvas Group‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
-        if (m_permanentEventSystem == null) UnityEngine.Debug.LogError("GameManager: Permanent Event System‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
-        if (m_scoreDisplay == null) UnityEngine.Debug.LogError("GameManager: Score Display‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
-        if (m_scorePanel == null) UnityEngine.Debug.LogError("GameManager: Score Panel‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
-        if (m_timeLimitText == null) UnityEngine.Debug.LogWarning("GameManager: Time Limit Text‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñBŠÔ§ŒÀUI‚Í•\¦‚³‚ê‚Ü‚¹‚ñB", this);
-        if (m_mobileControlCanvas == null) UnityEngine.Debug.LogError("GameManager: Mobile Control Canvas‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
+        if (m_permanentUICanvas == null) UnityEngine.Debug.LogError("GameManager: Permanent UICanvasãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
+        if (m_globalFadePanelImage == null) UnityEngine.Debug.LogError("GameManager: Global Fade Panel ImageãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
+        if (m_globalFadeCanvasGroup == null) UnityEngine.Debug.LogError("GameManager: Global Fade Canvas GroupãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
+        if (m_permanentEventSystem == null) UnityEngine.Debug.LogError("GameManager: Permanent Event SystemãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
+        if (m_scoreDisplay == null) UnityEngine.Debug.LogError("GameManager: Score DisplayãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
+        if (m_scorePanel == null) UnityEngine.Debug.LogError("GameManager: Score PanelãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
+        if (m_timeLimitText == null) UnityEngine.Debug.LogWarning("GameManager: Time Limit TextãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚æ™‚é–“åˆ¶é™UIã¯è¡¨ç¤ºã•ã‚Œã¾ã›ã‚“ã€‚", this);
+        if (m_mobileControlCanvas == null) UnityEngine.Debug.LogError("GameManager: Mobile Control CanvasãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
     }
     private void InitializeAudioSource()
     {
