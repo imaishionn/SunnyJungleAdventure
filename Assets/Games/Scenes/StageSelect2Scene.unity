@@ -334,8 +334,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u30AF\u30EA\u30A2!!"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: ccafd2358b2381a42afb4db7cd333e0e, type: 2}
-  m_sharedMaterial: {fileID: -502909064713370018, guid: ccafd2358b2381a42afb4db7cd333e0e, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 13b6c47d2bc1af64a8dbcfca76641f74, type: 2}
+  m_sharedMaterial: {fileID: -7153090943622793386, guid: 13b6c47d2bc1af64a8dbcfca76641f74, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -543,10 +543,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u30AA\u30FC\u30AD\u30E3\u30F3"
+  m_text: "\u30AA\u30FC\u30AD\u30E3\u30F3\u7528"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: ccafd2358b2381a42afb4db7cd333e0e, type: 2}
-  m_sharedMaterial: {fileID: -502909064713370018, guid: ccafd2358b2381a42afb4db7cd333e0e, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 13b6c47d2bc1af64a8dbcfca76641f74, type: 2}
+  m_sharedMaterial: {fileID: -7153090943622793386, guid: 13b6c47d2bc1af64a8dbcfca76641f74, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1172,10 +1172,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u30AA\u30FC\u30AD\u30E3\u30F3"
+  m_text: "\u30AA\u30FC\u30AD\u30E3\u30F3\u7528"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: ccafd2358b2381a42afb4db7cd333e0e, type: 2}
-  m_sharedMaterial: {fileID: -502909064713370018, guid: ccafd2358b2381a42afb4db7cd333e0e, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 13b6c47d2bc1af64a8dbcfca76641f74, type: 2}
+  m_sharedMaterial: {fileID: -7153090943622793386, guid: 13b6c47d2bc1af64a8dbcfca76641f74, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1307,7 +1307,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u30AA\u30FC\u30D7\u30AD\u30E3\u30F3\u30D1\u30B9"
+  m_text: "\u30AA\u30FC\u30D7\u30AD\u30E3\u30F3\u30D1\u30B9\u7528"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: cdd7b830eb46ebb42abfec333821465a, type: 2}
   m_sharedMaterial: {fileID: 21757523808282504, guid: cdd7b830eb46ebb42abfec333821465a, type: 2}
