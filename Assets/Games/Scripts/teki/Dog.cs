@@ -19,6 +19,8 @@ public class Dog : Enemy
     [Header("移動設定")]
     [Tooltip("プレイヤー追跡時の移動速度")]
     [SerializeField] private float runSpeed = 3f;
+    [Tooltip("プレイヤーが真上にいると判断する水平距離の許容範囲")]
+    [SerializeField] private float m_flipDeadZone = 0.2f;
 
     [Header("アニメーション設定")]
     [Tooltip("走るアニメーションを再生するためのトリガー名")]
@@ -97,29 +99,43 @@ public class Dog : Enemy
 
             if (isGrounded)
             {
-                // プレイヤーが右にいるか左にいるかで移動方向を決定
-                Vector2 direction = (m_player.position.x > transform.position.x) ? Vector2.right : Vector2.left;
+                // プレイヤーとの水平距離を計算
+                float horizontalDistance = m_player.position.x - transform.position.x;
 
-                // 進行方向の先に足場があるかチェック
-                if (IsGroundAhead(direction))
+                // プレイヤーがデッドゾーン内にいる場合、向きを変えずに停止
+                if (Mathf.Abs(horizontalDistance) < m_flipDeadZone)
                 {
-                    // 足場があれば移動
-                    if (m_rb != null)
-                    {
-                        m_rb.velocity = new Vector2(direction.x * runSpeed, m_rb.velocity.y);
-                    }
-                }
-                else
-                {
-                    // 足場の端なので停止
                     if (m_rb != null)
                     {
                         m_rb.velocity = new Vector2(0, m_rb.velocity.y);
                     }
                 }
+                else // プレイヤーがデッドゾーン外にいる場合、追跡と向きの更新を行う
+                {
+                    // プレイヤーが右にいるか左にいるかで移動方向を決定
+                    Vector2 direction = (horizontalDistance > 0) ? Vector2.right : Vector2.left;
 
-                // キャラクターの向きを更新
-                FlipSprite(direction.x);
+                    // 進行方向の先に足場があるかチェック
+                    if (IsGroundAhead(direction))
+                    {
+                        // 足場があれば移動
+                        if (m_rb != null)
+                        {
+                            m_rb.velocity = new Vector2(direction.x * runSpeed, m_rb.velocity.y);
+                        }
+                    }
+                    else
+                    {
+                        // 足場の端なので停止
+                        if (m_rb != null)
+                        {
+                            m_rb.velocity = new Vector2(0, m_rb.velocity.y);
+                        }
+                    }
+
+                    // キャラクターの向きを更新
+                    FlipSprite(direction.x);
+                }
             }
             else
             {
@@ -164,7 +180,7 @@ public class Dog : Enemy
         Vector2 checkPosition = (Vector2)groundCheck.position + direction * 0.1f;
         RaycastHit2D hit = Physics2D.Raycast(checkPosition, Vector2.down, groundAheadCheckDistance, groundLayer);
 
-        // デバッグ用にRayを可視化 
+        // デバッグ用にRayを可視化
         Debug.DrawRay(checkPosition, Vector2.down * groundAheadCheckDistance, Color.red);
 
         return hit.collider != null;
