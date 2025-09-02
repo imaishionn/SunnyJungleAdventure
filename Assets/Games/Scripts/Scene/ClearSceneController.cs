@@ -15,7 +15,7 @@ public class ClearSceneController : MonoBehaviour
 
     [Header("シーン設定")]
     [Tooltip("スコアシーンの名前")]
-    [SerializeField] private string scoreSceneName = "ScoreScene";
+    [SerializeField] private string ResultsceneName = "Resultscene";
 
     private bool m_isTransitioning = false;
 
@@ -51,16 +51,16 @@ public class ClearSceneController : MonoBehaviour
         if (m_isTransitioning) return;
         m_isTransitioning = true;
 
-        // GameManager.instance を GameManager.Instance に修正
         if (GameManager.Instance != null)
         {
-            // GameManager.instance.LoadSceneWithFade を GameManager.Instance.LoadSceneWithFade に修正
-            GameManager.Instance.LoadSceneWithFade(scoreSceneName);
+            // 変数名を ResultsceneName に修正
+            GameManager.Instance.LoadSceneWithFade(ResultsceneName);
         }
         else
         {
             Debug.LogError("ClearSceneController: GameManager インスタンスが見つかりません！直接シーンをロードします。", this);
-            SceneManager.LoadScene(scoreSceneName);
+            // 変数名を ResultsceneName に修正
+            SceneManager.LoadScene(ResultsceneName);
         }
     }
 }

@@ -89,19 +89,19 @@ public class ScoreManager : MonoBehaviour
     {
         if (scoreText != null)
         {
-            scoreText.text = "スコア: " + score.ToString();
+            scoreText.text = "スコア" + score.ToString();
         }
 
         if (timeText != null)
         {
-            timeText.text = "残り時間: " + Mathf.RoundToInt(time).ToString() + "秒";
+            timeText.text = "残り時間" + Mathf.RoundToInt(time).ToString() + "秒";
         }
 
         // 評価を計算して表示
         string rank = CalculateRank(score);
         if (rankText != null)
         {
-            rankText.text = "評価: " + rank;
+            rankText.text = "ランク" + rank;
         }
     }
 
