@@ -40,9 +40,9 @@ public class PlayerMove : MonoBehaviour
     // ====================================================================================================
     // #region: スクリプト内部で管理する変数
     // ====================================================================================================
-    private Rigidbody2D rb;
-    private Animator animator;
-    private ItemSoundPlayer itemSoundPlayer;
+    private Rigidbody2D rb; // プレイヤーの物理挙動を制御する
+    private Animator animator; // プレイヤーのアニメーションを制御する
+    private ItemSoundPlayer itemSoundPlayer; // サウンドを再生する
 
     private bool isGrounded; // 地面にいるかどうかの状態
     private bool isFacingRight = true; // プレイヤーが右を向いているか
@@ -164,11 +164,11 @@ public class PlayerMove : MonoBehaviour
         // 移動入力量に基づいてプレイヤーの向きを反転
         if (moveInput > 0 && !isFacingRight)
         {
-            Flip();
+            Flip(); // 右を向いていない時に右へ移動したら反転
         }
         else if (moveInput < 0 && isFacingRight)
         {
-            Flip();
+            Flip(); // 右を向いている時に左へ移動したら反転
         }
     }
 
@@ -186,7 +186,7 @@ public class PlayerMove : MonoBehaviour
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
-        jumpsRemaining--;
+        jumpsRemaining--; // ジャンプ回数を1減らす
 
         // サウンドとアニメーションを再生
         if (itemSoundPlayer != null) itemSoundPlayer.PlayJumpSound();
@@ -195,11 +195,11 @@ public class PlayerMove : MonoBehaviour
             // 地面に着地しているか、空中にいるかで異なるジャンプアニメーションを再生
             if (isGrounded && HasAnimatorParameter("JumpTrigger", AnimatorControllerParameterType.Trigger))
             {
-                animator.SetTrigger("JumpTrigger");
+                animator.SetTrigger("JumpTrigger"); // 通常ジャンプアニメーション
             }
             else if (!isGrounded && HasAnimatorParameter("DoubleJumpTrigger", AnimatorControllerParameterType.Trigger))
             {
-                animator.SetTrigger("DoubleJumpTrigger");
+                animator.SetTrigger("DoubleJumpTrigger"); // 2段ジャンプアニメーション
             }
         }
     }
@@ -209,7 +209,7 @@ public class PlayerMove : MonoBehaviour
     /// </summary>
     public void OnMobileJumpButtonPressed()
     {
-        Jump();
+        Jump(); // PCの入力と同様にジャンプを実行
     }
 
     /// <summary>
@@ -227,7 +227,7 @@ public class PlayerMove : MonoBehaviour
             // プレイヤーのy座標が敵のy座標より高い場合、踏みつけたと判定
             if (transform.position.y > collision.transform.position.y)
             {
-                StompEnemy(collision.gameObject);
+                StompEnemy(collision.gameObject); // 敵を踏みつける処理
             }
             else
             {
@@ -265,7 +265,7 @@ public class PlayerMove : MonoBehaviour
     public void Die()
     {
         if (IsDead) return;
-        IsDead = true;
+        IsDead = true; // 死亡フラグを立てる
 
         if (itemSoundPlayer != null) itemSoundPlayer.PlayGameOverSound();
 
@@ -273,7 +273,7 @@ public class PlayerMove : MonoBehaviour
         if (rb != null)
         {
             rb.velocity = Vector2.zero;
-            rb.isKinematic = true;
+            rb.isKinematic = true; // 物理演算を無効にする
         }
         // プレイヤーのColliderを無効化して他のオブジェクトとの衝突を停止
         Collider2D playerCollider = GetComponent<Collider2D>();
@@ -297,8 +297,8 @@ public class PlayerMove : MonoBehaviour
     /// </summary>
     public void OnGameOverAnimationEnd()
     {
-        gameObject.SetActive(false);
-        FinalizeDeathAndSceneTransition();
+        gameObject.SetActive(false); // プレイヤーを非表示にする
+        FinalizeDeathAndSceneTransition(); // シーン遷移処理へ
     }
 
     // ====================================================================================================
@@ -312,7 +312,7 @@ public class PlayerMove : MonoBehaviour
     {
         isFacingRight = !isFacingRight;
         Vector3 scaler = transform.localScale;
-        scaler.x *= -1;
+        scaler.x *= -1; // ローカルスケールのX軸を反転
         transform.localScale = scaler;
     }
 
@@ -372,16 +372,17 @@ public class PlayerMove : MonoBehaviour
     /// </summary>
     private void FinalizeDeathAndSceneTransition()
     {
-        gameObject.SetActive(false);
+        gameObject.SetActive(false); // プレイヤーオブジェクトを非アクティブにする
 
         if (GameManager.Instance != null)
         {
+            // GameManagerが存在すればゲームオーバー状態に設定してシーン遷移を委ねる
             GameManager.Instance.SetGameOverStateImmediately();
         }
         else
         {
             UnityEngine.Debug.LogError("PlayerMove: GameManagerのインスタンスが見つかりません！タイトルシーンへ直接遷移します。");
-            SceneManager.LoadScene("TitleScene");
+            SceneManager.LoadScene("TitleScene"); // GameManagerがない場合は直接タイトルへ
         }
     }
 
@@ -390,8 +391,8 @@ public class PlayerMove : MonoBehaviour
     /// </summary>
     private IEnumerator BecomeInvincible(float duration)
     {
-        isInvincible = true;
-        yield return new WaitForSeconds(duration);
-        isInvincible = false;
+        isInvincible = true; // 無敵状態を有効化
+        yield return new WaitForSeconds(duration); // 指定された時間だけ待機
+        isInvincible = false; // 無敵状態を無効化
     }
 }
