@@ -907,7 +907,7 @@ MonoBehaviour:
   - Stage1Scene
   - Stage2Scene
   - Stage3Scene
-  - For open campus
+  - OpenCampus
   m_scoreSceneName: Resultscene
   m_isTimeLimited: 1
   m_timeLimitSeconds: 180

@@ -4,6 +4,8 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// タッチ操作でプレイヤーを動かすためのバーチャルジョイスティックを制御します。
 /// </summary>
+// IDragHandler, IPointerUpHandler, IPointerDownHandlerインターフェースを実装することで、
+// UnityのEvent Systemからタッチイベントを直接受け取ることができるようになります。
 public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPointerDownHandler
 {
     // ====================================================================================================
@@ -49,6 +51,7 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
     /// <summary>
     /// 指が画面に触れたときに呼び出されます。
     /// </summary>
+    /// <param name="eventData">タッチに関する情報</param>
     public void OnPointerDown(PointerEventData eventData)
     {
         // 指が触れた時点でドラッグ処理を開始
@@ -58,15 +61,16 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
     /// <summary>
     /// 指を動かしている間、毎フレーム呼び出されます。
     /// </summary>
+    /// <param name="eventData">ドラッグに関する情報</param>
     public void OnDrag(PointerEventData eventData)
     {
         // 1. タッチした画面座標を、ジョイスティックのベース（RectTransform）のローカル座標に変換
         Vector2 position;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            joystickBase,
-            eventData.position,
-            eventData.pressEventCamera,
-            out position
+            joystickBase, // 基準となるRectTransform
+            eventData.position, // 現在のタッチ座標
+            eventData.pressEventCamera, // タッチを検出したカメラ
+            out position // 変換後のローカル座標
         );
 
         // 2. ローカル座標を正規化（-1.0から1.0の範囲に変換）
@@ -89,6 +93,7 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
     /// <summary>
     /// 指を画面から離したときに呼び出されます。
     /// </summary>
+    /// <param name="eventData">指を離した点に関する情報</param>
     public void OnPointerUp(PointerEventData eventData)
     {
         // 1. 入力方向をリセット
