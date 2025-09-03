@@ -162,9 +162,6 @@ public class Bomb : MonoBehaviour
     /// </summary>
     public void DestroyBomb()
     {
-        // Šù‚É”š”­‚µ‚Ä‚¢‚éê‡‚Í‰½‚à‚µ‚È‚¢
-        if (hasExploded) return;
-
         Destroy(gameObject);
     }
 }
