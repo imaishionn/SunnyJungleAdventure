@@ -1,125 +1,110 @@
 using System.Collections;
 using UnityEngine;
-// UnityƒGƒfƒBƒ^ã‚Å‚Ì‚İg—p‚·‚é–¼‘O‹óŠÔ‚ğ’è‹`
+// Unityã‚¨ãƒ‡ã‚£ã‚¿ä¸Šã§ã®ã¿ä½¿ç”¨ã™ã‚‹åå‰ç©ºé–“ã‚’å®šç¾©
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 /// <summary>
-/// İ’è‚³‚ê‚½À•WŠÔ‚ğ‰•œˆÚ“®‚·‚é‘«ê‚ğ§Œä‚·‚éƒXƒNƒŠƒvƒg‚Å‚·B
-/// ƒvƒŒƒCƒ„[‚ªæ‚é‚ÆAƒvƒŒƒCƒ„[‚àˆê‚ÉˆÚ“®‚µ‚Ü‚·B
+/// è¨­å®šã•ã‚ŒãŸåº§æ¨™é–“ã‚’å¾€å¾©ç§»å‹•ã™ã‚‹è¶³å ´ã‚’åˆ¶å¾¡ã™ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
+/// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒä¹—ã‚‹ã¨ã€ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚‚ä¸€ç·’ã«ç§»å‹•ã—ã¾ã™ã€‚
 /// </summary>
-public class MovingPlatform : MonoBehaviour
-{
+public class MovingPlatform : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
-    // ƒCƒ“ƒXƒyƒNƒ^[‚Åİ’è‚·‚éƒpƒ‰ƒ[ƒ^[
+    // ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§è¨­å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
     // ----------------------------------------------------------------------------------------------------
-    [Header("ˆÚ“®İ’è")]
-    [Tooltip("ƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ÌˆÚ“®‘¬“x")]
+    [Header("ç§»å‹•è¨­å®š")]
+    [Tooltip("ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã®ç§»å‹•é€Ÿåº¦")]
     [SerializeField] private float moveSpeed = 2.0f;
-    [Tooltip("ŠeI“_‚Å‚Ì‘Ò‹@ŠÔ")]
+    [Tooltip("å„çµ‚ç‚¹ã§ã®å¾…æ©Ÿæ™‚é–“")]
     [SerializeField] private float waitTimeAtPoint = 1.0f;
-    [Tooltip("X²•ûŒü‚Ö‚ÌˆÚ“®‹——£")]
+    [Tooltip("Xè»¸æ–¹å‘ã¸ã®ç§»å‹•è·é›¢")]
     [SerializeField] private float moveDistanceX = 0f;
-    [Tooltip("Y²•ûŒü‚Ö‚ÌˆÚ“®‹——£")]
+    [Tooltip("Yè»¸æ–¹å‘ã¸ã®ç§»å‹•è·é›¢")]
     [SerializeField] private float moveDistanceY = 0f;
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒg•Ï”
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆå¤‰æ•°
     // ----------------------------------------------------------------------------------------------------
-    private Vector3 initialPosition; // ‘«ê‚Ì‰ŠúˆÊ’u
-    private Vector3 endPosition;     // ‘«ê‚ÌI“_ˆÊ’u
-    private Vector3 targetPosition;  // Œ»İ‚Ì–Ú•WˆÊ’u
+    private Vector3 initialPosition; // è¶³å ´ã®åˆæœŸä½ç½®
+    private Vector3 endPosition;     // è¶³å ´ã®çµ‚ç‚¹ä½ç½®
+    private Vector3 targetPosition;  // ç¾åœ¨ã®ç›®æ¨™ä½ç½®
 
     private Coroutine movementCoroutine;
 
     // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviour‚Ìƒ‰ƒCƒtƒTƒCƒNƒ‹ƒƒ\ƒbƒh
+    // MonoBehaviourã®ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
-    private void Start()
-    {
+    private void Start() {
         initialPosition = transform.position;
-        endPosition = initialPosition + new Vector3(moveDistanceX, moveDistanceY, 0f);
+        endPosition = initialPosition + new Vector3(moveDistanceX,moveDistanceY,0f);
 
-        // ˆÚ“®‹——£‚ª0‚Ìê‡‚ÍˆÚ“®‚µ‚È‚¢
-        if (moveDistanceX == 0f && moveDistanceY == 0f)
-        {
-            Debug.LogWarning("MovingPlatform: ˆÚ“®‹——£‚ª0‚Ì‚½‚ßAƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ÍˆÚ“®‚µ‚Ü‚¹‚ñB", this);
+        // ç§»å‹•è·é›¢ãŒ0ã®å ´åˆã¯ç§»å‹•ã—ãªã„
+        if(moveDistanceX == 0f && moveDistanceY == 0f) {
+            Debug.LogWarning("MovingPlatform: ç§»å‹•è·é›¢ãŒ0ã®ãŸã‚ã€ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã¯ç§»å‹•ã—ã¾ã›ã‚“ã€‚",this);
             return;
         }
 
-        // ˆÚ“®‚ğŠJn
+        // ç§»å‹•ã‚’é–‹å§‹
         targetPosition = endPosition;
         movementCoroutine = StartCoroutine(MovePlatform());
     }
 
-    private void OnDestroy()
-    {
-        // ƒV[ƒ“‚ª”jŠü‚³‚ê‚é‘O‚ÉƒRƒ‹[ƒ`ƒ“‚ğ’â~
-        if (movementCoroutine != null)
-        {
+    private void OnDestroy() {
+        // ã‚·ãƒ¼ãƒ³ãŒç ´æ£„ã•ã‚Œã‚‹å‰ã«ã‚³ãƒ«ãƒ¼ãƒãƒ³ã‚’åœæ­¢
+        if(movementCoroutine != null) {
             StopCoroutine(movementCoroutine);
         }
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒgƒƒ\ƒbƒh
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// ƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ÌˆÚ“®‚ğ§Œä‚·‚éƒRƒ‹[ƒ`ƒ“
+    /// ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã®ç§»å‹•ã‚’åˆ¶å¾¡ã™ã‚‹ã‚³ãƒ«ãƒ¼ãƒãƒ³
     /// </summary>
-    private IEnumerator MovePlatform()
-    {
-        while (true)
-        {
-            // –Ú•WˆÊ’u‚Ü‚ÅˆÚ“®
-            while (Vector3.Distance(transform.position, targetPosition) > 0.01f)
-            {
-                transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+    private IEnumerator MovePlatform() {
+        while(true) {
+            // ç›®æ¨™ä½ç½®ã¾ã§ç§»å‹•
+            while(Vector3.Distance(transform.position,targetPosition) > 0.01f) {
+                transform.position = Vector3.MoveTowards(transform.position,targetPosition,moveSpeed * Time.deltaTime);
                 yield return null;
             }
 
-            // –Ú•WˆÊ’u‚É“’B‚µ‚½‚ç‘Ò‹@
+            // ç›®æ¨™ä½ç½®ã«åˆ°é”ã—ãŸã‚‰å¾…æ©Ÿ
             yield return new WaitForSeconds(waitTimeAtPoint);
 
-            // Ÿ‚Ì–Ú•WˆÊ’u‚ğØ‚è‘Ö‚¦‚é
-            if (targetPosition == endPosition)
-            {
+            // æ¬¡ã®ç›®æ¨™ä½ç½®ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹
+            if(targetPosition == endPosition) {
                 targetPosition = initialPosition;
             }
-            else
-            {
+            else {
                 targetPosition = endPosition;
             }
         }
     }
 
     /// <summary>
-    /// ƒvƒŒƒCƒ„[‚ªƒvƒ‰ƒbƒgƒtƒH[ƒ€‚Éæ‚Á‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B
-    /// ƒvƒŒƒCƒ„[‚ğƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ÌqƒIƒuƒWƒFƒNƒg‚É‚µ‚Ü‚·B
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã«ä¹—ã£ãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã®å­ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ã—ã¾ã™ã€‚
     /// </summary>
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            // Šù‚ÉqƒIƒuƒWƒFƒNƒg‚É‚È‚Á‚Ä‚¢‚éê‡‚Íˆ—‚µ‚È‚¢
-            if (other.transform.parent == transform) return;
+    private void OnTriggerEnter2D(Collider2D other) {
+        if(other.CompareTag("Player")) {
+            // æ—¢ã«å­ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ãªã£ã¦ã„ã‚‹å ´åˆã¯å‡¦ç†ã—ãªã„
+            if(other.transform.parent == transform) return;
 
             other.transform.SetParent(transform);
         }
     }
 
     /// <summary>
-    /// ƒvƒŒƒCƒ„[‚ªƒvƒ‰ƒbƒgƒtƒH[ƒ€‚©‚ç—£‚ê‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B
-    /// ƒvƒŒƒCƒ„[‚ÌeƒIƒuƒWƒFƒNƒg‚ğ‰ğœ‚µ‚Ü‚·B
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã‹ã‚‰é›¢ã‚ŒãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®è¦ªã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’è§£é™¤ã—ã¾ã™ã€‚
     /// </summary>
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            // qƒIƒuƒWƒFƒNƒg‚É‚È‚Á‚Ä‚¢‚éê‡‚Ì‚İe‚ğ‰ğœ
-            if (other.transform.parent == transform)
-            {
+    private void OnTriggerExit2D(Collider2D other) {
+        if(other.CompareTag("Player")) {
+            // å­ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ãªã£ã¦ã„ã‚‹å ´åˆã®ã¿è¦ªã‚’è§£é™¤
+            if(other.transform.parent == transform) {
                 other.transform.SetParent(null);
             }
         }
@@ -127,21 +112,20 @@ public class MovingPlatform : MonoBehaviour
 
 #if UNITY_EDITOR
     // ----------------------------------------------------------------------------------------------------
-    // UnityƒGƒfƒBƒ^[ŠÖ˜A
+    // Unityã‚¨ãƒ‡ã‚£ã‚¿ãƒ¼é–¢é€£
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// ƒGƒfƒBƒ^[ã‚Åƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ÌˆÚ“®”ÍˆÍ‚ğ‰Â‹‰»‚µ‚Ü‚·B
+    /// ã‚¨ãƒ‡ã‚£ã‚¿ãƒ¼ä¸Šã§ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã®ç§»å‹•ç¯„å›²ã‚’å¯è¦–åŒ–ã—ã¾ã™ã€‚
     /// </summary>
-    private void OnDrawGizmos()
-    {
-        // Às’†‚Í initialPosition ‚ğAƒGƒfƒBƒ^[ã‚Å‚Í transform.position ‚ğŠî€‚É‚·‚é
+    private void OnDrawGizmos() {
+        // å®Ÿè¡Œä¸­ã¯ initialPosition ã‚’ã€ã‚¨ãƒ‡ã‚£ã‚¿ãƒ¼ä¸Šã§ã¯ transform.position ã‚’åŸºæº–ã«ã™ã‚‹
         Vector3 gizmoInitialPos = EditorApplication.isPlayingOrWillChangePlaymode ? initialPosition : transform.position;
-        Vector3 gizmoEndPos = gizmoInitialPos + new Vector3(moveDistanceX, moveDistanceY, 0f);
+        Vector3 gizmoEndPos = gizmoInitialPos + new Vector3(moveDistanceX,moveDistanceY,0f);
 
         Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(gizmoInitialPos, gizmoEndPos);
-        Gizmos.DrawWireSphere(gizmoInitialPos, 0.2f);
-        Gizmos.DrawWireSphere(gizmoEndPos, 0.2f);
+        Gizmos.DrawLine(gizmoInitialPos,gizmoEndPos);
+        Gizmos.DrawWireSphere(gizmoInitialPos,0.2f);
+        Gizmos.DrawWireSphere(gizmoEndPos,0.2f);
     }
 #endif
 }

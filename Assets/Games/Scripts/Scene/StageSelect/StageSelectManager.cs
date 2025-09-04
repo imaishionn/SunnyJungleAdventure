@@ -4,179 +4,146 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
-/// ƒXƒe[ƒW‘I‘ğƒV[ƒ“‚ÌUI‚ÆƒCƒxƒ“ƒg‚ğŠÇ—‚·‚éƒXƒNƒŠƒvƒg‚Å‚·B
-/// ŠeƒXƒe[ƒWƒ{ƒ^ƒ“‚ÌƒNƒŠƒbƒNƒCƒxƒ“ƒg‚ğ§Œä‚µAƒXƒe[ƒWƒNƒŠƒAî•ñ‚ğ•\¦‚µ‚Ü‚·B
+/// ã‚¹ãƒ†ãƒ¼ã‚¸é¸æŠã‚·ãƒ¼ãƒ³ã®UIã¨ã‚¤ãƒ™ãƒ³ãƒˆã‚’ç®¡ç†ã™ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
+/// å„ã‚¹ãƒ†ãƒ¼ã‚¸ãƒœã‚¿ãƒ³ã®ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆã‚’åˆ¶å¾¡ã—ã€ã‚¹ãƒ†ãƒ¼ã‚¸ã‚¯ãƒªã‚¢æƒ…å ±ã‚’è¡¨ç¤ºã—ã¾ã™ã€‚
 /// </summary>
-public class StageSelectManager : MonoBehaviour
-{
+public class StageSelectManager : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
-    // ƒCƒ“ƒXƒyƒNƒ^[‚Åİ’è‚·‚éƒpƒ‰ƒ[ƒ^[
+    // ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§è¨­å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
     // ----------------------------------------------------------------------------------------------------
-    [Header("UIİ’è")]
-    [Tooltip("ƒXƒe[ƒW‘I‘ğƒV[ƒ“‚ÌƒƒCƒ“Canvas")]
+    [Header("UIè¨­å®š")]
+    [Tooltip("ã‚¹ãƒ†ãƒ¼ã‚¸é¸æŠã‚·ãƒ¼ãƒ³ã®ãƒ¡ã‚¤ãƒ³Canvas")]
     [SerializeField] private GameObject stageSelectCanvas;
-    [Tooltip("ŠeƒXƒe[ƒWƒ{ƒ^ƒ“‚Ì”z—ñ")]
+    [Tooltip("å„ã‚¹ãƒ†ãƒ¼ã‚¸ãƒœã‚¿ãƒ³ã®é…åˆ—")]
     [SerializeField] private Button[] stageButtons;
-    [Tooltip("ƒ^ƒCƒgƒ‹ƒV[ƒ“‚É–ß‚éƒ{ƒ^ƒ“")]
+    [Tooltip("ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³ã«æˆ»ã‚‹ãƒœã‚¿ãƒ³")]
     [SerializeField] private Button backButton;
-    [Tooltip("Ÿ‚Ìƒy[ƒW‚Éi‚Şƒ{ƒ^ƒ“")]
+    [Tooltip("æ¬¡ã®ãƒšãƒ¼ã‚¸ã«é€²ã‚€ãƒœã‚¿ãƒ³")]
     [SerializeField] private Button nextButton;
-    [Tooltip("–ß‚éƒ{ƒ^ƒ“‚Å‘JˆÚ‚·‚éƒ^ƒCƒgƒ‹ƒV[ƒ“–¼")]
+    [Tooltip("æˆ»ã‚‹ãƒœã‚¿ãƒ³ã§é·ç§»ã™ã‚‹ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³å")]
     [SerializeField] private string titleSceneName = "TitleScene";
-    [Tooltip("Ÿ‚ÌƒXƒe[ƒW‘I‘ğƒV[ƒ“–¼")]
+    [Tooltip("æ¬¡ã®ã‚¹ãƒ†ãƒ¼ã‚¸é¸æŠã‚·ãƒ¼ãƒ³å")]
     [SerializeField] private string nextStageSelectSceneName = "StageSelect2Scene";
 
-    [Header("ƒNƒŠƒA•\¦UI")]
-    [Tooltip("ŠeƒXƒe[ƒW‚É‘Î‰‚·‚éuƒNƒŠƒAv•\¦‚ÌƒQ[ƒ€ƒIƒuƒWƒFƒNƒg")]
+    [Header("ã‚¯ãƒªã‚¢è¡¨ç¤ºUI")]
+    [Tooltip("å„ã‚¹ãƒ†ãƒ¼ã‚¸ã«å¯¾å¿œã™ã‚‹ã€Œã‚¯ãƒªã‚¢ã€è¡¨ç¤ºã®ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ")]
     [SerializeField] private GameObject[] clearIndicators;
 
     // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviour‚Ìƒ‰ƒCƒtƒTƒCƒNƒ‹ƒƒ\ƒbƒh
+    // MonoBehaviourã®ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
-    private void Start()
-    {
-        if (stageSelectCanvas != null)
-        {
+    private void Start() {
+        if(stageSelectCanvas != null) {
             stageSelectCanvas.SetActive(true);
         }
-        else
-        {
-            Debug.LogError("StageSelectManager: StageSelect Canvas ‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñI", this);
+        else {
+            Debug.LogError("StageSelectManager: StageSelect Canvas ãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ï¼",this);
         }
 
-        if (stageButtons != null && stageButtons.Length > 0)
-        {
-            for (int i = 0; i < stageButtons.Length; i++)
-            {
+        if(stageButtons != null && stageButtons.Length > 0) {
+            for(int i = 0;i < stageButtons.Length;i++) {
                 int stageIndex = i;
-                if (stageButtons[i] != null)
-                {
+                if(stageButtons[i] != null) {
                     stageButtons[i].onClick.AddListener(() => OnStageButtonClicked(stageIndex));
                 }
             }
 
-            // ‰Šú‘I‘ğ‚ğİ’è
-            if (EventSystem.current != null && stageButtons[0] != null)
-            {
+            // åˆæœŸé¸æŠã‚’è¨­å®š
+            if(EventSystem.current != null && stageButtons[0] != null) {
                 EventSystem.current.SetSelectedGameObject(stageButtons[0].gameObject);
             }
         }
-        else
-        {
-            Debug.LogWarning("StageSelectManager: ƒXƒe[ƒWƒ{ƒ^ƒ“‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñI", this);
+        else {
+            Debug.LogWarning("StageSelectManager: ã‚¹ãƒ†ãƒ¼ã‚¸ãƒœã‚¿ãƒ³ãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ï¼",this);
         }
 
-        if (backButton != null)
-        {
+        if(backButton != null) {
             backButton.onClick.AddListener(OnBackButtonClicked);
         }
 
-        if (nextButton != null)
-        {
+        if(nextButton != null) {
             nextButton.onClick.AddListener(OnNextButtonClicked);
         }
 
         UpdateStageClearIndicators();
     }
 
-    private void OnDestroy()
-    {
-        if (stageButtons != null)
-        {
-            foreach (var button in stageButtons)
-            {
-                if (button != null)
-                {
+    private void OnDestroy() {
+        if(stageButtons != null) {
+            foreach(var button in stageButtons) {
+                if(button != null) {
                     button.onClick.RemoveAllListeners();
                 }
             }
         }
 
-        if (backButton != null)
-        {
+        if(backButton != null) {
             backButton.onClick.RemoveAllListeners();
         }
 
-        if (nextButton != null)
-        {
+        if(nextButton != null) {
             nextButton.onClick.RemoveAllListeners();
         }
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒgƒƒ\ƒbƒh
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
-    private void UpdateStageClearIndicators()
-    {
-        if (GameManager.Instance == null)
-        {
-            Debug.LogError("UpdateStageClearIndicators: GameManager‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB", this);
+    private void UpdateStageClearIndicators() {
+        if(GameManager.Instance == null) {
+            Debug.LogError("UpdateStageClearIndicators: GameManagerãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚",this);
             return;
         }
 
-        if (clearIndicators == null || stageButtons == null || clearIndicators.Length != stageButtons.Length)
-        {
-            Debug.LogWarning("UpdateStageClearIndicators: clearIndicators”z—ñ‚ÆstageButtons”z—ñ‚Ì”‚ªˆê’v‚µ‚Ü‚¹‚ñB‚Ü‚½‚Íİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
+        if(clearIndicators == null || stageButtons == null || clearIndicators.Length != stageButtons.Length) {
+            Debug.LogWarning("UpdateStageClearIndicators: clearIndicatorsé…åˆ—ã¨stageButtonsé…åˆ—ã®æ•°ãŒä¸€è‡´ã—ã¾ã›ã‚“ã€‚ã¾ãŸã¯è¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚",this);
             return;
         }
 
-        for (int i = 0; i < stageButtons.Length; i++)
-        {
+        for(int i = 0;i < stageButtons.Length;i++) {
             bool isClear = GameManager.Instance.IsStageClear(i);
-            if (clearIndicators[i] != null)
-            {
+            if(clearIndicators[i] != null) {
                 clearIndicators[i].SetActive(isClear);
             }
         }
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // UIƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰[
+    // UIã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©ãƒ¼
     // ----------------------------------------------------------------------------------------------------
-    private void OnStageButtonClicked(int index)
-    {
-        if (GameManager.Instance != null)
-        {
-            if (index >= 0 && index < GameManager.Instance.stageSceneNames.Length)
-            {
+    private void OnStageButtonClicked(int index) {
+        if(GameManager.Instance != null) {
+            if(index >= 0 && index < GameManager.Instance.stageSceneNames.Length) {
                 GameManager.Instance.currentStageIndex = index;
                 GameManager.Instance.LoadSceneWithFade(GameManager.Instance.stageSceneNames[index]);
             }
-            else
-            {
-                Debug.LogError($"StageSelectManager: –³Œø‚ÈƒXƒe[ƒWƒCƒ“ƒfƒbƒNƒX‚ª“n‚³‚ê‚Ü‚µ‚½: {index}", this);
+            else {
+                Debug.LogError($"StageSelectManager: ç„¡åŠ¹ãªã‚¹ãƒ†ãƒ¼ã‚¸ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãŒæ¸¡ã•ã‚Œã¾ã—ãŸ: {index}",this);
             }
         }
-        else
-        {
-            Debug.LogError("StageSelectManager: GameManager‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñIƒtƒF[ƒh‚È‚µ‚Å‘JˆÚ‚µ‚Ü‚·B", this);
-            // GameManager‚ª‚È‚¢ê‡AƒXƒe[ƒW–¼‚ª‚í‚©‚ç‚È‚¢‚½‚ß‘JˆÚ‚Å‚«‚È‚¢
-            // ˆ—‚ğ’†~
+        else {
+            Debug.LogError("StageSelectManager: GameManagerãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ï¼ãƒ•ã‚§ãƒ¼ãƒ‰ãªã—ã§é·ç§»ã—ã¾ã™ã€‚",this);
+            // GameManagerãŒãªã„å ´åˆã€ã‚¹ãƒ†ãƒ¼ã‚¸åãŒã‚ã‹ã‚‰ãªã„ãŸã‚é·ç§»ã§ããªã„
+            // å‡¦ç†ã‚’ä¸­æ­¢
         }
     }
 
-    private void OnBackButtonClicked()
-    {
-        if (GameManager.Instance != null)
-        {
+    private void OnBackButtonClicked() {
+        if(GameManager.Instance != null) {
             GameManager.Instance.LoadSceneWithFade(GameManager.Instance.TitleSceneName);
         }
-        else
-        {
-            Debug.LogError("StageSelectManager: GameManager‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñIƒtƒF[ƒh‚È‚µ‚Åƒ^ƒCƒgƒ‹‚É‘JˆÚ‚µ‚Ü‚·B", this);
+        else {
+            Debug.LogError("StageSelectManager: GameManagerãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ï¼ãƒ•ã‚§ãƒ¼ãƒ‰ãªã—ã§ã‚¿ã‚¤ãƒˆãƒ«ã«é·ç§»ã—ã¾ã™ã€‚",this);
             SceneManager.LoadScene(titleSceneName);
         }
     }
 
-    private void OnNextButtonClicked()
-    {
-        if (GameManager.Instance != null)
-        {
+    private void OnNextButtonClicked() {
+        if(GameManager.Instance != null) {
             GameManager.Instance.LoadSceneWithFade(nextStageSelectSceneName);
         }
-        else
-        {
-            Debug.LogError("StageSelectManager: GameManager‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñIƒtƒF[ƒh‚È‚µ‚ÅŸ‚ÌƒXƒe[ƒW‘I‘ğ‰æ–Ê‚É‘JˆÚ‚µ‚Ü‚·B", this);
+        else {
+            Debug.LogError("StageSelectManager: GameManagerãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ï¼ãƒ•ã‚§ãƒ¼ãƒ‰ãªã—ã§æ¬¡ã®ã‚¹ãƒ†ãƒ¼ã‚¸é¸æŠç”»é¢ã«é·ç§»ã—ã¾ã™ã€‚",this);
             SceneManager.LoadScene(nextStageSelectSceneName);
         }
     }

@@ -1,64 +1,55 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
-/// ƒQ[ƒ€ƒNƒŠƒAŒã‚ÌƒV[ƒ“‚ÅAUI‚âƒV[ƒ“‘JˆÚ‚ğ§Œä‚·‚éƒXƒNƒŠƒvƒg‚Å‚·B
+/// ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢å¾Œã®ã‚·ãƒ¼ãƒ³ã§ã€UIã‚„ã‚·ãƒ¼ãƒ³é·ç§»ã‚’åˆ¶å¾¡ã™ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
 /// </summary>
-public class ClearSceneController : MonoBehaviour
-{
-    [Header("UIİ’è")]
-    [Tooltip("ƒQ[ƒ€ƒpƒbƒh‘€ì‚ÅÅ‰‚É‘I‘ğó‘Ô‚É‚µ‚½‚¢UI—v‘f")]
+public class ClearSceneController : MonoBehaviour {
+    [Header("UIè¨­å®š")]
+    [Tooltip("ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰æ“ä½œã§æœ€åˆã«é¸æŠçŠ¶æ…‹ã«ã—ãŸã„UIè¦ç´ ")]
     [SerializeField] private Selectable firstSelected;
 
-    [Header("ƒV[ƒ“İ’è")]
-    [Tooltip("ƒXƒRƒAƒV[ƒ“‚Ì–¼‘O")]
+    [Header("ã‚·ãƒ¼ãƒ³è¨­å®š")]
+    [Tooltip("ã‚¹ã‚³ã‚¢ã‚·ãƒ¼ãƒ³ã®åå‰")]
     [SerializeField] private string ResultsceneName = "Resultscene";
 
     private bool m_isTransitioning = false;
 
-    private void Start()
-    {
-        if (firstSelected != null)
-        {
+    private void Start() {
+        if(firstSelected != null) {
             EventSystem.current.SetSelectedGameObject(firstSelected.gameObject);
         }
-        else
-        {
-            Debug.LogWarning("ClearSceneController: firstSelected‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
+        else {
+            Debug.LogWarning("ClearSceneController: firstSelectedãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚",this);
         }
 
         m_isTransitioning = false;
     }
 
-    private void Update()
-    {
-        if (m_isTransitioning) return;
+    private void Update() {
+        if(m_isTransitioning) return;
 
-        if (Input.GetButtonDown("Submit"))
-        {
+        if(Input.GetButtonDown("Submit")) {
             OnClickGoToScoreScene();
         }
     }
 
     /// <summary>
-    /// ƒXƒRƒA‰æ–Ê‚Öi‚Şƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½Û‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B
+    /// ã‚¹ã‚³ã‚¢ç”»é¢ã¸é€²ã‚€ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸéš›ã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
     /// </summary>
-    public void OnClickGoToScoreScene()
-    {
-        if (m_isTransitioning) return;
+    public void OnClickGoToScoreScene() {
+        if(m_isTransitioning) return;
         m_isTransitioning = true;
 
-        if (GameManager.Instance != null)
-        {
-            // •Ï”–¼‚ğ ResultsceneName ‚ÉC³
+        if(GameManager.Instance != null) {
+            // å¤‰æ•°åã‚’ ResultsceneName ã«ä¿®æ­£
             GameManager.Instance.LoadSceneWithFade(ResultsceneName);
         }
-        else
-        {
-            Debug.LogError("ClearSceneController: GameManager ƒCƒ“ƒXƒ^ƒ“ƒX‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñI’¼ÚƒV[ƒ“‚ğƒ[ƒh‚µ‚Ü‚·B", this);
-            // •Ï”–¼‚ğ ResultsceneName ‚ÉC³
+        else {
+            Debug.LogError("ClearSceneController: GameManager ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ï¼ç›´æ¥ã‚·ãƒ¼ãƒ³ã‚’ãƒ­ãƒ¼ãƒ‰ã—ã¾ã™ã€‚",this);
+            // å¤‰æ•°åã‚’ ResultsceneName ã«ä¿®æ­£
             SceneManager.LoadScene(ResultsceneName);
         }
     }

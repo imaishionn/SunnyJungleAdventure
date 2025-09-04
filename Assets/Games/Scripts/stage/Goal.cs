@@ -1,33 +1,28 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Goal : MonoBehaviour
-{
-    [Header("ƒV[ƒ“‘JˆÚİ’è")]
+public class Goal : MonoBehaviour {
+    [Header("ã‚·ãƒ¼ãƒ³é·ç§»è¨­å®š")]
     [SerializeField] private string gameClearSceneName = "ClearScene";
 
-    // ‰æ‘œ‚Íí‚É•\¦‚³‚ê‚é‚½‚ßAƒXƒNƒŠƒvƒg‚Å‚Ì§Œä‚Ís‚í‚È‚¢
+    // ç”»åƒã¯å¸¸ã«è¡¨ç¤ºã•ã‚Œã‚‹ãŸã‚ã€ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã®åˆ¶å¾¡ã¯è¡Œã‚ãªã„
 
     private bool m_isTriggered = false;
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (m_isTriggered || !other.CompareTag("Player"))
-        {
+    private void OnTriggerEnter2D(Collider2D other) {
+        if(m_isTriggered || !other.CompareTag("Player")) {
             return;
         }
 
         m_isTriggered = true;
 
-        // GameManager.instance ‚ğ GameManager.Instance ‚ÉC³
-        if (GameManager.Instance != null)
-        {
-            // GameManager.instance.GameClear() ‚ğ GameManager.Instance.GameClear() ‚ÉC³
+        // GameManager.instance ã‚’ GameManager.Instance ã«ä¿®æ­£
+        if(GameManager.Instance != null) {
+            // GameManager.instance.GameClear() ã‚’ GameManager.Instance.GameClear() ã«ä¿®æ­£
             GameManager.Instance.GameClear();
         }
-        else
-        {
-            Debug.LogWarning("Goal: GameManager‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB’¼ÚƒV[ƒ“‚ğƒ[ƒh‚µ‚Ü‚·B", this);
+        else {
+            Debug.LogWarning("Goal: GameManagerã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚ç›´æ¥ã‚·ãƒ¼ãƒ³ã‚’ãƒ­ãƒ¼ãƒ‰ã—ã¾ã™ã€‚",this);
             SceneManager.LoadScene(gameClearSceneName);
         }
     }

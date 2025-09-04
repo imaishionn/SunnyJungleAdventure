@@ -45,13 +45,13 @@ public class Bettle : Enemy {
         base.Awake();
 
         // プレイヤーのTransformが割り当てられていない場合、'Player'タグで自動検索
-        if (playerTransform == null) {
+        if(playerTransform == null) {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null) {
+            if(playerObj != null) {
                 playerTransform = playerObj.transform;
             }
             else {
-                Debug.LogWarning("Bettle: 'Player'タグを持つGameObjectが見つかりません。プレイヤー追跡機能が無効になります。", this);
+                Debug.LogWarning("Bettle: 'Player'タグを持つGameObjectが見つかりません。プレイヤー追跡機能が無効になります。",this);
             }
         }
 
@@ -63,27 +63,27 @@ public class Bettle : Enemy {
 
     private void Update() {
         // 死亡状態の場合は処理を停止
-        if (IsDead) return;
+        if(IsDead) return;
 
         // ------------------
         // 上下移動処理
         // ------------------
         // Sin関数を使って、初期位置を中心に滑らかな上下移動を表現
         float newY = startPosition.y + Mathf.Sin(Time.time * verticalMoveSpeed) * verticalMoveRange;
-        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+        transform.position = new Vector3(transform.position.x,newY,transform.position.z);
 
         // ------------------
         // プレイヤー追跡・攻撃処理
         // ------------------
-        if (playerTransform != null) {
-            float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
+        if(playerTransform != null) {
+            float distanceToPlayer = Vector2.Distance(transform.position,playerTransform.position);
 
             // プレイヤーが検知範囲内にいるかチェック
-            if (distanceToPlayer < detectRange) {
+            if(distanceToPlayer < detectRange) {
                 attackTimer -= Time.deltaTime;
 
                 // 攻撃タイマーがゼロになったら攻撃
-                if (attackTimer <= 0) {
+                if(attackTimer <= 0) {
                     Attack();
                     attackTimer = attackInterval; // タイマーをリセット
                 }
@@ -99,28 +99,28 @@ public class Bettle : Enemy {
     /// </summary>
     private void Attack() {
         // 必要な参照が設定されているか確認
-        if (bombPrefab == null) {
-            Debug.LogError("Bettle: bombPrefabが割り当てられていません。", this);
+        if(bombPrefab == null) {
+            Debug.LogError("Bettle: bombPrefabが割り当てられていません。",this);
             return;
         }
-        if (launchPoint == null) {
-            Debug.LogError("Bettle: launchPointが割り当てられていません。", this);
+        if(launchPoint == null) {
+            Debug.LogError("Bettle: launchPointが割り当てられていません。",this);
             return;
         }
 
         // ボムを生成
-        GameObject bomb = Instantiate(bombPrefab, launchPoint.position, Quaternion.identity);
+        GameObject bomb = Instantiate(bombPrefab,launchPoint.position,Quaternion.identity);
 
         // プレイヤーへの方向を正規化して取得
         Vector2 direction = (playerTransform.position - launchPoint.position).normalized;
 
         // ボムのスクリプトを取得して起動
         Bomb bombScript = bomb.GetComponent<Bomb>();
-        if (bombScript != null) {
-            bombScript.Launch(direction, bombLaunchSpeed);
+        if(bombScript != null) {
+            bombScript.Launch(direction,bombLaunchSpeed);
         }
         else {
-            Debug.LogError("Bettle: 生成したボムにBombコンポーネントが見つかりません。", this);
+            Debug.LogError("Bettle: 生成したボムにBombコンポーネントが見つかりません。",this);
         }
     }
 }

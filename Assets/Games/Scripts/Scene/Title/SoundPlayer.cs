@@ -1,21 +1,18 @@
 using UnityEngine;
 
 /// <summary>
-/// ƒTƒEƒ“ƒhÄ¶
+/// ã‚µã‚¦ãƒ³ãƒ‰å†ç”Ÿ
 /// </summary>
 [RequireComponent(typeof(AudioSource))]
-public class SoundPlayer : MonoBehaviour
-{
-    [Tooltip("‹ó‚È‚ç“¯‚¶ GameObject ‚Ì AudioSource ‚ğ©“®æ“¾"), SerializeField]
+public class SoundPlayer : MonoBehaviour {
+    [Tooltip("ç©ºãªã‚‰åŒã˜ GameObject ã® AudioSource ã‚’è‡ªå‹•å–å¾—"), SerializeField]
     private AudioSource audioSource;
 
-    [Tooltip("ƒXƒ^[ƒgƒ{ƒ^ƒ“‚ğ‰Ÿ‚µ‚½‚Æ‚«‚É–Â‚éŒø‰Ê‰¹"), SerializeField]
+    [Tooltip("ã‚¹ã‚¿ãƒ¼ãƒˆãƒœã‚¿ãƒ³ã‚’æŠ¼ã—ãŸã¨ãã«é³´ã‚‹åŠ¹æœéŸ³"), SerializeField]
     private AudioClip geMusutatoClip;
 
-    void Awake()
-    {
-        if (audioSource == null)
-        {
+    void Awake() {
+        if(audioSource == null) {
             audioSource = GetComponent<AudioSource>();
         }
 
@@ -23,17 +20,14 @@ public class SoundPlayer : MonoBehaviour
     }
 
     /// <summary>
-    /// UIButton‚ÌOnClick‚©‚çŒÄ‚Ôƒƒ\ƒbƒh
+    /// UIButtonã®OnClickã‹ã‚‰å‘¼ã¶ãƒ¡ã‚½ãƒƒãƒ‰
     /// </summary>
-    public void PlayGeMusutato()
-    {
-        if (geMusutatoClip != null)
-        {
+    public void PlayGeMusutato() {
+        if(geMusutatoClip != null) {
             audioSource.PlayOneShot(geMusutatoClip);
         }
-        else
-        {
-            Debug.LogWarning("[SoundPlayer] geMusutatoClip ‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ");
+        else {
+            Debug.LogWarning("[SoundPlayer] geMusutatoClip ãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“");
         }
     }
 }

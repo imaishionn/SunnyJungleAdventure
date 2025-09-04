@@ -1,27 +1,24 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
-/// ƒIƒuƒWƒFƒNƒgƒv[ƒ‹‚ğŠÇ—
+/// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãƒ—ãƒ¼ãƒ«ã‚’ç®¡ç†
 /// </summary>
-public class ObjectPoolManager : MonoBehaviour
-{
-    // ƒVƒ“ƒOƒ‹ƒgƒ“ƒCƒ“ƒXƒ^ƒ“ƒX
+public class ObjectPoolManager : MonoBehaviour {
+    // ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
     public static ObjectPoolManager Instance { get; private set; }
 
-    [Header("ƒv[ƒ‹İ’è")]
-    [Tooltip("ƒv[ƒ‹‚·‚éƒQ[ƒ€ƒIƒuƒWƒFƒNƒg‚ÌPrefab")]
+    [Header("ãƒ—ãƒ¼ãƒ«è¨­å®š")]
+    [Tooltip("ãƒ—ãƒ¼ãƒ«ã™ã‚‹ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®Prefab")]
     [SerializeField] private GameObject enemyPrefab;
-    [Tooltip("–‘O‚É¶¬‚µ‚Ä‚¨‚­ƒIƒuƒWƒFƒNƒg‚Ì”")]
+    [Tooltip("äº‹å‰ã«ç”Ÿæˆã—ã¦ãŠãã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æ•°")]
     [SerializeField] private int poolSize = 10;
 
     private List<GameObject> enemyPool;
 
-    private void Awake()
-    {
-        // ƒVƒ“ƒOƒ‹ƒgƒ“ƒpƒ^[ƒ“‚ÌÀ‘•iDontDestroyOnLoad‚ğíœj
-        if (Instance != null && Instance != this)
-        {
+    private void Awake() {
+        // ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ãƒ‘ã‚¿ãƒ¼ãƒ³ã®å®Ÿè£…ï¼ˆDontDestroyOnLoadã‚’å‰Šé™¤ï¼‰
+        if(Instance != null && Instance != this) {
             Destroy(this.gameObject);
             return;
         }
@@ -30,29 +27,23 @@ public class ObjectPoolManager : MonoBehaviour
         InitializePool();
     }
 
-    private void OnDestroy()
-    {
-        // ƒIƒuƒWƒFƒNƒg‚ª”jŠü‚³‚ê‚éÛ‚ÉAƒVƒ“ƒOƒ‹ƒgƒ“ƒCƒ“ƒXƒ^ƒ“ƒX‚ğƒNƒŠƒA
-        if (Instance == this)
-        {
+    private void OnDestroy() {
+        // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒç ´æ£„ã•ã‚Œã‚‹éš›ã«ã€ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ã‚¯ãƒªã‚¢
+        if(Instance == this) {
             Instance = null;
         }
     }
 
-    private void InitializePool()
-    {
+    private void InitializePool() {
         enemyPool = new List<GameObject>();
-        if (enemyPrefab == null)
-        {
-            Debug.LogError("ObjectPoolManager: enemyPrefab‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñBƒv[ƒ‹‚Ì‰Šú‰»‚ğ’†~‚µ‚Ü‚·B", this);
+        if(enemyPrefab == null) {
+            Debug.LogError("ObjectPoolManager: enemyPrefabãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚ãƒ—ãƒ¼ãƒ«ã®åˆæœŸåŒ–ã‚’ä¸­æ­¢ã—ã¾ã™ã€‚",this);
             return;
         }
-        for (int i = 0; i < poolSize; i++)
-        {
+        for(int i = 0;i < poolSize;i++) {
             GameObject enemy = Instantiate(enemyPrefab);
-            if (enemy == null)
-            {
-                Debug.LogError($"ObjectPoolManager: {i + 1}”Ô–Ú‚Ì“G‚Ì¶¬‚É¸”s‚µ‚Ü‚µ‚½BPrefab‚ª‰ó‚ê‚Ä‚¢‚é‰Â”\«‚ª‚ ‚è‚Ü‚·B", this);
+            if(enemy == null) {
+                Debug.LogError($"ObjectPoolManager: {i + 1}ç•ªç›®ã®æ•µã®ç”Ÿæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚PrefabãŒå£Šã‚Œã¦ã„ã‚‹å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚",this);
                 continue;
             }
             enemy.SetActive(false);
@@ -60,30 +51,25 @@ public class ObjectPoolManager : MonoBehaviour
         }
     }
 
-    public GameObject GetEnemyFromPool()
-    {
-        foreach (GameObject enemy in enemyPool)
-        {
-            if (enemy != null && !enemy.activeInHierarchy)
-            {
+    public GameObject GetEnemyFromPool() {
+        foreach(GameObject enemy in enemyPool) {
+            if(enemy != null && !enemy.activeInHierarchy) {
                 enemy.SetActive(true);
                 return enemy;
             }
         }
 
-        if (enemyPrefab == null)
-        {
-            Debug.LogError("ObjectPoolManager: enemyPrefab‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
+        if(enemyPrefab == null) {
+            Debug.LogError("ObjectPoolManager: enemyPrefabãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚",this);
             return null;
         }
         GameObject newEnemy = Instantiate(enemyPrefab);
-        if (newEnemy == null)
-        {
-            Debug.LogError("ObjectPoolManager: V‚µ‚¢“G‚Ì¶¬‚É¸”s‚µ‚Ü‚µ‚½B", this);
+        if(newEnemy == null) {
+            Debug.LogError("ObjectPoolManager: æ–°ã—ã„æ•µã®ç”Ÿæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚",this);
             return null;
         }
         enemyPool.Add(newEnemy);
-        Debug.LogWarning("ObjectPoolManager: ƒv[ƒ‹‚ªŒÍŠ‰‚µ‚Ü‚µ‚½BV‚µ‚­ƒIƒuƒWƒFƒNƒg‚ğ¶¬‚µ‚Ü‚µ‚½B", this);
+        Debug.LogWarning("ObjectPoolManager: ãƒ—ãƒ¼ãƒ«ãŒæ¯æ¸‡ã—ã¾ã—ãŸã€‚æ–°ã—ãã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã—ã¾ã—ãŸã€‚",this);
         return newEnemy;
     }
 }

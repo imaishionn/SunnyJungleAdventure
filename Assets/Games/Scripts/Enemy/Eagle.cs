@@ -40,23 +40,23 @@ public class Eagle : Enemy {
         base.Awake();
 
         // 'Player'タグを持つオブジェクトを探し、見つかればTransformを取得
-        if (m_player == null) {
+        if(m_player == null) {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null)
+            if(playerObj != null)
                 m_player = playerObj.transform;
             else {
-                Debug.LogWarning("Eagle: 'Player'タグを持つGameObjectが見つかりません。プレイヤー追跡機能が無効になります。", this);
+                Debug.LogWarning("Eagle: 'Player'タグを持つGameObjectが見つかりません。プレイヤー追跡機能が無効になります。",this);
             }
         }
 
         // SpriteRendererコンポーネントの参照を取得
         m_spriteRenderer = GetComponent<SpriteRenderer>();
-        if (m_spriteRenderer == null) {
-            Debug.LogError("Eagle: SpriteRendererがアタッチされていません。", this);
+        if(m_spriteRenderer == null) {
+            Debug.LogError("Eagle: SpriteRendererがアタッチされていません。",this);
         }
 
         // Rigidbody2Dの設定
-        if (m_rb != null) {
+        if(m_rb != null) {
             m_rb.gravityScale = 0f; // 重力を無効化
             m_rb.drag = 1f;         // 飛行中に滑らかに減速させるための抵抗
         }
@@ -72,54 +72,54 @@ public class Eagle : Enemy {
         m_hp = 3; // HPをリセット
 
         // 速度をリセット
-        if (m_rb != null) m_rb.velocity = Vector2.zero;
+        if(m_rb != null) m_rb.velocity = Vector2.zero;
 
         // アニメーションをリセット
-        if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool)) {
-            m_animator.SetBool("fly", false);
+        if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
+            m_animator.SetBool("fly",false);
         }
 
         // スプライトの状態をリセット
-        if (m_spriteRenderer != null) {
+        if(m_spriteRenderer != null) {
             m_spriteRenderer.enabled = true;
         }
     }
 
     protected void FixedUpdate() {
         // 死亡状態の場合は処理を停止
-        if (IsDead) return;
+        if(IsDead) return;
 
         // プレイヤーやRigidbody2Dが設定されていない場合は、動きを停止して処理を抜ける
-        if (m_player == null || m_rb == null) {
-            if (m_rb != null) m_rb.velocity = Vector2.zero;
-            if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool)) {
-                m_animator.SetBool("fly", false);
+        if(m_player == null || m_rb == null) {
+            if(m_rb != null) m_rb.velocity = Vector2.zero;
+            if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
+                m_animator.SetBool("fly",false);
             }
             return;
         }
 
         // プレイヤーとの距離を計算
-        float distance = Vector2.Distance(transform.position, m_player.position);
+        float distance = Vector2.Distance(transform.position,m_player.position);
 
         // プレイヤーが検知範囲内にいるかチェック
-        if (distance < DetectRange) {
+        if(distance < DetectRange) {
             // プレイヤーに向かって飛行
             FlyToPlayer();
 
             // 飛行状態のアニメーションを有効にする（一度だけ実行）
-            if (!m_isFlying) {
-                if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool)) {
-                    m_animator.SetBool("fly", true);
+            if(!m_isFlying) {
+                if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
+                    m_animator.SetBool("fly",true);
                 }
                 m_isFlying = true;
             }
         }
         else {
             // プレイヤーが検知範囲外に出た場合
-            if (m_isFlying) {
+            if(m_isFlying) {
                 // 飛行アニメーションを無効にする（一度だけ実行）
-                if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool)) {
-                    m_animator.SetBool("fly", false);
+                if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
+                    m_animator.SetBool("fly",false);
                 }
                 m_isFlying = false;
             }
@@ -142,10 +142,10 @@ public class Eagle : Enemy {
         m_rb.velocity = direction * FlySpeed;
 
         // キャラクターの向きをプレイヤーに合わせて反転
-        if (m_player.position.x > transform.position.x) {
+        if(m_player.position.x > transform.position.x) {
             FlipSprite(true); // 右向き
         }
-        else if (m_player.position.x < transform.position.x) {
+        else if(m_player.position.x < transform.position.x) {
             FlipSprite(false); // 左向き
         }
     }
@@ -156,7 +156,7 @@ public class Eagle : Enemy {
     /// <param name="isFacingRight">右向きならtrue、左向きならfalse</param>
     private void FlipSprite(bool isFacingRight) {
         Vector3 scale = transform.localScale;
-        if (isFacingRight) {
+        if(isFacingRight) {
             scale.x = Mathf.Abs(scale.x); // 右向き
         }
         else {
@@ -170,18 +170,18 @@ public class Eagle : Enemy {
     /// 親クラスのTakeDamage()をオーバーライドしています。
     /// </summary>
     public override void TakeDamage() {
-        if (IsDead) return;
+        if(IsDead) return;
 
         m_hp--;
         Debug.Log("Eagle took damage. HP: " + m_hp);
 
-        if (m_hp <= 0) {
+        if(m_hp <= 0) {
             // HPが0以下になったら死亡処理
             base.Die();
         }
         else {
             // ダメージアニメーションを再生
-            if (m_animator != null && HasAnimatorParameter("hurt", AnimatorControllerParameterType.Trigger)) {
+            if(m_animator != null && HasAnimatorParameter("hurt",AnimatorControllerParameterType.Trigger)) {
                 m_animator.SetTrigger("hurt");
             }
             // 点滅コルーチンを開始
@@ -194,9 +194,9 @@ public class Eagle : Enemy {
     /// </summary>
     private IEnumerator FlashRoutine() {
         float timer = 0f;
-        while (timer < FlashDuration) {
+        while(timer < FlashDuration) {
             // SpriteRendererの表示/非表示を切り替える
-            if (m_spriteRenderer != null) {
+            if(m_spriteRenderer != null) {
                 m_spriteRenderer.enabled = !m_spriteRenderer.enabled;
             }
             yield return new WaitForSeconds(FlashInterval);
@@ -204,7 +204,7 @@ public class Eagle : Enemy {
         }
 
         // 点滅終了後、スプライトを必ず表示状態に戻す
-        if (m_spriteRenderer != null) {
+        if(m_spriteRenderer != null) {
             m_spriteRenderer.enabled = true;
         }
     }

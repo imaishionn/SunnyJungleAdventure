@@ -2,57 +2,48 @@ using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// ƒQ[ƒ€“à‚ÌƒWƒFƒ€ƒJƒEƒ“ƒg‚ğUI‚É•\¦‚·‚é–ğŠ„‚ğ’S‚¤ƒXƒNƒŠƒvƒg‚Å‚·B
-/// GameManager‚©‚ç’Ê’m‚ğó‚¯æ‚èA•\¦‚ğXV‚µ‚Ü‚·B
+/// ã‚²ãƒ¼ãƒ å†…ã®ã‚¸ã‚§ãƒ ã‚«ã‚¦ãƒ³ãƒˆã‚’UIã«è¡¨ç¤ºã™ã‚‹å½¹å‰²ã‚’æ‹…ã†ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
+/// GameManagerã‹ã‚‰é€šçŸ¥ã‚’å—ã‘å–ã‚Šã€è¡¨ç¤ºã‚’æ›´æ–°ã—ã¾ã™ã€‚
 /// </summary>
-public class ScoreDisplay : MonoBehaviour
-{
-    [Header("UI—v‘f"), Tooltip("ƒWƒFƒ€‚ÌƒJƒEƒ“ƒg‚ğ•\¦‚·‚éTextMeshProUGUIƒRƒ“ƒ|[ƒlƒ“ƒg"), SerializeField]
+public class ScoreDisplay : MonoBehaviour {
+    [Header("UIè¦ç´ "), Tooltip("ã‚¸ã‚§ãƒ ã®ã‚«ã‚¦ãƒ³ãƒˆã‚’è¡¨ç¤ºã™ã‚‹TextMeshProUGUIã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ"), SerializeField]
     private TextMeshProUGUI gemCountText;
 
-    private void Awake()
-    {
-        // •K—v‚ÈUI—v‘f‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚é‚©Šm”F
-        if (gemCountText == null)
-        {
-            Debug.LogError("ScoreDisplay: gemCountText ‚ªƒCƒ“ƒXƒyƒNƒ^[‚ÅŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñI", this);
+    private void Awake() {
+        // å¿…è¦ãªUIè¦ç´ ãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã‚‹ã‹ç¢ºèª
+        if(gemCountText == null) {
+            Debug.LogError("ScoreDisplay: gemCountText ãŒã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§å‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ï¼",this);
         }
     }
 
     /// <summary>
-    /// ‚±‚ÌƒRƒ“ƒ|[ƒlƒ“ƒg‚ª—LŒø‚É‚È‚Á‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B
+    /// ã“ã®ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒæœ‰åŠ¹ã«ãªã£ãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
     /// </summary>
-    private void OnEnable()
-    {
-        if (GameManager.Instance != null)
-        {
+    private void OnEnable() {
+        if(GameManager.Instance != null) {
             GameManager.Instance.OnGemCountChanged += UpdateGemCount;
             UpdateGemCount(GameManager.Instance.currentGemCount);
         }
     }
 
     /// <summary>
-    /// ‚±‚ÌƒRƒ“ƒ|[ƒlƒ“ƒg‚ª–³Œø‚É‚È‚Á‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B
+    /// ã“ã®ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒç„¡åŠ¹ã«ãªã£ãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
     /// </summary>
-    private void OnDisable()
-    {
-        if (GameManager.Instance != null)
-        {
-            // ƒCƒxƒ“ƒg‚Ìw“Ç‚ğ‰ğœBƒƒ‚ƒŠƒŠ[ƒN‚ğ–h‚®‚½‚ß‚Ìd—v‚Èˆ—‚Å‚·B
+    private void OnDisable() {
+        if(GameManager.Instance != null) {
+            // ã‚¤ãƒ™ãƒ³ãƒˆã®è³¼èª­ã‚’è§£é™¤ã€‚ãƒ¡ãƒ¢ãƒªãƒªãƒ¼ã‚¯ã‚’é˜²ããŸã‚ã®é‡è¦ãªå‡¦ç†ã§ã™ã€‚
             GameManager.Instance.OnGemCountChanged -= UpdateGemCount;
         }
     }
 
     /// <summary>
-    /// ƒWƒFƒ€‚ÌƒJƒEƒ“ƒg‚ğUI‚É•\¦‚·‚éƒeƒLƒXƒg‚ğXV‚µ‚Ü‚·B
-    /// ‚±‚Ìƒƒ\ƒbƒh‚ÍGameManager‚ÌƒCƒxƒ“ƒg‚©‚çŒÄ‚Ño‚³‚ê‚Ü‚·B
+    /// ã‚¸ã‚§ãƒ ã®ã‚«ã‚¦ãƒ³ãƒˆã‚’UIã«è¡¨ç¤ºã™ã‚‹ãƒ†ã‚­ã‚¹ãƒˆã‚’æ›´æ–°ã—ã¾ã™ã€‚
+    /// ã“ã®ãƒ¡ã‚½ãƒƒãƒ‰ã¯GameManagerã®ã‚¤ãƒ™ãƒ³ãƒˆã‹ã‚‰å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
     /// </summary>
-    /// <param name="newCount">V‚µ‚¢ƒWƒFƒ€‚Ì”</param>
-    public void UpdateGemCount(int newCount)
-    {
-        if (gemCountText != null)
-        {
-            // ƒeƒLƒXƒg‚ğ’Z‚­‚µ‚Ä1s‚Éû‚Ü‚é‚æ‚¤‚É•ÏX
+    /// <param name="newCount">æ–°ã—ã„ã‚¸ã‚§ãƒ ã®æ•°</param>
+    public void UpdateGemCount(int newCount) {
+        if(gemCountText != null) {
+            // ãƒ†ã‚­ã‚¹ãƒˆã‚’çŸ­ãã—ã¦1è¡Œã«åã¾ã‚‹ã‚ˆã†ã«å¤‰æ›´
             gemCountText.text = ":" + newCount;
         }
     }

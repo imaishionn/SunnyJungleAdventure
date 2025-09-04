@@ -30,7 +30,7 @@ public class GroundCheck : MonoBehaviour {
     /// <param name="collision">接触している他のコライダー</param>
     private void OnTriggerStay2D(Collider2D collision) {
         // 接触しているオブジェクトが「Ground」タグを持つかチェック
-        if (collision.CompareTag("Ground")) {
+        if(collision.CompareTag("Ground")) {
             m_isGround = true;
         }
     }
@@ -41,7 +41,7 @@ public class GroundCheck : MonoBehaviour {
     /// <param name="collision">接触を終了した他のコライダー</param>
     private void OnTriggerExit2D(Collider2D collision) {
         // 接触を終了したオブジェクトが「Ground」タグを持つかチェック
-        if (collision.CompareTag("Ground")) {
+        if(collision.CompareTag("Ground")) {
             m_isGround = false;
         }
     }

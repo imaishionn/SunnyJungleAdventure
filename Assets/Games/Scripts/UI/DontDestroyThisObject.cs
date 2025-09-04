@@ -1,16 +1,14 @@
 using UnityEngine;
 
 /// <summary>
-/// ���̃Q�[���I�u�W�F�N�g���A�V�[�����؂�ւ���Ă��j�󂳂�Ȃ��悤�ɂ���X�N���v�g�B
-/// ��ɃQ�[���S�̂�ʂ��đ��݂�������Manager�n�̃I�u�W�F�N�g�Ɏg�p����܂��B
+/// このゲームオブジェクトを、シーンが切り替わっても破壊されないようにするスクリプト。
+/// 主にゲーム全体を通して存在し続けるManager系のオブジェクトに使用されます。
 /// </summary>
-public class DontDestroyThisObject : MonoBehaviour
-{
-    void Awake()
-    {
-        // DontDestroyOnLoad���Ăяo��
-        // ����ɂ��A���̃X�N���v�g���A�^�b�`���ꂽGameObject��
-        // �V�����V�[�������[�h����Ă��j�����ꂸ�Ɏc�葱���܂��B
+public class DontDestroyThisObject : MonoBehaviour {
+    void Awake() {
+        // DontDestroyOnLoadを呼び出す
+        // これにより、このスクリプトがアタッチされたGameObjectは
+        // 新しいシーンがロードされても破棄されずに残り続けます。
         DontDestroyOnLoad(gameObject);
     }
 }

@@ -1,16 +1,15 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 /// <summary>
-/// ƒXƒRƒAƒV[ƒ“‚ÅƒXƒRƒA•\¦Aƒ‰ƒ“ƒN•t‚¯AƒŠ[ƒ_[ƒ{[ƒhŠÇ—‚ğs‚¤ƒXƒNƒŠƒvƒgB
+/// ã‚¹ã‚³ã‚¢ã‚·ãƒ¼ãƒ³ã§ã‚¹ã‚³ã‚¢è¡¨ç¤ºã€ãƒ©ãƒ³ã‚¯ä»˜ã‘ã€ãƒªãƒ¼ãƒ€ãƒ¼ãƒœãƒ¼ãƒ‰ç®¡ç†ã‚’è¡Œã†ã‚¹ã‚¯ãƒªãƒ—ãƒˆã€‚
 /// </summary>
-public class ScoreManager : MonoBehaviour
-{
-    // UIİ’è
+public class ScoreManager : MonoBehaviour {
+    // UIè¨­å®š
     [Header("UI References")]
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI timeText;
@@ -18,169 +17,148 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] private Button titleButton;
 
     [Header("Leaderboard Settings")]
-    [Tooltip("ƒ‰ƒ“ƒLƒ“ƒO•\¦—p‚ÌText UI—v‘f‚ÌƒŠƒXƒgBƒCƒ“ƒXƒyƒNƒ^[‚Åİ’è‚µ‚Ä‚­‚¾‚³‚¢B")]
+    [Tooltip("ãƒ©ãƒ³ã‚­ãƒ³ã‚°è¡¨ç¤ºç”¨ã®Text UIè¦ç´ ã®ãƒªã‚¹ãƒˆã€‚ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§è¨­å®šã—ã¦ãã ã•ã„ã€‚")]
     [SerializeField] private List<TextMeshProUGUI> leaderboardEntries = new List<TextMeshProUGUI>();
-    [Tooltip("ƒ‰ƒ“ƒLƒ“ƒO‚É•Û‘¶‚·‚éÅ‘åŒ”")]
+    [Tooltip("ãƒ©ãƒ³ã‚­ãƒ³ã‚°ã«ä¿å­˜ã™ã‚‹æœ€å¤§ä»¶æ•°")]
     [SerializeField] private int maxLeaderboardCount = 5;
 
-    // ƒQ[ƒ€ƒpƒbƒhİ’è
+    // ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰è¨­å®š
     [Header("GamePad Setting")]
-    [Tooltip("ƒQ[ƒ€ƒpƒbƒh‘€ì‚ÅÅ‰‚É‘I‘ğó‘Ô‚É‚µ‚½‚¢UI—v‘f")]
+    [Tooltip("ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰æ“ä½œã§æœ€åˆã«é¸æŠçŠ¶æ…‹ã«ã—ãŸã„UIè¦ç´ ")]
     [SerializeField] private Selectable firstSelected;
 
-    // ƒV[ƒ“–¼
+    // ã‚·ãƒ¼ãƒ³å
     [Header("Scene Names")]
-    [Tooltip("ƒ^ƒCƒgƒ‹ƒV[ƒ“‚Ì–¼‘OBGameManager‚©‚çæ“¾‚·‚é•û‚ª–]‚Ü‚µ‚¢")]
+    [Tooltip("ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³ã®åå‰ã€‚GameManagerã‹ã‚‰å–å¾—ã™ã‚‹æ–¹ãŒæœ›ã¾ã—ã„")]
     [SerializeField] private string titleSceneName;
 
-    // PlayerPrefs‚ÌƒL[
+    // PlayerPrefsã®ã‚­ãƒ¼
     private const string LEADERBOARD_SCORE_KEY_PREFIX = "LeaderboardScore_";
     private const string LEADERBOARD_TIME_KEY_PREFIX = "LeaderboardTime_";
 
-    void OnEnable()
-    {
-        // GameManager‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ª‘¶İ‚·‚é‚©Šm”F
-        // GameManager.instance ‚ğ GameManager.Instance ‚ÉC³
-        if (GameManager.Instance == null)
-        {
-            UnityEngine.Debug.LogError("GameManager‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBƒXƒRƒA•\¦‚Í‚Å‚«‚Ü‚¹‚ñB");
-            // GameManager‚ª‚È‚¢ê‡‚ÍAƒ_ƒ~[ƒf[ƒ^‚Å•\¦
-            DisplayResults(0, 0);
+    void OnEnable() {
+        // GameManagerã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒå­˜åœ¨ã™ã‚‹ã‹ç¢ºèª
+        // GameManager.instance ã‚’ GameManager.Instance ã«ä¿®æ­£
+        if(GameManager.Instance == null) {
+            UnityEngine.Debug.LogError("GameManagerã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚ã‚¹ã‚³ã‚¢è¡¨ç¤ºã¯ã§ãã¾ã›ã‚“ã€‚");
+            // GameManagerãŒãªã„å ´åˆã¯ã€ãƒ€ãƒŸãƒ¼ãƒ‡ãƒ¼ã‚¿ã§è¡¨ç¤º
+            DisplayResults(0,0);
         }
-        else
-        {
-            // GameManager‚©‚çÅIƒXƒRƒA‚ÆŠÔ‚ğæ“¾
-            // GameManager.instance.finalScore ‚ğ GameManager.Instance.finalScore ‚ÉC³
-            // GameManager.instance.finalTime ‚ğ GameManager.Instance.finalTime ‚ÉC³
+        else {
+            // GameManagerã‹ã‚‰æœ€çµ‚ã‚¹ã‚³ã‚¢ã¨æ™‚é–“ã‚’å–å¾—
+            // GameManager.instance.finalScore ã‚’ GameManager.Instance.finalScore ã«ä¿®æ­£
+            // GameManager.instance.finalTime ã‚’ GameManager.Instance.finalTime ã«ä¿®æ­£
             int finalScore = GameManager.Instance.finalScore;
             float finalTime = GameManager.Instance.finalTime;
 
-            // ƒXƒRƒA‚ÆŠÔ‚ğUI‚É•\¦
-            DisplayResults(finalScore, finalTime);
+            // ã‚¹ã‚³ã‚¢ã¨æ™‚é–“ã‚’UIã«è¡¨ç¤º
+            DisplayResults(finalScore,finalTime);
 
-            // ƒXƒRƒA‚ğƒŠ[ƒ_[ƒ{[ƒh‚É•Û‘¶
-            SaveToLeaderboard(finalScore, finalTime);
+            // ã‚¹ã‚³ã‚¢ã‚’ãƒªãƒ¼ãƒ€ãƒ¼ãƒœãƒ¼ãƒ‰ã«ä¿å­˜
+            SaveToLeaderboard(finalScore,finalTime);
         }
 
-        // ƒŠ[ƒ_[ƒ{[ƒh‚ğXV
+        // ãƒªãƒ¼ãƒ€ãƒ¼ãƒœãƒ¼ãƒ‰ã‚’æ›´æ–°
         UpdateLeaderboardDisplay();
 
-        // ƒ{ƒ^ƒ“‚ÌƒNƒŠƒbƒNƒCƒxƒ“ƒg‚Éƒƒ\ƒbƒh‚ğ“o˜^
-        if (titleButton != null)
-        {
-            titleButton.onClick.RemoveAllListeners(); // d•¡“o˜^–h~
+        // ãƒœã‚¿ãƒ³ã®ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆã«ãƒ¡ã‚½ãƒƒãƒ‰ã‚’ç™»éŒ²
+        if(titleButton != null) {
+            titleButton.onClick.RemoveAllListeners(); // é‡è¤‡ç™»éŒ²é˜²æ­¢
             titleButton.onClick.AddListener(OnTitleButtonClicked);
         }
 
-        // Å‰‚ÌUI—v‘f‚ğ‘I‘ğ
-        if (firstSelected != null)
-        {
+        // æœ€åˆã®UIè¦ç´ ã‚’é¸æŠ
+        if(firstSelected != null) {
             EventSystem.current.SetSelectedGameObject(firstSelected.gameObject);
         }
     }
 
     /// <summary>
-    /// ƒXƒRƒA‚ÆŠÔ‚ğUI‚É•\¦‚µ‚Ü‚·B
+    /// ã‚¹ã‚³ã‚¢ã¨æ™‚é–“ã‚’UIã«è¡¨ç¤ºã—ã¾ã™ã€‚
     /// </summary>
-    /// <param name="score">•\¦‚·‚éƒXƒRƒA</param>
-    /// <param name="time">•\¦‚·‚éŠÔ</param>
-    private void DisplayResults(int score, float time)
-    {
-        if (scoreText != null)
-        {
-            scoreText.text = "ƒXƒRƒA" + score.ToString();
+    /// <param name="score">è¡¨ç¤ºã™ã‚‹ã‚¹ã‚³ã‚¢</param>
+    /// <param name="time">è¡¨ç¤ºã™ã‚‹æ™‚é–“</param>
+    private void DisplayResults(int score,float time) {
+        if(scoreText != null) {
+            scoreText.text = "ã‚¹ã‚³ã‚¢" + score.ToString();
         }
 
-        if (timeText != null)
-        {
-            timeText.text = "c‚èŠÔ" + Mathf.RoundToInt(time).ToString() + "•b";
+        if(timeText != null) {
+            timeText.text = "æ®‹ã‚Šæ™‚é–“" + Mathf.RoundToInt(time).ToString() + "ç§’";
         }
 
-        // •]‰¿‚ğŒvZ‚µ‚Ä•\¦
+        // è©•ä¾¡ã‚’è¨ˆç®—ã—ã¦è¡¨ç¤º
         string rank = CalculateRank(score);
-        if (rankText != null)
-        {
-            rankText.text = "ƒ‰ƒ“ƒN" + rank;
+        if(rankText != null) {
+            rankText.text = "ãƒ©ãƒ³ã‚¯" + rank;
         }
     }
 
     /// <summary>
-    /// V‚µ‚¢ƒXƒRƒA‚ÆŠÔ‚ğƒŠ[ƒ_[ƒ{[ƒh‚É•Û‘¶‚µ‚Ü‚·B
+    /// æ–°ã—ã„ã‚¹ã‚³ã‚¢ã¨æ™‚é–“ã‚’ãƒªãƒ¼ãƒ€ãƒ¼ãƒœãƒ¼ãƒ‰ã«ä¿å­˜ã—ã¾ã™ã€‚
     /// </summary>
-    /// <param name="newScore">•Û‘¶‚·‚éƒXƒRƒA</param>
-    /// <param name="newTime">•Û‘¶‚·‚éŠÔ</param>
-    private void SaveToLeaderboard(int newScore, float newTime)
-    {
-        List<KeyValuePair<int, float>> scoreEntries = LoadLeaderboardEntries();
-        scoreEntries.Add(new KeyValuePair<int, float>(newScore, newTime));
+    /// <param name="newScore">ä¿å­˜ã™ã‚‹ã‚¹ã‚³ã‚¢</param>
+    /// <param name="newTime">ä¿å­˜ã™ã‚‹æ™‚é–“</param>
+    private void SaveToLeaderboard(int newScore,float newTime) {
+        List<KeyValuePair<int,float>> scoreEntries = LoadLeaderboardEntries();
+        scoreEntries.Add(new KeyValuePair<int,float>(newScore,newTime));
 
-        // ƒXƒRƒA‚ğ~‡‚Éƒ\[ƒg‚µAƒXƒRƒA‚ª“¯‚¶ê‡‚ÍŠÔ‚ğ¸‡‚Éƒ\[ƒg
-        scoreEntries.Sort((a, b) =>
-        {
+        // ã‚¹ã‚³ã‚¢ã‚’é™é †ã«ã‚½ãƒ¼ãƒˆã—ã€ã‚¹ã‚³ã‚¢ãŒåŒã˜å ´åˆã¯æ™‚é–“ã‚’æ˜‡é †ã«ã‚½ãƒ¼ãƒˆ
+        scoreEntries.Sort((a,b) => {
             int scoreComparison = b.Key.CompareTo(a.Key);
-            if (scoreComparison != 0)
-            {
+            if(scoreComparison != 0) {
                 return scoreComparison;
             }
             return a.Value.CompareTo(b.Value);
         });
 
-        // Å‘åŒ”‚ğ’´‚¦‚½‚çíœ
-        if (scoreEntries.Count > maxLeaderboardCount)
-        {
-            scoreEntries.RemoveRange(maxLeaderboardCount, scoreEntries.Count - maxLeaderboardCount);
+        // æœ€å¤§ä»¶æ•°ã‚’è¶…ãˆãŸã‚‰å‰Šé™¤
+        if(scoreEntries.Count > maxLeaderboardCount) {
+            scoreEntries.RemoveRange(maxLeaderboardCount,scoreEntries.Count - maxLeaderboardCount);
         }
 
-        // PlayerPrefs‚É•Û‘¶
-        for (int i = 0; i < scoreEntries.Count; i++)
-        {
-            PlayerPrefs.SetInt(LEADERBOARD_SCORE_KEY_PREFIX + i, scoreEntries[i].Key);
-            PlayerPrefs.SetFloat(LEADERBOARD_TIME_KEY_PREFIX + i, scoreEntries[i].Value);
+        // PlayerPrefsã«ä¿å­˜
+        for(int i = 0;i < scoreEntries.Count;i++) {
+            PlayerPrefs.SetInt(LEADERBOARD_SCORE_KEY_PREFIX + i,scoreEntries[i].Key);
+            PlayerPrefs.SetFloat(LEADERBOARD_TIME_KEY_PREFIX + i,scoreEntries[i].Value);
         }
         PlayerPrefs.Save();
     }
 
     /// <summary>
-    /// ƒŠ[ƒ_[ƒ{[ƒh‚ÌƒGƒ“ƒgƒŠ‚ğPlayerPrefs‚©‚ç“Ç‚İ‚İ‚Ü‚·B
+    /// ãƒªãƒ¼ãƒ€ãƒ¼ãƒœãƒ¼ãƒ‰ã®ã‚¨ãƒ³ãƒˆãƒªã‚’PlayerPrefsã‹ã‚‰èª­ã¿è¾¼ã¿ã¾ã™ã€‚
     /// </summary>
-    /// <returns>“Ç‚İ‚ñ‚¾ƒXƒRƒA‚ÆŠÔ‚ÌƒyƒA‚ÌƒŠƒXƒg</returns>
-    private List<KeyValuePair<int, float>> LoadLeaderboardEntries()
-    {
-        List<KeyValuePair<int, float>> entries = new List<KeyValuePair<int, float>>();
-        for (int i = 0; i < maxLeaderboardCount; i++)
-        {
-            if (PlayerPrefs.HasKey(LEADERBOARD_SCORE_KEY_PREFIX + i))
-            {
+    /// <returns>èª­ã¿è¾¼ã‚“ã ã‚¹ã‚³ã‚¢ã¨æ™‚é–“ã®ãƒšã‚¢ã®ãƒªã‚¹ãƒˆ</returns>
+    private List<KeyValuePair<int,float>> LoadLeaderboardEntries() {
+        List<KeyValuePair<int,float>> entries = new List<KeyValuePair<int,float>>();
+        for(int i = 0;i < maxLeaderboardCount;i++) {
+            if(PlayerPrefs.HasKey(LEADERBOARD_SCORE_KEY_PREFIX + i)) {
                 int score = PlayerPrefs.GetInt(LEADERBOARD_SCORE_KEY_PREFIX + i);
                 float time = PlayerPrefs.GetFloat(LEADERBOARD_TIME_KEY_PREFIX + i);
-                entries.Add(new KeyValuePair<int, float>(score, time));
+                entries.Add(new KeyValuePair<int,float>(score,time));
             }
         }
         return entries;
     }
 
     /// <summary>
-    /// UI‚ÉƒŠ[ƒ_[ƒ{[ƒh‚Ìƒ‰ƒ“ƒLƒ“ƒO‚ğ•\¦‚µ‚Ü‚·B
+    /// UIã«ãƒªãƒ¼ãƒ€ãƒ¼ãƒœãƒ¼ãƒ‰ã®ãƒ©ãƒ³ã‚­ãƒ³ã‚°ã‚’è¡¨ç¤ºã—ã¾ã™ã€‚
     /// </summary>
-    void UpdateLeaderboardDisplay()
-    {
-        List<KeyValuePair<int, float>> entries = LoadLeaderboardEntries();
+    void UpdateLeaderboardDisplay() {
+        List<KeyValuePair<int,float>> entries = LoadLeaderboardEntries();
 
-        // ƒŠ[ƒ_[ƒ{[ƒh‚ÌUI—v‘f‚ğXV
-        for (int i = 0; i < leaderboardEntries.Count; i++)
-        {
-            if (i < entries.Count)
-            {
+        // ãƒªãƒ¼ãƒ€ãƒ¼ãƒœãƒ¼ãƒ‰ã®UIè¦ç´ ã‚’æ›´æ–°
+        for(int i = 0;i < leaderboardEntries.Count;i++) {
+            if(i < entries.Count) {
                 int score = entries[i].Key;
                 float time = entries[i].Value;
 
-                leaderboardEntries[i].text = (i + 1).ToString() + ".ƒXƒRƒA:" + score.ToString() + "(" + Mathf.RoundToInt(time).ToString() + "•b)";
+                leaderboardEntries[i].text = (i + 1).ToString() + ".ã‚¹ã‚³ã‚¢:" + score.ToString() + "(" + Mathf.RoundToInt(time).ToString() + "ç§’)";
 
                 leaderboardEntries[i].gameObject.SetActive(true);
             }
-            else
-            {
-                // ƒGƒ“ƒgƒŠ‚ª‚È‚¢ê‡‚Í”ñ•\¦‚É‚·‚é‚©AƒfƒtƒHƒ‹ƒgƒeƒLƒXƒg‚ğİ’è
+            else {
+                // ã‚¨ãƒ³ãƒˆãƒªãŒãªã„å ´åˆã¯éè¡¨ç¤ºã«ã™ã‚‹ã‹ã€ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ†ã‚­ã‚¹ãƒˆã‚’è¨­å®š
                 leaderboardEntries[i].text = (i + 1).ToString() + ". ---";
                 leaderboardEntries[i].gameObject.SetActive(true);
             }
@@ -188,51 +166,42 @@ public class ScoreManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ƒXƒRƒA‚ÉŠî‚Ã‚¢‚Ä•]‰¿ƒ‰ƒ“ƒN‚ğŒvZ‚µ‚Ü‚·B
+    /// ã‚¹ã‚³ã‚¢ã«åŸºã¥ã„ã¦è©•ä¾¡ãƒ©ãƒ³ã‚¯ã‚’è¨ˆç®—ã—ã¾ã™ã€‚
     /// </summary>
-    /// <param name="score">ŒvZ‚·‚éƒXƒRƒA</param>
-    /// <returns>•]‰¿ƒ‰ƒ“ƒNi—áF"S"j</returns>
-    string CalculateRank(int score)
-    {
-        if (score >= 5000)
-        {
+    /// <param name="score">è¨ˆç®—ã™ã‚‹ã‚¹ã‚³ã‚¢</param>
+    /// <returns>è©•ä¾¡ãƒ©ãƒ³ã‚¯ï¼ˆä¾‹ï¼š"S"ï¼‰</returns>
+    string CalculateRank(int score) {
+        if(score >= 5000) {
             return "S";
         }
-        else if (score >= 4000)
-        {
+        else if(score >= 4000) {
             return "A";
         }
-        else if (score >= 2000)
-        {
+        else if(score >= 2000) {
             return "B";
         }
-        else
-        {
+        else {
             return "C";
         }
     }
 
     /// <summary>
-    /// ƒ^ƒCƒgƒ‹ƒ{ƒ^ƒ“‚ªƒNƒŠƒbƒN‚³‚ê‚½‚Ìˆ—B
+    /// ã‚¿ã‚¤ãƒˆãƒ«ãƒœã‚¿ãƒ³ãŒã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸæ™‚ã®å‡¦ç†ã€‚
     /// </summary>
-    void OnTitleButtonClicked()
-    {
-        // GameManager‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğg—p‚µ‚Äƒ^ƒCƒgƒ‹ƒV[ƒ“‚É‘JˆÚ
-        // GameManager.instance ‚ğ GameManager.Instance ‚ÉC³
-        if (GameManager.Instance != null && !string.IsNullOrEmpty(GameManager.Instance.TitleSceneName))
-        {
-            // GameManager.instance.LoadSceneWithFade ‚ğ GameManager.Instance.LoadSceneWithFade ‚ÉC³
-            // GameManager.instance.TitleSceneName ‚ğ GameManager.Instance.TitleSceneName ‚ÉC³
+    void OnTitleButtonClicked() {
+        // GameManagerã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½¿ç”¨ã—ã¦ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³ã«é·ç§»
+        // GameManager.instance ã‚’ GameManager.Instance ã«ä¿®æ­£
+        if(GameManager.Instance != null && !string.IsNullOrEmpty(GameManager.Instance.TitleSceneName)) {
+            // GameManager.instance.LoadSceneWithFade ã‚’ GameManager.Instance.LoadSceneWithFade ã«ä¿®æ­£
+            // GameManager.instance.TitleSceneName ã‚’ GameManager.Instance.TitleSceneName ã«ä¿®æ­£
             GameManager.Instance.LoadSceneWithFade(GameManager.Instance.TitleSceneName);
         }
-        else if (!string.IsNullOrEmpty(titleSceneName))
-        {
-            // GameManager‚ª‚È‚¢ê‡‚Í’¼ÚƒV[ƒ“‚ğƒ[ƒh
+        else if(!string.IsNullOrEmpty(titleSceneName)) {
+            // GameManagerãŒãªã„å ´åˆã¯ç›´æ¥ã‚·ãƒ¼ãƒ³ã‚’ãƒ­ãƒ¼ãƒ‰
             SceneManager.LoadScene(titleSceneName);
         }
-        else
-        {
-            UnityEngine.Debug.LogError("ScoreManager: ƒ^ƒCƒgƒ‹ƒV[ƒ“–¼‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+        else {
+            UnityEngine.Debug.LogError("ScoreManager: ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³åãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚");
         }
     }
 }

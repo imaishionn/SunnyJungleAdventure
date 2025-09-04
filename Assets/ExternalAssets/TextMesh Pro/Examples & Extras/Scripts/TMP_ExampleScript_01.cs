@@ -1,14 +1,9 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
-using TMPro;
+using UnityEngine;
 
 
-namespace TMPro.Examples
-{
+namespace TMPro.Examples {
 
-    public class TMP_ExampleScript_01 : MonoBehaviour
-    {
+    public class TMP_ExampleScript_01 : MonoBehaviour {
         public enum objectType { TextMeshPro = 0, TextMeshProUGUI = 1 };
 
         public objectType ObjectType;
@@ -22,11 +17,10 @@ namespace TMPro.Examples
         private const string k_label = "The count is <#0080ff>{0}</color>";
         private int count;
 
-        void Awake()
-        {
+        void Awake() {
             // Get a reference to the TMP text component if one already exists otherwise add one.
             // This example show the convenience of having both TMP components derive from TMP_Text. 
-            if (ObjectType == 0)
+            if(ObjectType == 0)
                 m_text = GetComponent<TextMeshPro>() ?? gameObject.AddComponent<TextMeshPro>();
             else
                 m_text = GetComponent<TextMeshProUGUI>() ?? gameObject.AddComponent<TextMeshProUGUI>();
@@ -44,18 +38,16 @@ namespace TMPro.Examples
             m_text.text = "A <#0080ff>simple</color> line of text.";
 
             // Get the preferred width and height based on the supplied width and height as opposed to the actual size of the current text container.
-            Vector2 size = m_text.GetPreferredValues(Mathf.Infinity, Mathf.Infinity);
+            Vector2 size = m_text.GetPreferredValues(Mathf.Infinity,Mathf.Infinity);
 
             // Set the size of the RectTransform based on the new calculated values.
-            m_text.rectTransform.sizeDelta = new Vector2(size.x, size.y);
+            m_text.rectTransform.sizeDelta = new Vector2(size.x,size.y);
         }
 
 
-        void Update()
-        {
-            if (!isStatic)
-            {
-                m_text.SetText(k_label, count % 1000);
+        void Update() {
+            if(!isStatic) {
+                m_text.SetText(k_label,count % 1000);
                 count += 1;
             }
         }

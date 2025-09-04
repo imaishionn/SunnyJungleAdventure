@@ -1,158 +1,138 @@
 using UnityEngine;
 
 /// <summary>
-/// “GƒLƒƒƒ‰ƒNƒ^[uƒnƒQƒ^ƒJv‚ÌAI‚Æ“®ì‚ğ§Œä‚·‚éƒXƒNƒŠƒvƒg‚Å‚·B
-/// ƒvƒŒƒCƒ„[‚ğŒŸ’m‚·‚é‚Æ’ÇÕ‚ğŠJn‚µAŒü‚«‚ğ”½“]‚³‚¹‚È‚ª‚ç”òs‚µ‚Ü‚·B
-/// EnemyƒNƒ‰ƒX‚ğŒp³‚µ‚Ä‚¢‚Ü‚·B
+/// æ•µã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã€Œãƒã‚²ã‚¿ã‚«ã€ã®AIã¨å‹•ä½œã‚’åˆ¶å¾¡ã™ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
+/// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’æ¤œçŸ¥ã™ã‚‹ã¨è¿½è·¡ã‚’é–‹å§‹ã—ã€å‘ãã‚’åè»¢ã•ã›ãªãŒã‚‰é£›è¡Œã—ã¾ã™ã€‚
+/// Enemyã‚¯ãƒ©ã‚¹ã‚’ç¶™æ‰¿ã—ã¦ã„ã¾ã™ã€‚
 /// </summary>
-public class Vulture : Enemy
-{
+public class Vulture : Enemy {
     // ----------------------------------------------------------------------------------------------------
-    // ƒCƒ“ƒXƒyƒNƒ^[‚Åİ’è‚·‚éƒpƒ‰ƒ[ƒ^[
+    // ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§è¨­å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
     // ----------------------------------------------------------------------------------------------------
-    [Header("ƒvƒŒƒCƒ„[ŒŸ’mİ’è")]
-    [Tooltip("ƒvƒŒƒCƒ„[‚ğŒŸ’m‚·‚é”¼Œa")]
+    [Header("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æ¤œçŸ¥è¨­å®š")]
+    [Tooltip("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’æ¤œçŸ¥ã™ã‚‹åŠå¾„")]
     [SerializeField] private float DetectRange = 5f;
 
-    [Header("ˆÚ“®İ’è")]
-    [Tooltip("”òs‘¬“x")]
+    [Header("ç§»å‹•è¨­å®š")]
+    [Tooltip("é£›è¡Œé€Ÿåº¦")]
     [SerializeField] private float FlySpeed = 5f;
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒg•Ï”
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆå¤‰æ•°
     // ----------------------------------------------------------------------------------------------------
     [SerializeField] private Transform m_player;
     private bool m_isFlying = false;
 
     // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviour‚Ìƒ‰ƒCƒtƒTƒCƒNƒ‹ƒƒ\ƒbƒh
+    // MonoBehaviourã®ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
-    protected override void Awake()
-    {
-        // eƒNƒ‰ƒX‚ÌAwake()‚ğŒÄ‚Ño‚µAŠî”Õ‚Æ‚È‚é‰Šú‰»‚ğs‚¤
+    protected override void Awake() {
+        // è¦ªã‚¯ãƒ©ã‚¹ã®Awake()ã‚’å‘¼ã³å‡ºã—ã€åŸºç›¤ã¨ãªã‚‹åˆæœŸåŒ–ã‚’è¡Œã†
         base.Awake();
 
-        // 'Player'ƒ^ƒO‚ğ‚ÂƒIƒuƒWƒFƒNƒg‚ğ’T‚µAŒ©‚Â‚©‚ê‚ÎTransform‚ğæ“¾
-        if (m_player == null)
-        {
+        // 'Player'ã‚¿ã‚°ã‚’æŒã¤ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æ¢ã—ã€è¦‹ã¤ã‹ã‚Œã°Transformã‚’å–å¾—
+        if(m_player == null) {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null)
+            if(playerObj != null)
                 m_player = playerObj.transform;
-            else
-            {
-                Debug.LogWarning("Vulture: 'Player'ƒ^ƒO‚ğ‚ÂGameObject‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBƒvƒŒƒCƒ„[’ÇÕ‹@”\‚ª–³Œø‚É‚È‚è‚Ü‚·B", this);
+            else {
+                Debug.LogWarning("Vulture: 'Player'ã‚¿ã‚°ã‚’æŒã¤GameObjectãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼è¿½è·¡æ©Ÿèƒ½ãŒç„¡åŠ¹ã«ãªã‚Šã¾ã™ã€‚",this);
             }
         }
 
-        // Rigidbody2D‚Ìİ’è
-        if (m_rb != null)
-        {
-            m_rb.gravityScale = 0f; // d—Í‚ğ–³Œø‰»
-            m_rb.drag = 1f;         // ”òs’†‚ÉŠŠ‚ç‚©‚ÉŒ¸‘¬‚³‚¹‚é‚½‚ß‚Ì’ïR
+        // Rigidbody2Dã®è¨­å®š
+        if(m_rb != null) {
+            m_rb.gravityScale = 0f; // é‡åŠ›ã‚’ç„¡åŠ¹åŒ–
+            m_rb.drag = 1f;         // é£›è¡Œä¸­ã«æ»‘ã‚‰ã‹ã«æ¸›é€Ÿã•ã›ã‚‹ãŸã‚ã®æŠµæŠ—
         }
     }
 
-    protected override void OnEnable()
-    {
-        // eƒNƒ‰ƒX‚ÌOnEnable()‚ğŒÄ‚Ño‚·
+    protected override void OnEnable() {
+        // è¦ªã‚¯ãƒ©ã‚¹ã®OnEnable()ã‚’å‘¼ã³å‡ºã™
         base.OnEnable();
 
-        // ƒIƒuƒWƒFƒNƒg‚ªƒv[ƒ‹‚©‚çÄ—˜—p‚³‚ê‚éÛ‚Ì‰Šú‰»
+        // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒãƒ—ãƒ¼ãƒ«ã‹ã‚‰å†åˆ©ç”¨ã•ã‚Œã‚‹éš›ã®åˆæœŸåŒ–
         IsDead = false;
         m_isFlying = false;
 
-        // ‘¬“x‚ğƒŠƒZƒbƒg
-        if (m_rb != null) m_rb.velocity = Vector2.zero;
+        // é€Ÿåº¦ã‚’ãƒªã‚»ãƒƒãƒˆ
+        if(m_rb != null) m_rb.velocity = Vector2.zero;
 
-        // ƒAƒjƒ[ƒVƒ‡ƒ“‚ğƒŠƒZƒbƒg
-        if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
-        {
-            m_animator.SetBool("fly", false);
+        // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’ãƒªã‚»ãƒƒãƒˆ
+        if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
+            m_animator.SetBool("fly",false);
         }
     }
 
-    protected void FixedUpdate()
-    {
-        // €–Só‘Ô‚Ìê‡‚Íˆ—‚ğ’â~
-        if (IsDead) return;
+    protected void FixedUpdate() {
+        // æ­»äº¡çŠ¶æ…‹ã®å ´åˆã¯å‡¦ç†ã‚’åœæ­¢
+        if(IsDead) return;
 
-        // ƒvƒŒƒCƒ„[‚âRigidbody2D‚ªİ’è‚³‚ê‚Ä‚¢‚È‚¢ê‡‚ÍA“®‚«‚ğ’â~‚µ‚Äˆ—‚ğ”²‚¯‚é
-        if (m_player == null || m_rb == null)
-        {
-            if (m_rb != null) m_rb.velocity = Vector2.zero;
-            if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
-            {
-                m_animator.SetBool("fly", false);
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚„Rigidbody2DãŒè¨­å®šã•ã‚Œã¦ã„ãªã„å ´åˆã¯ã€å‹•ãã‚’åœæ­¢ã—ã¦å‡¦ç†ã‚’æŠœã‘ã‚‹
+        if(m_player == null || m_rb == null) {
+            if(m_rb != null) m_rb.velocity = Vector2.zero;
+            if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
+                m_animator.SetBool("fly",false);
             }
             return;
         }
 
-        // ƒvƒŒƒCƒ„[‚Æ‚Ì‹——£‚ğŒvZ
-        float distance = Vector2.Distance(transform.position, m_player.position);
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨ã®è·é›¢ã‚’è¨ˆç®—
+        float distance = Vector2.Distance(transform.position,m_player.position);
 
-        // ƒvƒŒƒCƒ„[‚ªŒŸ’m”ÍˆÍ“à‚É‚¢‚é‚©ƒ`ƒFƒbƒN
-        if (distance < DetectRange)
-        {
-            // ƒvƒŒƒCƒ„[‚ÉŒü‚©‚Á‚Ä”òs
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒæ¤œçŸ¥ç¯„å›²å†…ã«ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
+        if(distance < DetectRange) {
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«å‘ã‹ã£ã¦é£›è¡Œ
             FlyToPlayer();
 
-            // ”òsó‘Ô‚ÌƒAƒjƒ[ƒVƒ‡ƒ“‚ğ—LŒø‚É‚·‚éiˆê“x‚¾‚¯Àsj
-            if (!m_isFlying)
-            {
-                if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
-                {
-                    m_animator.SetBool("fly", true);
+            // é£›è¡ŒçŠ¶æ…‹ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’æœ‰åŠ¹ã«ã™ã‚‹ï¼ˆä¸€åº¦ã ã‘å®Ÿè¡Œï¼‰
+            if(!m_isFlying) {
+                if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
+                    m_animator.SetBool("fly",true);
                 }
                 m_isFlying = true;
             }
         }
-        else
-        {
-            // ƒvƒŒƒCƒ„[‚ªŒŸ’m”ÍˆÍŠO‚Éo‚½ê‡
-            if (m_isFlying)
-            {
-                // ”òsƒAƒjƒ[ƒVƒ‡ƒ“‚ğ–³Œø‚É‚·‚éiˆê“x‚¾‚¯Àsj
-                if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
-                {
-                    m_animator.SetBool("fly", false);
+        else {
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒæ¤œçŸ¥ç¯„å›²å¤–ã«å‡ºãŸå ´åˆ
+            if(m_isFlying) {
+                // é£›è¡Œã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’ç„¡åŠ¹ã«ã™ã‚‹ï¼ˆä¸€åº¦ã ã‘å®Ÿè¡Œï¼‰
+                if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
+                    m_animator.SetBool("fly",false);
                 }
                 m_isFlying = false;
             }
 
-            // ‘¬“x‚ğ’â~
+            // é€Ÿåº¦ã‚’åœæ­¢
             m_rb.velocity = Vector2.zero;
         }
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒgƒƒ\ƒbƒh
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// ƒvƒŒƒCƒ„[‚ÉŒü‚©‚Á‚ÄˆÚ“®‚µ‚Ü‚·B
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«å‘ã‹ã£ã¦ç§»å‹•ã—ã¾ã™ã€‚
     /// </summary>
-    private void FlyToPlayer()
-    {
-        // ƒvƒŒƒCƒ„[‚Ö‚Ì•ûŒü‚ğ³‹K‰»‚µ‚Äæ“¾
+    private void FlyToPlayer() {
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¸ã®æ–¹å‘ã‚’æ­£è¦åŒ–ã—ã¦å–å¾—
         Vector2 direction = (m_player.position - transform.position).normalized;
-        // Rigidbody2D‚É‘¬“x‚ğİ’è‚µ‚ÄˆÚ“®
+        // Rigidbody2Dã«é€Ÿåº¦ã‚’è¨­å®šã—ã¦ç§»å‹•
         m_rb.velocity = direction * FlySpeed;
 
-        // ƒLƒƒƒ‰ƒNƒ^[‚ÌŒü‚«‚ğƒvƒŒƒCƒ„[‚É‡‚í‚¹‚Ä”½“]
-        if (direction.x > 0 && transform.localScale.x < 0)
-        {
+        // ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®å‘ãã‚’ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«åˆã‚ã›ã¦åè»¢
+        if(direction.x > 0 && transform.localScale.x < 0) {
             FlipSprite();
         }
-        else if (direction.x < 0 && transform.localScale.x > 0)
-        {
+        else if(direction.x < 0 && transform.localScale.x > 0) {
             FlipSprite();
         }
     }
 
     /// <summary>
-    /// ƒLƒƒƒ‰ƒNƒ^[‚Ìx²ƒXƒP[ƒ‹‚ğ”½“]‚³‚¹AŒü‚«‚ğ•Ï‚¦‚Ü‚·B
+    /// ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®xè»¸ã‚¹ã‚±ãƒ¼ãƒ«ã‚’åè»¢ã•ã›ã€å‘ãã‚’å¤‰ãˆã¾ã™ã€‚
     /// </summary>
-    private void FlipSprite()
-    {
+    private void FlipSprite() {
         Vector3 scale = transform.localScale;
         scale.x *= -1;
         transform.localScale = scale;

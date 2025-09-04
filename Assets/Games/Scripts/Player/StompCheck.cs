@@ -19,8 +19,8 @@ public class StompCheck : MonoBehaviour {
         m_playerMove = transform.parent.GetComponent<PlayerMove>();
 
         // 参照が取得できなかった場合、警告を出す
-        if (m_playerMove == null) {
-            Debug.LogWarning("StompCheck: 親オブジェクトにPlayerMoveコンポーネントが見つかりません。", this);
+        if(m_playerMove == null) {
+            Debug.LogWarning("StompCheck: 親オブジェクトにPlayerMoveコンポーネントが見つかりません。",this);
         }
     }
 
@@ -30,9 +30,9 @@ public class StompCheck : MonoBehaviour {
     /// <param name="other">接触した他のコライダー</param>
     private void OnTriggerEnter2D(Collider2D other) {
         // 敵のタグを持つオブジェクトと接触したかチェック
-        if (other.CompareTag("Enemy")) {
+        if(other.CompareTag("Enemy")) {
             // PlayerMoveコンポーネントが存在する場合、敵を踏みつける処理を呼び出す
-            if (m_playerMove != null) {
+            if(m_playerMove != null) {
                 m_playerMove.StompEnemy(other.gameObject);
             }
         }

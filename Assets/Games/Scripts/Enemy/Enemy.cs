@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// 敵キャラクターの基本的な挙動を管理
 /// </summary>
-public class Enemy:MonoBehaviour {
+public class Enemy : MonoBehaviour {
     protected Rigidbody2D m_rb;
     protected Animator m_animator;
     protected Collider2D m_collider;

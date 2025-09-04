@@ -3,36 +3,35 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 /// <summary>
-/// ƒXƒCƒbƒ`‚É˜A“®‚µ‚ÄoŒ»EÁ–Å‚·‚éƒMƒ~ƒbƒN•t‚«‚Ì‘«ê‚ğŠÇ—‚µ‚Ü‚·B
-/// ƒ^ƒCƒ€ƒŠƒ~ƒbƒg‚âBGM‚ÌØ‚è‘Ö‚¦‹@”\‚ğŠÜ‚İ‚Ü‚·B
+/// ã‚¹ã‚¤ãƒƒãƒã«é€£å‹•ã—ã¦å‡ºç¾ãƒ»æ¶ˆæ»…ã™ã‚‹ã‚®ãƒŸãƒƒã‚¯ä»˜ãã®è¶³å ´ã‚’ç®¡ç†ã—ã¾ã™ã€‚
+/// ã‚¿ã‚¤ãƒ ãƒªãƒŸãƒƒãƒˆã‚„BGMã®åˆ‡ã‚Šæ›¿ãˆæ©Ÿèƒ½ã‚’å«ã¿ã¾ã™ã€‚
 /// </summary>
-public class TilemapSwitchPlatform : MonoBehaviour
-{
+public class TilemapSwitchPlatform : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
-    // ƒCƒ“ƒXƒyƒNƒ^[‚Åİ’è‚·‚éƒpƒ‰ƒ[ƒ^[
+    // ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§è¨­å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
     // ----------------------------------------------------------------------------------------------------
-    [Header("ƒvƒ‰ƒbƒgƒtƒH[ƒ€İ’è")]
-    [Tooltip("‚±‚Ìƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ğ§Œä‚·‚éƒXƒCƒbƒ`‚ÌID")]
+    [Header("ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ è¨­å®š")]
+    [Tooltip("ã“ã®ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã‚’åˆ¶å¾¡ã™ã‚‹ã‚¹ã‚¤ãƒƒãƒã®ID")]
     public int switchId;
-    [Tooltip("ƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ªŠ®‘S‚ÉŒ»‚ê‚éA‚Ü‚½‚ÍÁ‚¦‚é‚Ü‚Å‚ÌŠÔ")]
+    [Tooltip("ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ãŒå®Œå…¨ã«ç¾ã‚Œã‚‹ã€ã¾ãŸã¯æ¶ˆãˆã‚‹ã¾ã§ã®æ™‚é–“")]
     [SerializeField] private float fadeTime = 1.0f;
-    [Tooltip("ƒQ[ƒ€ŠJn‚Ìƒvƒ‰ƒbƒgƒtƒH[ƒ€‚Ìó‘Ô")]
+    [Tooltip("ã‚²ãƒ¼ãƒ é–‹å§‹æ™‚ã®ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã®çŠ¶æ…‹")]
     [SerializeField] private bool startsActive = false;
 
-    [Header("ƒ^ƒCƒ€ƒŠƒ~ƒbƒgİ’è")]
-    [Tooltip("true‚Ìê‡Aƒvƒ‰ƒbƒgƒtƒH[ƒ€‚Íˆê’èŠÔŒo‰ßŒã‚É©“®“I‚ÉÁ–Å‚µ‚Ü‚·")]
+    [Header("ã‚¿ã‚¤ãƒ ãƒªãƒŸãƒƒãƒˆè¨­å®š")]
+    [Tooltip("trueã®å ´åˆã€ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã¯ä¸€å®šæ™‚é–“çµŒéå¾Œã«è‡ªå‹•çš„ã«æ¶ˆæ»…ã—ã¾ã™")]
     [SerializeField] private bool hasTimeLimit = true;
-    [Tooltip("ƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ª©“®‚ÅÁ–Å‚·‚é‚Ü‚Å‚ÌŠÔ")]
+    [Tooltip("ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ãŒè‡ªå‹•ã§æ¶ˆæ»…ã™ã‚‹ã¾ã§ã®æ™‚é–“")]
     [SerializeField] private float displayDuration = 5.0f;
 
-    [Header("ƒI[ƒfƒBƒIİ’è")]
-    [Tooltip("ƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ªƒAƒNƒeƒBƒu‚È‚Æ‚«‚ÉÄ¶‚·‚éBGM")]
+    [Header("ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªè¨­å®š")]
+    [Tooltip("ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ãŒã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãªã¨ãã«å†ç”Ÿã™ã‚‹BGM")]
     [SerializeField] private AudioClip platformBGM;
-    [Tooltip("ƒV[ƒ“‚Ì’ÊíBGM")]
+    [Tooltip("ã‚·ãƒ¼ãƒ³ã®é€šå¸¸BGM")]
     [SerializeField] private AudioClip normalBGM;
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒg•Ï”
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆå¤‰æ•°
     // ----------------------------------------------------------------------------------------------------
     private Tilemap tilemap;
     private TilemapRenderer tilemapRenderer;
@@ -44,23 +43,21 @@ public class TilemapSwitchPlatform : MonoBehaviour
     private Coroutine autoDisappearCoroutine;
 
     // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviour‚Ìƒ‰ƒCƒtƒTƒCƒNƒ‹ƒƒ\ƒbƒh
+    // MonoBehaviourã®ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
-    private void Start()
-    {
-        // ƒRƒ“ƒ|[ƒlƒ“ƒg‚ÌQÆ‚ğæ“¾
+    private void Start() {
+        // ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®å‚ç…§ã‚’å–å¾—
         tilemap = GetComponent<Tilemap>();
         tilemapRenderer = GetComponent<TilemapRenderer>();
         tilemapCollider = GetComponent<TilemapCollider2D>();
 
-        // •K{ƒRƒ“ƒ|[ƒlƒ“ƒg‚Ì‘¶İƒ`ƒFƒbƒN
-        if (tilemap == null || tilemapRenderer == null || tilemapCollider == null)
-        {
-            Debug.LogError("‚±‚ÌƒQ[ƒ€ƒIƒuƒWƒFƒNƒg‚É‚ÍA•K{ƒRƒ“ƒ|[ƒlƒ“ƒg(Tilemap, TilemapRenderer, ‚Ü‚½‚ÍTilemapCollider2D)‚ªƒAƒ^ƒbƒ`‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
+        // å¿…é ˆã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®å­˜åœ¨ãƒã‚§ãƒƒã‚¯
+        if(tilemap == null || tilemapRenderer == null || tilemapCollider == null) {
+            Debug.LogError("ã“ã®ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ã¯ã€å¿…é ˆã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ(Tilemap, TilemapRenderer, ã¾ãŸã¯TilemapCollider2D)ãŒã‚¢ã‚¿ãƒƒãƒã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚",this);
             return;
         }
 
-        // ‰ŠúƒJƒ‰[‚Æó‘Ô‚ğİ’è
+        // åˆæœŸã‚«ãƒ©ãƒ¼ã¨çŠ¶æ…‹ã‚’è¨­å®š
         initialColor = tilemap.color;
         isActive = startsActive;
 
@@ -68,64 +65,55 @@ public class TilemapSwitchPlatform : MonoBehaviour
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒpƒuƒŠƒbƒNƒƒ\ƒbƒh
+    // ãƒ‘ãƒ–ãƒªãƒƒã‚¯ãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// ƒvƒ‰ƒbƒgƒtƒH[ƒ€‚Ìó‘Ô‚ğØ‚è‘Ö‚¦A‚»‚ê‚É”º‚¤BGM‚Ì•ÏX‚às‚¢‚Ü‚·B
+    /// ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’åˆ‡ã‚Šæ›¿ãˆã€ãã‚Œã«ä¼´ã†BGMã®å¤‰æ›´ã‚‚è¡Œã„ã¾ã™ã€‚
     /// </summary>
-    public void ToggleVisibilityWithBGM()
-    {
-        if (isAnimating) return;
+    public void ToggleVisibilityWithBGM() {
+        if(isAnimating) return;
 
-        if (isActive)
-        {
+        if(isActive) {
             DeactivatePlatformAndRestoreBGM();
         }
-        else
-        {
+        else {
             ActivatePlatformAndPlayBGM();
         }
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒgƒƒ\ƒbƒh
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// ƒvƒ‰ƒbƒgƒtƒH[ƒ€‚Ìó‘ÔiƒAƒNƒeƒBƒu/”ñƒAƒNƒeƒBƒuj‚ğ‘¦À‚ÉXV‚µ‚Ü‚·B
+    /// ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã®çŠ¶æ…‹ï¼ˆã‚¢ã‚¯ãƒ†ã‚£ãƒ–/éã‚¢ã‚¯ãƒ†ã‚£ãƒ–ï¼‰ã‚’å³åº§ã«æ›´æ–°ã—ã¾ã™ã€‚
     /// </summary>
-    /// <param name="activeState">true‚È‚çƒAƒNƒeƒBƒuAfalse‚È‚ç”ñƒAƒNƒeƒBƒu</param>
-    private void UpdatePlatformState(bool activeState)
-    {
-        if (activeState)
-        {
+    /// <param name="activeState">trueãªã‚‰ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã€falseãªã‚‰éã‚¢ã‚¯ãƒ†ã‚£ãƒ–</param>
+    private void UpdatePlatformState(bool activeState) {
+        if(activeState) {
             tilemap.color = initialColor;
             tilemapRenderer.enabled = true;
             tilemapCollider.enabled = true;
         }
-        else
-        {
-            tilemap.color = new Color(initialColor.r, initialColor.g, initialColor.b, 0);
+        else {
+            tilemap.color = new Color(initialColor.r,initialColor.g,initialColor.b,0);
             tilemapRenderer.enabled = false;
             tilemapCollider.enabled = false;
         }
     }
 
     /// <summary>
-    /// ƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ğƒAƒNƒeƒBƒu‰»‚µAê—pBGM‚ğÄ¶‚µ‚Ü‚·B
+    /// ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã‚’ã‚¢ã‚¯ãƒ†ã‚£ãƒ–åŒ–ã—ã€å°‚ç”¨BGMã‚’å†ç”Ÿã—ã¾ã™ã€‚
     /// </summary>
-    private void ActivatePlatformAndPlayBGM()
-    {
-        if (autoDisappearCoroutine != null)
-        {
+    private void ActivatePlatformAndPlayBGM() {
+        if(autoDisappearCoroutine != null) {
             StopCoroutine(autoDisappearCoroutine);
             autoDisappearCoroutine = null;
         }
 
-        // ê—pBGM‚ğÄ¶
-        // GameManager.instance ‚ğ GameManager.Instance ‚ÉC³
-        if (GameManager.Instance != null && platformBGM != null)
-        {
-            // GameManager.instance.PlayBGM(platformBGM) ‚ğ GameManager.Instance.PlayBGM(platformBGM) ‚ÉC³
+        // å°‚ç”¨BGMã‚’å†ç”Ÿ
+        // GameManager.instance ã‚’ GameManager.Instance ã«ä¿®æ­£
+        if(GameManager.Instance != null && platformBGM != null) {
+            // GameManager.instance.PlayBGM(platformBGM) ã‚’ GameManager.Instance.PlayBGM(platformBGM) ã«ä¿®æ­£
             GameManager.Instance.PlayBGM(platformBGM);
         }
 
@@ -133,21 +121,18 @@ public class TilemapSwitchPlatform : MonoBehaviour
     }
 
     /// <summary>
-    /// ƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ğ”ñƒAƒNƒeƒBƒu‰»‚µA’Êí‚ÌBGM‚É–ß‚µ‚Ü‚·B
+    /// ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã‚’éã‚¢ã‚¯ãƒ†ã‚£ãƒ–åŒ–ã—ã€é€šå¸¸ã®BGMã«æˆ»ã—ã¾ã™ã€‚
     /// </summary>
-    private void DeactivatePlatformAndRestoreBGM()
-    {
-        if (autoDisappearCoroutine != null)
-        {
+    private void DeactivatePlatformAndRestoreBGM() {
+        if(autoDisappearCoroutine != null) {
             StopCoroutine(autoDisappearCoroutine);
             autoDisappearCoroutine = null;
         }
 
-        // Œ³‚ÌBGM‚É–ß‚·
-        // GameManager.instance ‚ğ GameManager.Instance ‚ÉC³
-        if (GameManager.Instance != null && normalBGM != null)
-        {
-            // GameManager.instance.PlayBGM(normalBGM) ‚ğ GameManager.Instance.PlayBGM(normalBGM) ‚ÉC³
+        // å…ƒã®BGMã«æˆ»ã™
+        // GameManager.instance ã‚’ GameManager.Instance ã«ä¿®æ­£
+        if(GameManager.Instance != null && normalBGM != null) {
+            // GameManager.instance.PlayBGM(normalBGM) ã‚’ GameManager.Instance.PlayBGM(normalBGM) ã«ä¿®æ­£
             GameManager.Instance.PlayBGM(normalBGM);
         }
 
@@ -155,10 +140,9 @@ public class TilemapSwitchPlatform : MonoBehaviour
     }
 
     /// <summary>
-    /// ‘«ê‚ğƒtƒF[ƒhƒCƒ“‚³‚¹‚éƒRƒ‹[ƒ`ƒ“
+    /// è¶³å ´ã‚’ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ã•ã›ã‚‹ã‚³ãƒ«ãƒ¼ãƒãƒ³
     /// </summary>
-    private IEnumerator FadeIn()
-    {
+    private IEnumerator FadeIn() {
         isAnimating = true;
         isActive = true;
         float elapsedTime = 0f;
@@ -169,40 +153,36 @@ public class TilemapSwitchPlatform : MonoBehaviour
         Color startColor = tilemap.color;
         Color targetColor = initialColor;
 
-        while (elapsedTime < fadeTime)
-        {
+        while(elapsedTime < fadeTime) {
             elapsedTime += Time.deltaTime;
-            float alpha = Mathf.Lerp(startColor.a, targetColor.a, elapsedTime / fadeTime);
-            tilemap.color = new Color(targetColor.r, targetColor.g, targetColor.b, alpha);
+            float alpha = Mathf.Lerp(startColor.a,targetColor.a,elapsedTime / fadeTime);
+            tilemap.color = new Color(targetColor.r,targetColor.g,targetColor.b,alpha);
             yield return null;
         }
 
         tilemap.color = initialColor;
         isAnimating = false;
 
-        if (hasTimeLimit)
-        {
+        if(hasTimeLimit) {
             autoDisappearCoroutine = StartCoroutine(AutoDisappearCountdown());
         }
     }
 
     /// <summary>
-    /// ‘«ê‚ğƒtƒF[ƒhƒAƒEƒg‚³‚¹‚éƒRƒ‹[ƒ`ƒ“
+    /// è¶³å ´ã‚’ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆã•ã›ã‚‹ã‚³ãƒ«ãƒ¼ãƒãƒ³
     /// </summary>
-    private IEnumerator FadeOut()
-    {
+    private IEnumerator FadeOut() {
         isAnimating = true;
         isActive = false;
         float elapsedTime = 0f;
 
         Color startColor = tilemap.color;
-        Color targetColor = new Color(initialColor.r, initialColor.g, initialColor.b, 0);
+        Color targetColor = new Color(initialColor.r,initialColor.g,initialColor.b,0);
 
-        while (elapsedTime < fadeTime)
-        {
+        while(elapsedTime < fadeTime) {
             elapsedTime += Time.deltaTime;
-            float alpha = Mathf.Lerp(startColor.a, targetColor.a, elapsedTime / fadeTime);
-            tilemap.color = new Color(targetColor.r, targetColor.g, targetColor.b, alpha);
+            float alpha = Mathf.Lerp(startColor.a,targetColor.a,elapsedTime / fadeTime);
+            tilemap.color = new Color(targetColor.r,targetColor.g,targetColor.b,alpha);
             yield return null;
         }
 
@@ -214,15 +194,13 @@ public class TilemapSwitchPlatform : MonoBehaviour
     }
 
     /// <summary>
-    /// ©“®‚ÅÁ‚¦‚é‚½‚ß‚ÌƒJƒEƒ“ƒgƒ_ƒEƒ“ƒRƒ‹[ƒ`ƒ“
+    /// è‡ªå‹•ã§æ¶ˆãˆã‚‹ãŸã‚ã®ã‚«ã‚¦ãƒ³ãƒˆãƒ€ã‚¦ãƒ³ã‚³ãƒ«ãƒ¼ãƒãƒ³
     /// </summary>
-    private IEnumerator AutoDisappearCountdown()
-    {
+    private IEnumerator AutoDisappearCountdown() {
         yield return new WaitForSeconds(displayDuration);
 
-        // ŠÔØ‚ê‚Éƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ªƒAƒNƒeƒBƒu‚Èê‡‚Ì‚İˆ—‚ğÀs
-        if (isActive)
-        {
+        // æ™‚é–“åˆ‡ã‚Œæ™‚ã«ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ãŒã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãªå ´åˆã®ã¿å‡¦ç†ã‚’å®Ÿè¡Œ
+        if(isActive) {
             DeactivatePlatformAndRestoreBGM();
         }
         autoDisappearCoroutine = null;

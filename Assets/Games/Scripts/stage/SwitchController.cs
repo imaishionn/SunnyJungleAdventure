@@ -2,8 +2,7 @@ using UnityEngine;
 
 // This script controls a toggle switch's functionality and visual state.
 // It detects player interaction and triggers a method on the target platform.
-public class SwitchController : MonoBehaviour
-{
+public class SwitchController : MonoBehaviour {
     [Header("Switch Settings")]
     [Tooltip("The ID of this switch. It should match the ID on the target platform.")]
     public int switchId = 1;
@@ -18,85 +17,70 @@ public class SwitchController : MonoBehaviour
     [Tooltip("The sprite for the 'down' state of the crank.")]
     [SerializeField] private Sprite crankDownSprite;
 
-    [Header("Audio")] // š’Ç‰Á: ƒI[ƒfƒBƒIİ’è
+    [Header("Audio")] // â˜…è¿½åŠ : ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªè¨­å®š
     [Tooltip("The sound effect to play when the switch is toggled.")]
     [SerializeField] private AudioClip switchSoundEffect;
-    private AudioSource audioSource; // AudioSourceƒRƒ“ƒ|[ƒlƒ“ƒg‚Ö‚ÌQÆ
+    private AudioSource audioSource; // AudioSourceã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã¸ã®å‚ç…§
 
     // Current state of the switch (true if 'up', false if 'down')
     private bool isUpState;
 
-    void Start()
-    {
+    void Start() {
         // Get SpriteRenderer if not assigned in Inspector
-        if (spriteRenderer == null)
-        {
+        if(spriteRenderer == null) {
             spriteRenderer = GetComponent<SpriteRenderer>();
         }
 
         // Get or add AudioSource component
         audioSource = GetComponent<AudioSource>();
-        if (audioSource == null)
-        {
+        if(audioSource == null) {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
 
         // Initialize the switch state based on its initial sprite
-        if (spriteRenderer != null)
-        {
-            if (spriteRenderer.sprite == crankUpSprite)
-            {
+        if(spriteRenderer != null) {
+            if(spriteRenderer.sprite == crankUpSprite) {
                 isUpState = true;
             }
-            else if (spriteRenderer.sprite == crankDownSprite)
-            {
+            else if(spriteRenderer.sprite == crankDownSprite) {
                 isUpState = false;
             }
-            else
-            {
+            else {
                 isUpState = false;
                 spriteRenderer.sprite = crankDownSprite;
-                UnityEngine.Debug.LogWarning("SwitchController: Initial sprite is not recognized as crankUpSprite or crankDownSprite. Defaulting to crankDownSprite.", this);
+                UnityEngine.Debug.LogWarning("SwitchController: Initial sprite is not recognized as crankUpSprite or crankDownSprite. Defaulting to crankDownSprite.",this);
             }
         }
-        else
-        {
-            UnityEngine.Debug.LogError("SwitchController: SpriteRenderer is not assigned or found.", this);
+        else {
+            UnityEngine.Debug.LogError("SwitchController: SpriteRenderer is not assigned or found.",this);
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
+    private void OnTriggerEnter2D(Collider2D other) {
+        if(other.CompareTag("Player")) {
             ToggleSwitchState();
         }
     }
 
-    private void ToggleSwitchState()
-    {
+    private void ToggleSwitchState() {
         isUpState = !isUpState;
 
-        if (spriteRenderer != null)
-        {
+        if(spriteRenderer != null) {
             spriteRenderer.sprite = isUpState ? crankUpSprite : crankDownSprite;
         }
 
         // Play the sound effect
-        if (audioSource != null && switchSoundEffect != null)
-        {
+        if(audioSource != null && switchSoundEffect != null) {
             audioSource.PlayOneShot(switchSoundEffect);
         }
 
         // Trigger the corresponding action on the target platform
-        if (targetPlatform != null)
-        {
-            // š•ÏX: BGM‚ğØ‚è‘Ö‚¦‚éƒƒ\ƒbƒh‚ğŒÄ‚Ño‚·
+        if(targetPlatform != null) {
+            // â˜…å¤‰æ›´: BGMã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹ãƒ¡ã‚½ãƒƒãƒ‰ã‚’å‘¼ã³å‡ºã™
             targetPlatform.ToggleVisibilityWithBGM();
         }
-        else
-        {
-            UnityEngine.Debug.LogWarning("SwitchController: Target Platform not assigned for switch with ID: " + switchId, this);
+        else {
+            UnityEngine.Debug.LogWarning("SwitchController: Target Platform not assigned for switch with ID: " + switchId,this);
         }
     }
 }

@@ -1,68 +1,59 @@
 using UnityEngine;
 
 /// <summary>
-/// ƒvƒŒƒCƒ„[‚ªG‚ê‚é‚ÆƒXƒRƒA‚É‰ÁZ‚³‚ê‚é•óÎ‚Ì‹““®‚ğ§Œä‚µ‚Ü‚·B
+/// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒè§¦ã‚Œã‚‹ã¨ã‚¹ã‚³ã‚¢ã«åŠ ç®—ã•ã‚Œã‚‹å®çŸ³ã®æŒ™å‹•ã‚’åˆ¶å¾¡ã—ã¾ã™ã€‚
 /// </summary>
-public class Gem : MonoBehaviour
-{
-    [Header("ƒXƒRƒAİ’è")]
+public class Gem : MonoBehaviour {
+    [Header("ã‚¹ã‚³ã‚¢è¨­å®š")]
     [SerializeField] private int scoreValue = 1;
 
-    // Šù‚É‰ñû‚³‚ê‚½‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
+    // æ—¢ã«å›åã•ã‚ŒãŸã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
     private bool m_isCollected = false;
 
-    // ƒVƒ“ƒOƒ‹ƒgƒ“‰»‚³‚ê‚½ItemSoundPlayer‚Ö‚ÌQÆ‚ğƒLƒƒƒbƒVƒ…
+    // ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³åŒ–ã•ã‚ŒãŸItemSoundPlayerã¸ã®å‚ç…§ã‚’ã‚­ãƒ£ãƒƒã‚·ãƒ¥
     private static ItemSoundPlayer s_itemSoundPlayer;
 
-    private void Awake()
-    {
-        // GameManager‚Æ“¯—l‚ÉAItemSoundPlayer‚ªƒVƒ“ƒOƒ‹ƒgƒ“‚Å‚ ‚é‚±‚Æ‚ğ‘O’ñ‚Æ‚·‚é
-        if (s_itemSoundPlayer == null)
-        {
+    private void Awake() {
+        // GameManagerã¨åŒæ§˜ã«ã€ItemSoundPlayerãŒã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã§ã‚ã‚‹ã“ã¨ã‚’å‰æã¨ã™ã‚‹
+        if(s_itemSoundPlayer == null) {
             s_itemSoundPlayer = FindObjectOfType<ItemSoundPlayer>();
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        // Šù‚É‰ñûÏ‚İ‚Ìê‡‚Í‰½‚à‚µ‚È‚¢
-        if (m_isCollected) return;
+    private void OnTriggerEnter2D(Collider2D other) {
+        // æ—¢ã«å›åæ¸ˆã¿ã®å ´åˆã¯ä½•ã‚‚ã—ãªã„
+        if(m_isCollected) return;
 
-        // ƒvƒŒƒCƒ„[‚ÉG‚ê‚½‚©ƒ`ƒFƒbƒN
-        if (other.CompareTag("Player"))
-        {
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«è§¦ã‚ŒãŸã‹ãƒã‚§ãƒƒã‚¯
+        if(other.CompareTag("Player")) {
             m_isCollected = true;
 
-            // GameManager‚ÉƒXƒRƒA‚ğ‰ÁZ
-            // GameManager.instance ‚ğ GameManager.Instance ‚ÉC³
-            if (GameManager.Instance != null)
-            {
-                // GameManager.instance.AddGem(scoreValue) ‚ğ GameManager.Instance.AddGem(scoreValue) ‚ÉC³
+            // GameManagerã«ã‚¹ã‚³ã‚¢ã‚’åŠ ç®—
+            // GameManager.instance ã‚’ GameManager.Instance ã«ä¿®æ­£
+            if(GameManager.Instance != null) {
+                // GameManager.instance.AddGem(scoreValue) ã‚’ GameManager.Instance.AddGem(scoreValue) ã«ä¿®æ­£
                 GameManager.Instance.AddGem(scoreValue);
             }
 
-            // Œø‰Ê‰¹‚ğÄ¶
-            if (s_itemSoundPlayer != null)
-            {
+            // åŠ¹æœéŸ³ã‚’å†ç”Ÿ
+            if(s_itemSoundPlayer != null) {
                 s_itemSoundPlayer.PlayGemSound();
             }
 
-            // ƒIƒuƒWƒFƒNƒg‚ÌŒ©‚½–Ú‚ğ‘¦À‚É”ñ•\¦‚É‚·‚é
-            if (TryGetComponent<SpriteRenderer>(out SpriteRenderer sr))
-            {
+            // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®è¦‹ãŸç›®ã‚’å³åº§ã«éè¡¨ç¤ºã«ã™ã‚‹
+            if(TryGetComponent<SpriteRenderer>(out SpriteRenderer sr)) {
                 sr.enabled = false;
             }
 
-            // ƒRƒ‰ƒCƒ_[‚ğ–³Œø‰»
-            if (TryGetComponent<Collider2D>(out Collider2D col))
-            {
+            // ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã‚’ç„¡åŠ¹åŒ–
+            if(TryGetComponent<Collider2D>(out Collider2D col)) {
                 col.enabled = false;
             }
 
-            // Œø‰Ê‰¹‚ÌÄ¶‚ªŠ®—¹‚µ‚½Œã‚ÉƒIƒuƒWƒFƒNƒg‚ğ”jŠü
-            // ‚±‚±‚Å‚ÍƒI[ƒfƒBƒIƒNƒŠƒbƒv‚Ì’·‚³‚ğæ“¾‚µ‚Ä‘Ò‹@‚·‚é‚Ì‚ª—‘z“I
-            // —á‚Æ‚µ‚Ä1•bŒã‚É”jŠü‚·‚é
-            Destroy(gameObject, 1.0f);
+            // åŠ¹æœéŸ³ã®å†ç”ŸãŒå®Œäº†ã—ãŸå¾Œã«ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç ´æ£„
+            // ã“ã“ã§ã¯ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã‚¯ãƒªãƒƒãƒ—ã®é•·ã•ã‚’å–å¾—ã—ã¦å¾…æ©Ÿã™ã‚‹ã®ãŒç†æƒ³çš„
+            // ä¾‹ã¨ã—ã¦1ç§’å¾Œã«ç ´æ£„ã™ã‚‹
+            Destroy(gameObject,1.0f);
         }
     }
 }

@@ -41,12 +41,12 @@ public class Bomb : MonoBehaviour {
         bombCollider = GetComponent<CircleCollider2D>();
 
         // コンポーネントが取得できなかった場合の警告
-        if (rb == null) Debug.LogWarning("Bomb: Rigidbody2Dがアタッチされていません。", this);
-        if (anim == null) Debug.LogWarning("Bomb: Animatorがアタッチされていません。", this);
-        if (bombCollider == null) Debug.LogWarning("Bomb: CircleCollider2Dがアタッチされていません。", this);
+        if(rb == null) Debug.LogWarning("Bomb: Rigidbody2Dがアタッチされていません。",this);
+        if(anim == null) Debug.LogWarning("Bomb: Animatorがアタッチされていません。",this);
+        if(bombCollider == null) Debug.LogWarning("Bomb: CircleCollider2Dがアタッチされていません。",this);
 
         // コライダーの初期設定
-        if (bombCollider != null) {
+        if(bombCollider != null) {
             bombCollider.radius = startRadius;
             bombCollider.isTrigger = true;
         }
@@ -57,8 +57,8 @@ public class Bomb : MonoBehaviour {
     /// </summary>
     /// <param name="direction">発射方向</param>
     /// <param name="speed">発射速度</param>
-    public void Launch(Vector2 direction, float speed) {
-        if (rb != null) {
+    public void Launch(Vector2 direction,float speed) {
+        if(rb != null) {
             rb.velocity = direction.normalized * speed;
         }
     }
@@ -68,16 +68,16 @@ public class Bomb : MonoBehaviour {
     /// </summary>
     private void OnTriggerEnter2D(Collider2D other) {
         // 既に爆発済みなら処理をスキップ
-        if (hasExploded) return;
+        if(hasExploded) return;
 
         // 地面またはプレイヤーに触れたら爆発処理を開始
-        if (other.CompareTag("Ground") || other.CompareTag(playerTag)) {
+        if(other.CompareTag("Ground") || other.CompareTag(playerTag)) {
             Explode();
 
             // プレイヤーに当たった場合の処理（爆発開始時のみ）
-            if (other.CompareTag(playerTag)) {
+            if(other.CompareTag(playerTag)) {
                 PlayerMove playerMove = other.GetComponent<PlayerMove>();
-                if (playerMove != null && !playerMove.IsDead) {
+                if(playerMove != null && !playerMove.IsDead) {
                     playerMove.Die();
                 }
             }
@@ -89,10 +89,10 @@ public class Bomb : MonoBehaviour {
     /// </summary>
     private void OnTriggerStay2D(Collider2D other) {
         // 爆発処理中（コライダーが拡大中）にプレイヤーが範囲内にいるかチェック
-        if (hasExploded && other.CompareTag(playerTag)) {
+        if(hasExploded && other.CompareTag(playerTag)) {
             // プレイヤーのDie()メソッドを呼び出す
             PlayerMove playerMove = other.GetComponent<PlayerMove>();
-            if (playerMove != null && !playerMove.IsDead) {
+            if(playerMove != null && !playerMove.IsDead) {
                 playerMove.Die();
             }
         }
@@ -108,12 +108,12 @@ public class Bomb : MonoBehaviour {
         hasExploded = true; // 爆発フラグを立てて、二重に爆発しないようにする
 
         // ボムの移動を停止
-        if (rb != null) {
+        if(rb != null) {
             rb.velocity = Vector2.zero;
         }
 
         // 爆発アニメーションを再生
-        if (anim != null) {
+        if(anim != null) {
             anim.SetTrigger("Explode");
         }
 
@@ -126,13 +126,13 @@ public class Bomb : MonoBehaviour {
     /// </summary>
     private IEnumerator ExplosionRoutine() {
         float timer = 0f;
-        while (timer < explosionDuration) {
+        while(timer < explosionDuration) {
             timer += Time.deltaTime;
             float t = timer / explosionDuration;
 
-            if (bombCollider != null) {
+            if(bombCollider != null) {
                 // 爆発に合わせてコライダーの半径をLerpで滑らかに広げる
-                bombCollider.radius = Mathf.Lerp(startRadius, endRadius, t);
+                bombCollider.radius = Mathf.Lerp(startRadius,endRadius,t);
             }
             yield return null;
         }

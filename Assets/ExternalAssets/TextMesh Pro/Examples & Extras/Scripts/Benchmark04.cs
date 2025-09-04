@@ -1,12 +1,9 @@
 using UnityEngine;
-using System.Collections;
 
 
-namespace TMPro.Examples
-{
-    
-    public class Benchmark04 : MonoBehaviour
-    {
+namespace TMPro.Examples {
+
+    public class Benchmark04 : MonoBehaviour {
 
         public int SpawnType = 0;
 
@@ -19,31 +16,28 @@ namespace TMPro.Examples
         //public Material material;
 
 
-        void Start()
-        {
+        void Start() {
             m_Transform = transform;
 
             float lineHeight = 0;
             float orthoSize = Camera.main.orthographicSize = Screen.height / 2;
             float ratio = (float)Screen.width / Screen.height;
 
-            for (int i = MinPointSize; i <= MaxPointSize; i += Steps)
-            {
-                if (SpawnType == 0)
-                {
+            for(int i = MinPointSize;i <= MaxPointSize;i += Steps) {
+                if(SpawnType == 0) {
                     // TextMesh Pro Implementation
                     GameObject go = new GameObject("Text - " + i + " Pts");
 
-                    if (lineHeight > orthoSize * 2) return;
+                    if(lineHeight > orthoSize * 2) return;
 
-                    go.transform.position = m_Transform.position + new Vector3(ratio * -orthoSize * 0.975f, orthoSize * 0.975f - lineHeight, 0);
+                    go.transform.position = m_Transform.position + new Vector3(ratio * -orthoSize * 0.975f,orthoSize * 0.975f - lineHeight,0);
 
                     TextMeshPro textMeshPro = go.AddComponent<TextMeshPro>();
 
                     //textMeshPro.fontSharedMaterial = material;
                     //textMeshPro.font = Resources.Load("Fonts & Materials/LiberationSans SDF", typeof(TextMeshProFont)) as TextMeshProFont;
                     //textMeshPro.anchor = AnchorPositions.Left;
-                    textMeshPro.rectTransform.pivot = new Vector2(0, 0.5f);
+                    textMeshPro.rectTransform.pivot = new Vector2(0,0.5f);
 
                     textMeshPro.enableWordWrapping = false;
                     textMeshPro.extraPadding = true;
@@ -51,12 +45,11 @@ namespace TMPro.Examples
                     textMeshPro.fontSize = i;
 
                     textMeshPro.text = i + " pts - Lorem ipsum dolor sit...";
-                    textMeshPro.color = new Color32(255, 255, 255, 255);
+                    textMeshPro.color = new Color32(255,255,255,255);
 
                     lineHeight += i;
                 }
-                else
-                {
+                else {
                     // TextMesh Implementation
                     // Causes crashes since atlas needed exceeds 4096 X 4096
                     /*

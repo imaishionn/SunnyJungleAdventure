@@ -3,84 +3,71 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// ƒ^ƒCƒgƒ‹ƒV[ƒ“‚ÌUI‚ÆƒCƒxƒ“ƒg‚ğŠÇ—‚·‚éƒXƒNƒŠƒvƒg‚Å‚·B
-/// ƒ{ƒ^ƒ“ƒNƒŠƒbƒN‚É‚æ‚éƒV[ƒ“‘JˆÚ‚ğ§Œä‚µ‚Ü‚·B
+/// ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³ã®UIã¨ã‚¤ãƒ™ãƒ³ãƒˆã‚’ç®¡ç†ã™ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
+/// ãƒœã‚¿ãƒ³ã‚¯ãƒªãƒƒã‚¯ã«ã‚ˆã‚‹ã‚·ãƒ¼ãƒ³é·ç§»ã‚’åˆ¶å¾¡ã—ã¾ã™ã€‚
 /// </summary>
-public class TitleSceneManager : MonoBehaviour
-{
+public class TitleSceneManager : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
-    // ƒCƒ“ƒXƒyƒNƒ^[‚Åİ’è‚·‚éƒpƒ‰ƒ[ƒ^[
+    // ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§è¨­å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
     // ----------------------------------------------------------------------------------------------------
-    [Header("UIİ’è")]
-    [Tooltip("ƒQ[ƒ€ŠJnƒ{ƒ^ƒ“")]
+    [Header("UIè¨­å®š")]
+    [Tooltip("ã‚²ãƒ¼ãƒ é–‹å§‹ãƒœã‚¿ãƒ³")]
     [SerializeField] private Button startButton;
-    [Tooltip("ƒ^ƒCƒgƒ‹ƒV[ƒ“‚ÌƒƒCƒ“Canvas")]
+    [Tooltip("ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³ã®ãƒ¡ã‚¤ãƒ³Canvas")]
     [SerializeField] private GameObject titleCanvas;
 
     // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviour‚Ìƒ‰ƒCƒtƒTƒCƒNƒ‹ƒƒ\ƒbƒh
+    // MonoBehaviourã®ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
-    private void Start()
-    {
-        // Canvas‚Ì‘¶İƒ`ƒFƒbƒN
-        if (titleCanvas != null)
-        {
-            // Canvas‚ğƒAƒNƒeƒBƒu‚É‚·‚éBƒtƒF[ƒhƒCƒ“‚ÍGameManager‚ª’S“–B
+    private void Start() {
+        // Canvasã®å­˜åœ¨ãƒã‚§ãƒƒã‚¯
+        if(titleCanvas != null) {
+            // Canvasã‚’ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã«ã™ã‚‹ã€‚ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ã¯GameManagerãŒæ‹…å½“ã€‚
             titleCanvas.SetActive(true);
         }
-        else
-        {
-            Debug.LogError("TitleSceneManager: Title Canvas ‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñI", this);
+        else {
+            Debug.LogError("TitleSceneManager: Title Canvas ãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ï¼",this);
         }
 
-        // ƒXƒ^[ƒgƒ{ƒ^ƒ“‚Ì‘¶İƒ`ƒFƒbƒN‚ÆƒŠƒXƒi[‚Ì“o˜^
-        if (startButton != null)
-        {
-            // ƒ{ƒ^ƒ“‚ªƒNƒŠƒbƒN‚³‚ê‚½‚Æ‚«‚ÌƒCƒxƒ“ƒg‚ğ“o˜^
+        // ã‚¹ã‚¿ãƒ¼ãƒˆãƒœã‚¿ãƒ³ã®å­˜åœ¨ãƒã‚§ãƒƒã‚¯ã¨ãƒªã‚¹ãƒŠãƒ¼ã®ç™»éŒ²
+        if(startButton != null) {
+            // ãƒœã‚¿ãƒ³ãŒã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸã¨ãã®ã‚¤ãƒ™ãƒ³ãƒˆã‚’ç™»éŒ²
             startButton.onClick.AddListener(OnStartButtonClicked);
 
-            // ƒQ[ƒ€ƒpƒbƒh‚âƒL[ƒ{[ƒh‘€ì‚Ì‚½‚ß‚ÉA‰Šú‘I‘ğ‚ğStartƒ{ƒ^ƒ“‚Éİ’è
-            if (EventSystem.current != null)
-            {
+            // ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰ã‚„ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰æ“ä½œã®ãŸã‚ã«ã€åˆæœŸé¸æŠã‚’Startãƒœã‚¿ãƒ³ã«è¨­å®š
+            if(EventSystem.current != null) {
                 EventSystem.current.SetSelectedGameObject(startButton.gameObject);
             }
-            else
-            {
-                Debug.LogWarning("TitleSceneManager: EventSystem‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBƒ{ƒ^ƒ“‚Ì‰Šú‘I‘ğ‚É¸”s‚µ‚Ü‚µ‚½B", this);
+            else {
+                Debug.LogWarning("TitleSceneManager: EventSystemãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚ãƒœã‚¿ãƒ³ã®åˆæœŸé¸æŠã«å¤±æ•—ã—ã¾ã—ãŸã€‚",this);
             }
         }
-        else
-        {
-            Debug.LogError("TitleSceneManager: Startƒ{ƒ^ƒ“‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñI", this);
+        else {
+            Debug.LogError("TitleSceneManager: Startãƒœã‚¿ãƒ³ãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ï¼",this);
         }
     }
 
-    private void OnDestroy()
-    {
-        // ƒV[ƒ“‘JˆÚ‚Éƒ{ƒ^ƒ“‚ÌƒCƒxƒ“ƒgƒŠƒXƒi[‚ğ‰ğœ‚·‚é
-        if (startButton != null)
-        {
+    private void OnDestroy() {
+        // ã‚·ãƒ¼ãƒ³é·ç§»æ™‚ã«ãƒœã‚¿ãƒ³ã®ã‚¤ãƒ™ãƒ³ãƒˆãƒªã‚¹ãƒŠãƒ¼ã‚’è§£é™¤ã™ã‚‹
+        if(startButton != null) {
             startButton.onClick.RemoveListener(OnStartButtonClicked);
         }
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // UIƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰[
+    // UIã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©ãƒ¼
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// ƒXƒ^[ƒgƒ{ƒ^ƒ“‚ªƒNƒŠƒbƒN‚³‚ê‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚Ü‚·B
+    /// ã‚¹ã‚¿ãƒ¼ãƒˆãƒœã‚¿ãƒ³ãŒã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸã¨ãã«å‘¼ã°ã‚Œã¾ã™ã€‚
     /// </summary>
-    private void OnStartButtonClicked()
-    {
-        if (GameManager.Instance != null)
-        {
+    private void OnStartButtonClicked() {
+        if(GameManager.Instance != null) {
             GameManager.Instance.LoadSceneWithFade(GameManager.Instance.StageSelectSceneName);
         }
-        else
-        {
-            // GameManager.Instance‚ªnull‚Ì‚½‚ßAStageSelectSceneName‚É’¼ÚƒAƒNƒZƒX‚¹‚¸AƒGƒ‰[ƒƒO‚ğo—Í
-            // ƒtƒH[ƒ‹ƒoƒbƒNˆ—‚ª•K—v‚Èê‡‚ÍA—\‚ßİ’è‚µ‚½ƒV[ƒ“–¼‚È‚Ç‚ğg—p‚·‚é
-            Debug.LogError("TitleSceneManager: GameManager‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñIƒV[ƒ“‘JˆÚ‚Å‚«‚Ü‚¹‚ñB", this);
+        else {
+            // GameManager.InstanceãŒnullã®ãŸã‚ã€StageSelectSceneNameã«ç›´æ¥ã‚¢ã‚¯ã‚»ã‚¹ã›ãšã€ã‚¨ãƒ©ãƒ¼ãƒ­ã‚°ã‚’å‡ºåŠ›
+            // ãƒ•ã‚©ãƒ¼ãƒ«ãƒãƒƒã‚¯å‡¦ç†ãŒå¿…è¦ãªå ´åˆã¯ã€äºˆã‚è¨­å®šã—ãŸã‚·ãƒ¼ãƒ³åãªã©ã‚’ä½¿ç”¨ã™ã‚‹
+            Debug.LogError("TitleSceneManager: GameManagerãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ï¼ã‚·ãƒ¼ãƒ³é·ç§»ã§ãã¾ã›ã‚“ã€‚",this);
         }
     }
 }

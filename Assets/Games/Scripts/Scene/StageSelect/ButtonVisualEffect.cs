@@ -4,69 +4,61 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// UIƒ{ƒ^ƒ“‚É‹Šo“I‚ÈƒtƒB[ƒhƒoƒbƒNŒø‰Ê‚ğ’Ç‰Á‚·‚éƒXƒNƒŠƒvƒg‚Å‚·B
-/// ‘I‘ğ‚ÌŠg‘å/k¬AƒNƒŠƒbƒN‚Ì“_–ÅŒø‰Ê‚ğŠÇ—‚µ‚Ü‚·B
+/// UIãƒœã‚¿ãƒ³ã«è¦–è¦šçš„ãªãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯åŠ¹æœã‚’è¿½åŠ ã™ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
+/// é¸æŠæ™‚ã®æ‹¡å¤§/ç¸®å°ã€ã‚¯ãƒªãƒƒã‚¯æ™‚ã®ç‚¹æ»…åŠ¹æœã‚’ç®¡ç†ã—ã¾ã™ã€‚
 /// </summary>
-public class ButtonVisualEffect : MonoBehaviour, ISelectHandler, IDeselectHandler, IPointerClickHandler
-{
-    private Vector3 originalScale; // Œ³‚Ì‘å‚«‚³‚ğ•Û‘¶
+public class ButtonVisualEffect : MonoBehaviour, ISelectHandler, IDeselectHandler, IPointerClickHandler {
+    private Vector3 originalScale; // å…ƒã®å¤§ãã•ã‚’ä¿å­˜
     private Image buttonImage;
     private Color originalColor;
     private Coroutine blinkCoroutine;
 
-    [Header("Šg‘å/k¬İ’è")]
-    [Tooltip("Šg‘å—¦")]
+    [Header("æ‹¡å¤§/ç¸®å°è¨­å®š")]
+    [Tooltip("æ‹¡å¤§ç‡")]
     [SerializeField] private float scaleFactor = 1.1f;
-    [Tooltip("Šg‘å/k¬‚É‚©‚©‚éŠÔ")]
+    [Tooltip("æ‹¡å¤§/ç¸®å°ã«ã‹ã‹ã‚‹æ™‚é–“")]
     [SerializeField] private float transitionDuration = 0.1f;
 
-    [Header("“_–Åİ’è")]
-    [Tooltip("“_–Å‰ñ”")]
+    [Header("ç‚¹æ»…è¨­å®š")]
+    [Tooltip("ç‚¹æ»…å›æ•°")]
     [SerializeField] private int blinkCount = 3;
-    [Tooltip("“_–Å‘¬“xi’Z‚¢‚Ù‚Ç‘¬‚¢j")]
+    [Tooltip("ç‚¹æ»…é€Ÿåº¦ï¼ˆçŸ­ã„ã»ã©é€Ÿã„ï¼‰")]
     [SerializeField] private float blinkSpeed = 0.1f;
-    [Tooltip("“_–Å‚ÌF")]
+    [Tooltip("ç‚¹æ»…æ™‚ã®è‰²")]
     [SerializeField] private Color blinkColor = Color.white;
 
-    private void Awake()
-    {
+    private void Awake() {
         originalScale = transform.localScale;
         buttonImage = GetComponent<Image>();
-        if (buttonImage != null)
-        {
+        if(buttonImage != null) {
             originalColor = buttonImage.color;
         }
     }
 
     /// <summary>
-    /// UI‚ª‘I‘ğ‚³‚ê‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·BiƒL[ƒ{[ƒhAƒQ[ƒ€ƒpƒbƒhAƒ}ƒEƒXƒzƒo[j
+    /// UIãŒé¸æŠã•ã‚ŒãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚ï¼ˆã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã€ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰ã€ãƒã‚¦ã‚¹ãƒ›ãƒãƒ¼ï¼‰
     /// </summary>
-    public void OnSelect(BaseEventData eventData)
-    {
-        // Šg‘å‚ğŠJn
+    public void OnSelect(BaseEventData eventData) {
+        // æ‹¡å¤§ã‚’é–‹å§‹
         StopAllCoroutines();
-        StartCoroutine(ScaleButton(transform.localScale, originalScale * scaleFactor));
+        StartCoroutine(ScaleButton(transform.localScale,originalScale * scaleFactor));
     }
 
     /// <summary>
-    /// UI‚Ì‘I‘ğ‚ªŠO‚ê‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B
+    /// UIã®é¸æŠãŒå¤–ã‚ŒãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
     /// </summary>
-    public void OnDeselect(BaseEventData eventData)
-    {
-        // Œ³‚Ì‘å‚«‚³‚É–ß‚·
+    public void OnDeselect(BaseEventData eventData) {
+        // å…ƒã®å¤§ãã•ã«æˆ»ã™
         StopAllCoroutines();
-        StartCoroutine(ScaleButton(transform.localScale, originalScale));
+        StartCoroutine(ScaleButton(transform.localScale,originalScale));
     }
 
     /// <summary>
-    /// ƒ{ƒ^ƒ“‚ªƒNƒŠƒbƒN‚³‚ê‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B
+    /// ãƒœã‚¿ãƒ³ãŒã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
     /// </summary>
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (gameObject.activeInHierarchy)
-        {
-            if (blinkCoroutine != null)
-            {
+    public void OnPointerClick(PointerEventData eventData) {
+        if(gameObject.activeInHierarchy) {
+            if(blinkCoroutine != null) {
                 StopCoroutine(blinkCoroutine);
             }
             blinkCoroutine = StartCoroutine(BlinkEffect());
@@ -74,27 +66,23 @@ public class ButtonVisualEffect : MonoBehaviour, ISelectHandler, IDeselectHandle
     }
 
     /// <summary>
-    /// ƒ{ƒ^ƒ“‚ÌŠg‘å/k¬‚ğŠŠ‚ç‚©‚És‚¤ƒRƒ‹[ƒ`ƒ“
+    /// ãƒœã‚¿ãƒ³ã®æ‹¡å¤§/ç¸®å°ã‚’æ»‘ã‚‰ã‹ã«è¡Œã†ã‚³ãƒ«ãƒ¼ãƒãƒ³
     /// </summary>
-    private IEnumerator ScaleButton(Vector3 startScale, Vector3 endScale)
-    {
+    private IEnumerator ScaleButton(Vector3 startScale,Vector3 endScale) {
         float timer = 0f;
-        while (timer < transitionDuration)
-        {
+        while(timer < transitionDuration) {
             timer += Time.unscaledDeltaTime;
-            transform.localScale = Vector3.Lerp(startScale, endScale, timer / transitionDuration);
+            transform.localScale = Vector3.Lerp(startScale,endScale,timer / transitionDuration);
             yield return null;
         }
         transform.localScale = endScale;
     }
 
     /// <summary>
-    /// ƒ{ƒ^ƒ“‚ğ“_–Å‚³‚¹‚éƒRƒ‹[ƒ`ƒ“
+    /// ãƒœã‚¿ãƒ³ã‚’ç‚¹æ»…ã•ã›ã‚‹ã‚³ãƒ«ãƒ¼ãƒãƒ³
     /// </summary>
-    private IEnumerator BlinkEffect()
-    {
-        for (int i = 0; i < blinkCount; i++)
-        {
+    private IEnumerator BlinkEffect() {
+        for(int i = 0;i < blinkCount;i++) {
             buttonImage.color = blinkColor;
             yield return new WaitForSecondsRealtime(blinkSpeed);
             buttonImage.color = originalColor;

@@ -1,78 +1,71 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 
 /// <summary>
-/// ƒIƒuƒWƒFƒNƒgƒv[ƒ‹‚©‚ç“G‚ğƒXƒ|[ƒ“i¶¬j‚·‚éƒXƒNƒŠƒvƒg‚Å‚·B
-/// w’è‚µ‚½”‚ÆŠÔŠu‚ÅA“G‚ğ’èŠú“I‚É”z’u‚µ‚Ü‚·B
+/// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãƒ—ãƒ¼ãƒ«ã‹ã‚‰æ•µã‚’ã‚¹ãƒãƒ¼ãƒ³ï¼ˆç”Ÿæˆï¼‰ã™ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
+/// æŒ‡å®šã—ãŸæ•°ã¨é–“éš”ã§ã€æ•µã‚’å®šæœŸçš„ã«é…ç½®ã—ã¾ã™ã€‚
 /// </summary>
-public class Spawner : MonoBehaviour
-{
+public class Spawner : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
-    // ƒCƒ“ƒXƒyƒNƒ^[‚Åİ’è‚·‚éƒpƒ‰ƒ[ƒ^[
+    // ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§è¨­å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
     // ----------------------------------------------------------------------------------------------------
-    [Header("ƒXƒ|[ƒ“İ’è")]
-    [Tooltip("—˜—p‚·‚éObjectPoolManager‚ÌQÆ")]
+    [Header("ã‚¹ãƒãƒ¼ãƒ³è¨­å®š")]
+    [Tooltip("åˆ©ç”¨ã™ã‚‹ObjectPoolManagerã®å‚ç…§")]
     [SerializeField] private ObjectPoolManager objectPoolManager;
-    [Tooltip("“G‚ğƒXƒ|[ƒ“‚·‚éŠÔŠu (•b)")]
+    [Tooltip("æ•µã‚’ã‚¹ãƒãƒ¼ãƒ³ã™ã‚‹é–“éš” (ç§’)")]
     [SerializeField] private float spawnInterval = 3f;
-    [Tooltip("ƒXƒ|[ƒ“‚·‚é“G‚Ì‘”")]
+    [Tooltip("ã‚¹ãƒãƒ¼ãƒ³ã™ã‚‹æ•µã®ç·æ•°")]
     [SerializeField] private int spawnCount = 5;
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒg•Ï”
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆå¤‰æ•°
     // ----------------------------------------------------------------------------------------------------
     private int spawnedCount = 0;
 
     // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviour‚Ìƒ‰ƒCƒtƒTƒCƒNƒ‹ƒƒ\ƒbƒh
+    // MonoBehaviourã®ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
-    private void Start()
-    {
-        // •K—v‚ÈƒRƒ“ƒ|[ƒlƒ“ƒg‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚é‚©Šm”F
-        if (objectPoolManager == null)
-        {
-            Debug.LogError("Spawner: ObjectPoolManager‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñI", this);
-            // ‘ã‚í‚è‚ÉƒVƒ“ƒOƒ‹ƒgƒ“ƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‚·
+    private void Start() {
+        // å¿…è¦ãªã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã‚‹ã‹ç¢ºèª
+        if(objectPoolManager == null) {
+            Debug.LogError("Spawner: ObjectPoolManagerãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ï¼",this);
+            // ä»£ã‚ã‚Šã«ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’è©¦ã™
             objectPoolManager = ObjectPoolManager.Instance;
-            if (objectPoolManager == null)
-            {
-                Debug.LogError("Spawner: ƒVƒ“ƒOƒ‹ƒgƒ“ƒCƒ“ƒXƒ^ƒ“ƒX‚àŒ©‚Â‚©‚è‚Ü‚¹‚ñBƒXƒ|[ƒ“‚ğ’†~‚µ‚Ü‚·B");
+            if(objectPoolManager == null) {
+                Debug.LogError("Spawner: ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚‚è¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚ã‚¹ãƒãƒ¼ãƒ³ã‚’ä¸­æ­¢ã—ã¾ã™ã€‚");
                 return;
             }
         }
 
-        // ƒRƒ‹[ƒ`ƒ“‚ğŠJn
+        // ã‚³ãƒ«ãƒ¼ãƒãƒ³ã‚’é–‹å§‹
         StartCoroutine(SpawnEnemyRoutine());
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒgƒƒ\ƒbƒh
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// w’è‚³‚ê‚½ŠÔŠu‚Å“G‚ğ¶¬‚·‚éƒRƒ‹[ƒ`ƒ“‚Å‚·B
+    /// æŒ‡å®šã•ã‚ŒãŸé–“éš”ã§æ•µã‚’ç”Ÿæˆã™ã‚‹ã‚³ãƒ«ãƒ¼ãƒãƒ³ã§ã™ã€‚
     /// </summary>
-    private IEnumerator SpawnEnemyRoutine()
-    {
-        while (spawnedCount < spawnCount)
-        {
-            // Ÿ‚Ì¶¬‚Ü‚Å‘Ò‹@
+    private IEnumerator SpawnEnemyRoutine() {
+        while(spawnedCount < spawnCount) {
+            // æ¬¡ã®ç”Ÿæˆã¾ã§å¾…æ©Ÿ
             yield return new WaitForSeconds(spawnInterval);
 
-            // ƒIƒuƒWƒFƒNƒgƒv[ƒ‹‚©‚ç“G‚ğæ“¾
+            // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãƒ—ãƒ¼ãƒ«ã‹ã‚‰æ•µã‚’å–å¾—
             GameObject enemy = objectPoolManager.GetEnemyFromPool();
-            if (enemy != null)
-            {
-                // ƒXƒ|ƒi[‚ÌüˆÍ‚Éƒ‰ƒ“ƒ_ƒ€‚ÈˆÊ’u‚ğ¶¬
-                float offsetX = UnityEngine.Random.Range(-1f, 1f);
-                float offsetY = UnityEngine.Random.Range(-1f, 1f);
-                Vector3 spawnPosition = transform.position + new Vector3(offsetX, offsetY, 0);
+            if(enemy != null) {
+                // ã‚¹ãƒãƒŠãƒ¼ã®å‘¨å›²ã«ãƒ©ãƒ³ãƒ€ãƒ ãªä½ç½®ã‚’ç”Ÿæˆ
+                float offsetX = UnityEngine.Random.Range(-1f,1f);
+                float offsetY = UnityEngine.Random.Range(-1f,1f);
+                Vector3 spawnPosition = transform.position + new Vector3(offsetX,offsetY,0);
 
-                // “G‚ğ”z’u
+                // æ•µã‚’é…ç½®
                 enemy.transform.position = spawnPosition;
                 spawnedCount++;
-                Debug.Log($"Spawner: “G‚ğƒXƒ|[ƒ“‚µ‚Ü‚µ‚½BŒ»İ {spawnedCount} ‘Ì / {spawnCount} ‘Ì");
+                Debug.Log($"Spawner: æ•µã‚’ã‚¹ãƒãƒ¼ãƒ³ã—ã¾ã—ãŸã€‚ç¾åœ¨ {spawnedCount} ä½“ / {spawnCount} ä½“");
             }
         }
-        Debug.Log("Spawner: w’è‚³‚ê‚½”‚Ì“G‚ğ‚·‚×‚ÄƒXƒ|[ƒ“‚µ‚Ü‚µ‚½B");
+        Debug.Log("Spawner: æŒ‡å®šã•ã‚ŒãŸæ•°ã®æ•µã‚’ã™ã¹ã¦ã‚¹ãƒãƒ¼ãƒ³ã—ã¾ã—ãŸã€‚");
     }
 }

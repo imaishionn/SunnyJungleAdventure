@@ -11,27 +11,27 @@ public class BG_Scroll : MonoBehaviour {
 
     private void Awake() {
         // PlayerMoveがInspectorで割り当てられていない場合、タグで検索して取得
-        if (m_playerMove == null) {
+        if(m_playerMove == null) {
             var playerObject = GameObject.FindGameObjectWithTag("Player");
-            if (playerObject != null) {
+            if(playerObject != null) {
                 m_playerMove = playerObject.GetComponent<PlayerMove>();
             }
 
-            if (m_playerMove == null) {
-                Debug.LogError("BG_Scroll: 'Player'タグを持つオブジェクトにPlayerMoveコンポーネントが見つかりません。Inspectorで設定するか、Playerオブジェクトにコンポーネントがアタッチされているか確認してください。", this);
+            if(m_playerMove == null) {
+                Debug.LogError("BG_Scroll: 'Player'タグを持つオブジェクトにPlayerMoveコンポーネントが見つかりません。Inspectorで設定するか、Playerオブジェクトにコンポーネントがアタッチされているか確認してください。",this);
             }
         }
 
         // Divisionが0の場合の警告と修正
-        if (Division == 0.0f) {
-            Debug.LogWarning("BG_Scroll: Divisionの値が0です。ゼロ除算を防ぐため、値を1.0fに設定します。", this);
+        if(Division == 0.0f) {
+            Debug.LogWarning("BG_Scroll: Divisionの値が0です。ゼロ除算を防ぐため、値を1.0fに設定します。",this);
             Division = 1.0f;
         }
     }
 
     private void Update() {
         // プレイヤーの参照がないか、Divisionが0の場合は処理をスキップ
-        if (m_playerMove == null || Division == 0.0f) {
+        if(m_playerMove == null || Division == 0.0f) {
             return;
         }
 
@@ -40,6 +40,6 @@ public class BG_Scroll : MonoBehaviour {
         float move = (-m_playerMove.MoveSpeed / Division) * Time.deltaTime;
 
         // 背景を横方向に移動
-        transform.Translate(new Vector3(move, 0.0f, 0.0f));
+        transform.Translate(new Vector3(move,0.0f,0.0f));
     }
 }

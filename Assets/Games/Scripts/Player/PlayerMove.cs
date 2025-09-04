@@ -1,5 +1,5 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
@@ -63,14 +63,14 @@ public class PlayerMove : MonoBehaviour {
         animator = GetComponent<Animator>();
 
         // コンポーネントが正しく取得できたか確認し、エラーをログに出力
-        if (rb == null) UnityEngine.Debug.LogError("PlayerMove: Rigidbody2Dがアタッチされていません。", this);
-        if (animator == null) UnityEngine.Debug.LogError("PlayerMove: Animatorがアタッチされていません。", this);
+        if(rb == null) UnityEngine.Debug.LogError("PlayerMove: Rigidbody2Dがアタッチされていません。",this);
+        if(animator == null) UnityEngine.Debug.LogError("PlayerMove: Animatorがアタッチされていません。",this);
 
         // GroundCheckコンポーネントがインスペクターで設定されていない場合、子オブジェクトから探す
-        if (m_groundCheckComponent == null) {
+        if(m_groundCheckComponent == null) {
             m_groundCheckComponent = GetComponentInChildren<GroundCheck>();
-            if (m_groundCheckComponent == null) {
-                UnityEngine.Debug.LogError("PlayerMove: GroundCheckコンポーネントが見つかりません。", this);
+            if(m_groundCheckComponent == null) {
+                UnityEngine.Debug.LogError("PlayerMove: GroundCheckコンポーネントが見つかりません。",this);
             }
         }
 
@@ -83,7 +83,7 @@ public class PlayerMove : MonoBehaviour {
     /// <summary>
     /// GameManagerからモバイル操作用のジョイスティックとジャンプボタンの参照を受け取る
     /// </summary>
-    public void SetMobileControls(VirtualJoystick joystick, JumpButtonController jump) {
+    public void SetMobileControls(VirtualJoystick joystick,JumpButtonController jump) {
         m_joystick = joystick;
     }
 
@@ -92,14 +92,14 @@ public class PlayerMove : MonoBehaviour {
     /// </summary>
     private void Update() {
         // プレイヤーが死亡している場合は、これ以降の処理を停止
-        if (IsDead) return;
+        if(IsDead) return;
 
         // 1. 地面判定の更新
         bool previousIsGrounded = isGrounded;
         isGrounded = m_groundCheckComponent != null && m_groundCheckComponent.GetIsGround();
 
         // 地面に着地した場合、ジャンプ回数をリセット
-        if (!previousIsGrounded && isGrounded) {
+        if(!previousIsGrounded && isGrounded) {
             jumpsRemaining = maxJumps;
         }
 
@@ -107,7 +107,7 @@ public class PlayerMove : MonoBehaviour {
         float moveInput = 0f;
 
         // モバイルプラットフォームで実行されている場合はジョイスティックの入力を優先
-        if (UnityEngine.Application.isMobilePlatform && m_joystick != null) {
+        if(UnityEngine.Application.isMobilePlatform && m_joystick != null) {
             moveInput = m_joystick.InputDirection.x;
         }
         else {
@@ -119,7 +119,7 @@ public class PlayerMove : MonoBehaviour {
         HandleMovementInput(moveInput);
 
         // PCでジャンプボタンが押されたらジャンプを実行
-        if (Input.GetButtonDown("Jump")) {
+        if(Input.GetButtonDown("Jump")) {
             Jump();
         }
 
@@ -128,7 +128,7 @@ public class PlayerMove : MonoBehaviour {
 
         // 4. ゲームオーバー判定
         // プレイヤーが指定されたY座標より下に落ちたら死亡
-        if (transform.position.y < m_gameOverFallHeight) {
+        if(transform.position.y < m_gameOverFallHeight) {
             Die();
         }
     }
@@ -142,16 +142,16 @@ public class PlayerMove : MonoBehaviour {
     /// </summary>
     /// <param name="moveInput">横方向の入力（-1から1）</param>
     private void HandleMovementInput(float moveInput) {
-        if (rb != null) {
+        if(rb != null) {
             // Rigidbody2Dの速度を直接設定して横移動
-            rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
+            rb.velocity = new Vector2(moveInput * moveSpeed,rb.velocity.y);
         }
 
         // 移動入力量に基づいてプレイヤーの向きを反転
-        if (moveInput > 0 && !isFacingRight) {
+        if(moveInput > 0 && !isFacingRight) {
             Flip(); // 右を向いていない時に右へ移動したら反転
         }
-        else if (moveInput < 0 && isFacingRight) {
+        else if(moveInput < 0 && isFacingRight) {
             Flip(); // 右を向いている時に左へ移動したら反転
         }
     }
@@ -161,23 +161,23 @@ public class PlayerMove : MonoBehaviour {
     /// </summary>
     public void Jump() {
         // 死亡時やジャンプ回数が残っていない場合は処理を停止
-        if (IsDead) return;
-        if (jumpsRemaining <= 0) return;
+        if(IsDead) return;
+        if(jumpsRemaining <= 0) return;
 
         // Rigidbody2DのY軸の速度をジャンプ力に設定
-        if (rb != null) {
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+        if(rb != null) {
+            rb.velocity = new Vector2(rb.velocity.x,jumpForce);
         }
         jumpsRemaining--; // ジャンプ回数を1減らす
 
         // サウンドとアニメーションを再生
-        if (itemSoundPlayer != null) itemSoundPlayer.PlayJumpSound();
-        if (animator != null) {
+        if(itemSoundPlayer != null) itemSoundPlayer.PlayJumpSound();
+        if(animator != null) {
             // 地面に着地しているか、空中にいるかで異なるジャンプアニメーションを再生
-            if (isGrounded && HasAnimatorParameter("JumpTrigger", AnimatorControllerParameterType.Trigger)) {
+            if(isGrounded && HasAnimatorParameter("JumpTrigger",AnimatorControllerParameterType.Trigger)) {
                 animator.SetTrigger("JumpTrigger"); // 通常ジャンプアニメーション
             }
-            else if (!isGrounded && HasAnimatorParameter("DoubleJumpTrigger", AnimatorControllerParameterType.Trigger)) {
+            else if(!isGrounded && HasAnimatorParameter("DoubleJumpTrigger",AnimatorControllerParameterType.Trigger)) {
                 animator.SetTrigger("DoubleJumpTrigger"); // 2段ジャンプアニメーション
             }
         }
@@ -195,13 +195,13 @@ public class PlayerMove : MonoBehaviour {
     /// </summary>
     private void OnCollisionEnter2D(Collision2D collision) {
         // 死亡時や無敵状態では衝突処理をスキップ
-        if (IsDead || isInvincible) return;
+        if(IsDead || isInvincible) return;
 
         // 衝突したオブジェクトが"Enemy"タグを持つ場合
-        if (collision.gameObject.CompareTag("Enemy")) {
+        if(collision.gameObject.CompareTag("Enemy")) {
             // 敵との接触位置を判定
             // プレイヤーのy座標が敵のy座標より高い場合、踏みつけたと判定
-            if (transform.position.y > collision.transform.position.y) {
+            if(transform.position.y > collision.transform.position.y) {
                 StompEnemy(collision.gameObject); // 敵を踏みつける処理
             }
             else {
@@ -215,15 +215,15 @@ public class PlayerMove : MonoBehaviour {
     /// 敵を踏みつけた時の処理
     /// </summary>
     public void StompEnemy(GameObject enemyObject) {
-        if (IsDead) return;
+        if(IsDead) return;
 
         // 敵のコンポーネントを取得
         Enemy enemy = enemyObject.GetComponent<Enemy>();
-        if (enemy == null) return;
+        if(enemy == null) return;
 
         // 敵を踏みつけて上に跳ねる
-        if (rb != null) {
-            rb.velocity = new Vector2(rb.velocity.x, m_stompBounceForce);
+        if(rb != null) {
+            rb.velocity = new Vector2(rb.velocity.x,m_stompBounceForce);
         }
         // 敵にダメージを与える
         enemy.TakeDamage();
@@ -235,22 +235,22 @@ public class PlayerMove : MonoBehaviour {
     /// プレイヤーの死亡処理
     /// </summary>
     public void Die() {
-        if (IsDead) return;
+        if(IsDead) return;
         IsDead = true; // 死亡フラグを立てる
 
-        if (itemSoundPlayer != null) itemSoundPlayer.PlayGameOverSound();
+        if(itemSoundPlayer != null) itemSoundPlayer.PlayGameOverSound();
 
         // 速度をゼロにし、物理演算を停止
-        if (rb != null) {
+        if(rb != null) {
             rb.velocity = Vector2.zero;
             rb.isKinematic = true; // 物理演算を無効にする
         }
         // プレイヤーのColliderを無効化して他のオブジェクトとの衝突を停止
         Collider2D playerCollider = GetComponent<Collider2D>();
-        if (playerCollider != null) playerCollider.enabled = false;
+        if(playerCollider != null) playerCollider.enabled = false;
 
         // 死亡アニメーションを再生
-        if (animator != null && HasAnimatorParameter("GameOver", AnimatorControllerParameterType.Trigger)) {
+        if(animator != null && HasAnimatorParameter("GameOver",AnimatorControllerParameterType.Trigger)) {
             animator.SetTrigger("GameOver");
         }
         // アニメーションがない場合は、即座に次の処理へ移行するコルーチンを開始
@@ -286,31 +286,31 @@ public class PlayerMove : MonoBehaviour {
     /// アニメーションのパラメーターを更新します。
     /// </summary>
     private void UpdateAnimatorParameters(float moveInput) {
-        if (animator == null) return;
+        if(animator == null) return;
 
         // runパラメーターを更新（移動中か）
-        if (HasAnimatorParameter("run", AnimatorControllerParameterType.Bool)) {
-            animator.SetBool("run", Mathf.Abs(moveInput) > 0.01f);
+        if(HasAnimatorParameter("run",AnimatorControllerParameterType.Bool)) {
+            animator.SetBool("run",Mathf.Abs(moveInput) > 0.01f);
         }
 
         // isGroundedパラメーターを更新（地面にいるか）
-        if (HasAnimatorParameter("isGrounded", AnimatorControllerParameterType.Bool)) {
-            animator.SetBool("isGrounded", isGrounded);
+        if(HasAnimatorParameter("isGrounded",AnimatorControllerParameterType.Bool)) {
+            animator.SetBool("isGrounded",isGrounded);
         }
 
         // velocityYパラメーターを更新（垂直方向の速度）
-        if (HasAnimatorParameter("velocityY", AnimatorControllerParameterType.Float) && rb != null) {
-            animator.SetFloat("velocityY", rb.velocity.y);
+        if(HasAnimatorParameter("velocityY",AnimatorControllerParameterType.Float) && rb != null) {
+            animator.SetFloat("velocityY",rb.velocity.y);
         }
     }
 
     /// <summary>
     /// 指定されたアニメーターパラメーターが存在するか確認します。
     /// </summary>
-    private bool HasAnimatorParameter(string paramName, AnimatorControllerParameterType paramType) {
-        if (animator == null) return false;
-        foreach (AnimatorControllerParameter param in animator.parameters) {
-            if (param.name == paramName && param.type == paramType) {
+    private bool HasAnimatorParameter(string paramName,AnimatorControllerParameterType paramType) {
+        if(animator == null) return false;
+        foreach(AnimatorControllerParameter param in animator.parameters) {
+            if(param.name == paramName && param.type == paramType) {
                 return true;
             }
         }
@@ -331,7 +331,7 @@ public class PlayerMove : MonoBehaviour {
     private void FinalizeDeathAndSceneTransition() {
         gameObject.SetActive(false); // プレイヤーオブジェクトを非アクティブにする
 
-        if (GameManager.Instance != null) {
+        if(GameManager.Instance != null) {
             // GameManagerが存在すればゲームオーバー状態に設定してシーン遷移を委ねる
             GameManager.Instance.SetGameOverStateImmediately();
         }

@@ -1,126 +1,110 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
-/// ƒQ[ƒ€ƒI[ƒo[‰æ–Ê‚ÌUI‚ÆƒV[ƒ“‘JˆÚ‚ğŠÇ—‚·‚éƒXƒNƒŠƒvƒg‚Å‚·B
+/// ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ç”»é¢ã®UIã¨ã‚·ãƒ¼ãƒ³é·ç§»ã‚’ç®¡ç†ã™ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
 /// </summary>
-public class GameOverManager : MonoBehaviour
-{
+public class GameOverManager : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
-    // ƒCƒ“ƒXƒyƒNƒ^[‚Åİ’è‚·‚éƒpƒ‰ƒ[ƒ^[
+    // ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§è¨­å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
     // ----------------------------------------------------------------------------------------------------
-    [Header("UIİ’è")]
-    [Tooltip("ƒQ[ƒ€ƒpƒbƒh‘€ì‚ÅÅ‰‚É‘I‘ğó‘Ô‚É‚µ‚½‚¢UI—v‘f")]
+    [Header("UIè¨­å®š")]
+    [Tooltip("ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰æ“ä½œã§æœ€åˆã«é¸æŠçŠ¶æ…‹ã«ã—ãŸã„UIè¦ç´ ")]
     [SerializeField] private Selectable firstSelected;
-    [Tooltip("ƒ^ƒCƒgƒ‹‚É–ß‚éƒ{ƒ^ƒ“")]
+    [Tooltip("ã‚¿ã‚¤ãƒˆãƒ«ã«æˆ»ã‚‹ãƒœã‚¿ãƒ³")]
     [SerializeField] private Button returnTitleButton;
-    [Tooltip("‚à‚¤ˆê“xƒvƒŒƒC‚·‚éƒ{ƒ^ƒ“")]
+    [Tooltip("ã‚‚ã†ä¸€åº¦ãƒ—ãƒ¬ã‚¤ã™ã‚‹ãƒœã‚¿ãƒ³")]
     [SerializeField] private Button retryButton;
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒV[ƒ“İ’è
+    // ã‚·ãƒ¼ãƒ³è¨­å®š
     // ----------------------------------------------------------------------------------------------------
-    [Header("ƒV[ƒ“İ’è")]
-    [Tooltip("ƒ^ƒCƒgƒ‹ƒV[ƒ“‚Ì–¼‘O")]
+    [Header("ã‚·ãƒ¼ãƒ³è¨­å®š")]
+    [Tooltip("ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³ã®åå‰")]
     [SerializeField] private string titleSceneName = "TitleScene";
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒg•Ï”
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆå¤‰æ•°
     // ----------------------------------------------------------------------------------------------------
     private bool m_isTransitioning = false;
 
     // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviour‚Ìƒ‰ƒCƒtƒTƒCƒNƒ‹ƒƒ\ƒbƒh
+    // MonoBehaviourã®ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
-    private void Start()
-    {
-        // UI‚Ì‰Šú‘I‘ğ‚ğİ’è
-        if (firstSelected != null)
-        {
-            if (EventSystem.current != null)
-            {
+    private void Start() {
+        // UIã®åˆæœŸé¸æŠã‚’è¨­å®š
+        if(firstSelected != null) {
+            if(EventSystem.current != null) {
                 EventSystem.current.SetSelectedGameObject(firstSelected.gameObject);
             }
         }
-        else
-        {
-            Debug.LogWarning("GameOverManager: firstSelected‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
+        else {
+            Debug.LogWarning("GameOverManager: firstSelectedãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚",this);
         }
 
-        // ƒ{ƒ^ƒ“‚ÌƒNƒŠƒbƒNƒCƒxƒ“ƒg‚ÉƒŠƒXƒi[‚ğ“o˜^
-        if (returnTitleButton != null)
-        {
+        // ãƒœã‚¿ãƒ³ã®ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆã«ãƒªã‚¹ãƒŠãƒ¼ã‚’ç™»éŒ²
+        if(returnTitleButton != null) {
             returnTitleButton.onClick.AddListener(OnClickReturnTitle);
         }
-        if (retryButton != null)
-        {
+        if(retryButton != null) {
             retryButton.onClick.AddListener(OnClickRetry);
         }
 
-        // ƒV[ƒ“ƒ[ƒhŠ®—¹‚É‘JˆÚƒtƒ‰ƒO‚ğƒŠƒZƒbƒg
+        // ã‚·ãƒ¼ãƒ³ãƒ­ãƒ¼ãƒ‰å®Œäº†æ™‚ã«é·ç§»ãƒ•ãƒ©ã‚°ã‚’ãƒªã‚»ãƒƒãƒˆ
         m_isTransitioning = false;
     }
 
-    private void OnDestroy()
-    {
-        // ƒV[ƒ“‚ª”jŠü‚³‚ê‚é‘O‚ÉƒCƒxƒ“ƒgƒŠƒXƒi[‚ğ‰ğœ‚·‚é
-        if (returnTitleButton != null)
-        {
+    private void OnDestroy() {
+        // ã‚·ãƒ¼ãƒ³ãŒç ´æ£„ã•ã‚Œã‚‹å‰ã«ã‚¤ãƒ™ãƒ³ãƒˆãƒªã‚¹ãƒŠãƒ¼ã‚’è§£é™¤ã™ã‚‹
+        if(returnTitleButton != null) {
             returnTitleButton.onClick.RemoveListener(OnClickReturnTitle);
         }
-        if (retryButton != null)
-        {
+        if(retryButton != null) {
             retryButton.onClick.RemoveListener(OnClickRetry);
         }
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // UIƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰[
+    // UIã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©ãƒ¼
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// ƒ^ƒCƒgƒ‹‚É–ß‚éƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½Û‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B
+    /// ã‚¿ã‚¤ãƒˆãƒ«ã«æˆ»ã‚‹ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸéš›ã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
     /// </summary>
-    public void OnClickReturnTitle()
-    {
-        if (m_isTransitioning) return;
+    public void OnClickReturnTitle() {
+        if(m_isTransitioning) return;
         m_isTransitioning = true;
         Time.timeScale = 1f;
 
-        // GameManager.instance ‚ğ GameManager.Instance ‚ÉC³
-        if (GameManager.Instance != null)
-        {
-            // GameManager.instance.LoadSceneWithFade ‚ğ GameManager.Instance.LoadSceneWithFade ‚ÉC³
+        // GameManager.instance ã‚’ GameManager.Instance ã«ä¿®æ­£
+        if(GameManager.Instance != null) {
+            // GameManager.instance.LoadSceneWithFade ã‚’ GameManager.Instance.LoadSceneWithFade ã«ä¿®æ­£
             GameManager.Instance.LoadSceneWithFade(titleSceneName);
         }
-        else
-        {
+        else {
             SceneManager.LoadScene(titleSceneName);
         }
     }
 
     /// <summary>
-    /// ‚à‚¤ˆê“xƒvƒŒƒC‚·‚éƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½Û‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B
+    /// ã‚‚ã†ä¸€åº¦ãƒ—ãƒ¬ã‚¤ã™ã‚‹ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸéš›ã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
     /// </summary>
-    public void OnClickRetry()
-    {
-        if (m_isTransitioning) return;
+    public void OnClickRetry() {
+        if(m_isTransitioning) return;
         m_isTransitioning = true;
         Time.timeScale = 1f;
 
-        // GameManager.instance ‚ğ GameManager.Instance ‚ÉC³
-        if (GameManager.Instance != null)
-        {
-            // ‚±‚±‚ÅƒQ[ƒ€ƒf[ƒ^‚ğƒŠƒZƒbƒg‚·‚é
-            // GameManager.instance.ResetGameData() ‚ğ GameManager.Instance.ResetGameData() ‚ÉC³
-            // GameManager.instance.RetryLastStage() ‚ğ GameManager.Instance.RetryLastStage() ‚ÉC³
+        // GameManager.instance ã‚’ GameManager.Instance ã«ä¿®æ­£
+        if(GameManager.Instance != null) {
+            // ã“ã“ã§ã‚²ãƒ¼ãƒ ãƒ‡ãƒ¼ã‚¿ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹
+            // GameManager.instance.ResetGameData() ã‚’ GameManager.Instance.ResetGameData() ã«ä¿®æ­£
+            // GameManager.instance.RetryLastStage() ã‚’ GameManager.Instance.RetryLastStage() ã«ä¿®æ­£
             GameManager.Instance.ResetGameData();
-            GameManager.Instance.RetryLastStage(); // GameManager‚Ìƒƒ\ƒbƒh‚ğŒÄ‚Ño‚·
+            GameManager.Instance.RetryLastStage(); // GameManagerã®ãƒ¡ã‚½ãƒƒãƒ‰ã‚’å‘¼ã³å‡ºã™
         }
-        else
-        {
-            Debug.LogError("GameOverManager: GameManager.instance‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñIƒ^ƒCƒgƒ‹ƒV[ƒ“‚Ö’¼Ú‘JˆÚ‚µ‚Ü‚·B", this);
+        else {
+            Debug.LogError("GameOverManager: GameManager.instanceãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ï¼ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³ã¸ç›´æ¥é·ç§»ã—ã¾ã™ã€‚",this);
             SceneManager.LoadScene(titleSceneName);
         }
     }

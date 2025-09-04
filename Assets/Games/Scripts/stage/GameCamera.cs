@@ -2,99 +2,90 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// ƒvƒŒƒCƒ„[‚ğ’ÇÕ‚µAİ’è‚³‚ê‚½”ÍˆÍ“à‚ÅƒJƒƒ‰‚ÌˆÚ“®‚ğ§ŒÀ‚·‚éƒXƒNƒŠƒvƒg‚Å‚·B
+/// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’è¿½è·¡ã—ã€è¨­å®šã•ã‚ŒãŸç¯„å›²å†…ã§ã‚«ãƒ¡ãƒ©ã®ç§»å‹•ã‚’åˆ¶é™ã™ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
 /// </summary>
-public class GameCamera : MonoBehaviour
-{
+public class GameCamera : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
-    // ƒCƒ“ƒXƒyƒNƒ^[‚Åİ’è‚·‚éƒpƒ‰ƒ[ƒ^[
+    // ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§è¨­å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
     // ----------------------------------------------------------------------------------------------------
-    [Header("’ÇÕ‘ÎÛ")]
-    [Tooltip("’ÇÕ‚·‚éƒvƒŒƒCƒ„[ƒIƒuƒWƒFƒNƒg")]
+    [Header("è¿½è·¡å¯¾è±¡")]
+    [Tooltip("è¿½è·¡ã™ã‚‹ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ")]
     [SerializeField] private GameObject player;
 
-    [Header("ƒJƒƒ‰İ’è")]
-    [Tooltip("ƒvƒŒƒCƒ„[‚©‚ç‚ÌƒJƒƒ‰‚Ì‘Š‘ÎˆÊ’uBZ‚Í’Êí•‰‚Ì’l‚ÅƒJƒƒ‰‚Ì‰œs‚«‚ğİ’è‚µ‚Ü‚·B")]
-    [SerializeField] private Vector3 cameraOffset = new Vector3(0f, 0f, -10f);
+    [Header("ã‚«ãƒ¡ãƒ©è¨­å®š")]
+    [Tooltip("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‹ã‚‰ã®ã‚«ãƒ¡ãƒ©ã®ç›¸å¯¾ä½ç½®ã€‚Zã¯é€šå¸¸è² ã®å€¤ã§ã‚«ãƒ¡ãƒ©ã®å¥¥è¡Œãã‚’è¨­å®šã—ã¾ã™ã€‚")]
+    [SerializeField] private Vector3 cameraOffset = new Vector3(0f,0f,-10f);
 
-    [Header("ƒJƒƒ‰’ÇÕ”ÍˆÍ‚Ì§ŒÀ")]
-    [Tooltip("XÀ•W‚Ì’ÇÕ‚ğ§ŒÀ‚·‚é‚©‚Ç‚¤‚©")]
+    [Header("ã‚«ãƒ¡ãƒ©è¿½è·¡ç¯„å›²ã®åˆ¶é™")]
+    [Tooltip("Xåº§æ¨™ã®è¿½è·¡ã‚’åˆ¶é™ã™ã‚‹ã‹ã©ã†ã‹")]
     [SerializeField] private bool useClampX = false;
-    [Tooltip("YÀ•W‚Ì’ÇÕ‚ğ§ŒÀ‚·‚é‚©‚Ç‚¤‚©")]
+    [Tooltip("Yåº§æ¨™ã®è¿½è·¡ã‚’åˆ¶é™ã™ã‚‹ã‹ã©ã†ã‹")]
     [SerializeField] private bool useClampY = false;
-    [Tooltip("ƒJƒƒ‰‚ªˆÚ“®‚Å‚«‚éÅ‘åˆÊ’u (X, Y)")]
+    [Tooltip("ã‚«ãƒ¡ãƒ©ãŒç§»å‹•ã§ãã‚‹æœ€å¤§ä½ç½® (X, Y)")]
     [SerializeField] private Vector2 cameraMaxPos = Vector2.zero;
-    [Tooltip("ƒJƒƒ‰‚ªˆÚ“®‚Å‚«‚éÅ¬ˆÊ’u (X, Y)")]
+    [Tooltip("ã‚«ãƒ¡ãƒ©ãŒç§»å‹•ã§ãã‚‹æœ€å°ä½ç½® (X, Y)")]
     [SerializeField] private Vector2 cameraMinPos = Vector2.zero;
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒg•Ï”
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆå¤‰æ•°
     // ----------------------------------------------------------------------------------------------------
-    // ƒJƒƒ‰‚ğƒVƒ“ƒOƒ‹ƒgƒ“‚Æ‚µ‚ÄŠÇ—‚·‚éê‡
+    // ã‚«ãƒ¡ãƒ©ã‚’ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã¨ã—ã¦ç®¡ç†ã™ã‚‹å ´åˆ
     // public static GameCamera Instance { get; private set; }
 
     // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviour‚Ìƒ‰ƒCƒtƒTƒCƒNƒ‹ƒƒ\ƒbƒh
+    // MonoBehaviourã®ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
-    private void Start()
-    {
-        // "Player"ƒ^ƒO‚ğ‚ÂƒIƒuƒWƒFƒNƒg‚ğŒŸõ‚µ‚Äİ’è
-        if (player == null)
-        {
+    private void Start() {
+        // "Player"ã‚¿ã‚°ã‚’æŒã¤ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æ¤œç´¢ã—ã¦è¨­å®š
+        if(player == null) {
             player = GameObject.FindGameObjectWithTag("Player");
         }
 
-        // ƒJƒƒ‰’ÇÕ‚Ì—LŒø«‚ğƒ`ƒFƒbƒN
-        if (player == null)
-        {
-            Debug.LogError("GameCamera: 'Player'ƒ^ƒO‚ÌƒQ[ƒ€ƒIƒuƒWƒFƒNƒg‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñIƒJƒƒ‰’ÇÕ‚ª‚Å‚«‚Ü‚¹‚ñB", this);
+        // ã‚«ãƒ¡ãƒ©è¿½è·¡ã®æœ‰åŠ¹æ€§ã‚’ãƒã‚§ãƒƒã‚¯
+        if(player == null) {
+            Debug.LogError("GameCamera: 'Player'ã‚¿ã‚°ã®ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ï¼ã‚«ãƒ¡ãƒ©è¿½è·¡ãŒã§ãã¾ã›ã‚“ã€‚",this);
             return;
         }
 
-        // ƒV[ƒ“–¼‚ÉŠî‚Ã‚¢‚Ä’ÇÕ‚ğ–³Œø‰»
+        // ã‚·ãƒ¼ãƒ³åã«åŸºã¥ã„ã¦è¿½è·¡ã‚’ç„¡åŠ¹åŒ–
         string currentSceneName = SceneManager.GetActiveScene().name;
-        if (currentSceneName == "ClearScene")
-        {
-            Debug.Log("GameCamera: ClearScene‚Ì‚½‚ßAƒJƒƒ‰‚Ì’ÇÕ‚ğ–³Œø‰»‚µ‚Ü‚·B");
-            player = null; // ’ÇÕ‚ğ’â~‚·‚é‚½‚ßAQÆ‚ğƒNƒŠƒA
+        if(currentSceneName == "ClearScene") {
+            Debug.Log("GameCamera: ClearSceneã®ãŸã‚ã€ã‚«ãƒ¡ãƒ©ã®è¿½è·¡ã‚’ç„¡åŠ¹åŒ–ã—ã¾ã™ã€‚");
+            player = null; // è¿½è·¡ã‚’åœæ­¢ã™ã‚‹ãŸã‚ã€å‚ç…§ã‚’ã‚¯ãƒªã‚¢
             return;
         }
 
-        // ƒQ[ƒ€ŠJn‚ÉƒJƒƒ‰‚ğƒvƒŒƒCƒ„[‚Ì‰ŠúˆÊ’u‚É‡‚í‚¹‚é
+        // ã‚²ãƒ¼ãƒ é–‹å§‹æ™‚ã«ã‚«ãƒ¡ãƒ©ã‚’ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åˆæœŸä½ç½®ã«åˆã‚ã›ã‚‹
         CameraUpdate();
     }
 
-    private void LateUpdate()
-    {
-        // LateUpdate‚ÅƒJƒƒ‰‚ğXV‚·‚é‚±‚Æ‚ÅAƒvƒŒƒCƒ„[‚ÌˆÚ“®Œã‚É’ÇÕ‚µA‚æ‚èŠŠ‚ç‚©‚È“®‚«‚É‚È‚è‚Ü‚·B
-        if (player == null) return;
+    private void LateUpdate() {
+        // LateUpdateã§ã‚«ãƒ¡ãƒ©ã‚’æ›´æ–°ã™ã‚‹ã“ã¨ã§ã€ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç§»å‹•å¾Œã«è¿½è·¡ã—ã€ã‚ˆã‚Šæ»‘ã‚‰ã‹ãªå‹•ãã«ãªã‚Šã¾ã™ã€‚
+        if(player == null) return;
 
-        // ƒJƒƒ‰‚Ì’ÇÕƒƒWƒbƒN‚ğÀs
+        // ã‚«ãƒ¡ãƒ©ã®è¿½è·¡ãƒ­ã‚¸ãƒƒã‚¯ã‚’å®Ÿè¡Œ
         CameraUpdate();
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒgƒƒ\ƒbƒh
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// ƒJƒƒ‰‚ÌˆÊ’u‚ğXV‚µAİ’è‚³‚ê‚½”ÍˆÍ“à‚ÅƒNƒ‰ƒ“ƒv‚µ‚Ü‚·B
+    /// ã‚«ãƒ¡ãƒ©ã®ä½ç½®ã‚’æ›´æ–°ã—ã€è¨­å®šã•ã‚ŒãŸç¯„å›²å†…ã§ã‚¯ãƒ©ãƒ³ãƒ—ã—ã¾ã™ã€‚
     /// </summary>
-    private void CameraUpdate()
-    {
-        // ƒvƒŒƒCƒ„[‚ÌˆÊ’u‚ÉƒIƒtƒZƒbƒg‚ğ‰Á‚¦‚½–Ú•WˆÊ’u‚ğŒvZ
+    private void CameraUpdate() {
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½ç½®ã«ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’åŠ ãˆãŸç›®æ¨™ä½ç½®ã‚’è¨ˆç®—
         Vector3 targetPos = player.transform.position + cameraOffset;
 
-        // ’ÇÕ”ÍˆÍ‚Ì§ŒÀ‚ğ“K—p
-        if (useClampX)
-        {
-            targetPos.x = Mathf.Clamp(targetPos.x, cameraMinPos.x, cameraMaxPos.x);
+        // è¿½è·¡ç¯„å›²ã®åˆ¶é™ã‚’é©ç”¨
+        if(useClampX) {
+            targetPos.x = Mathf.Clamp(targetPos.x,cameraMinPos.x,cameraMaxPos.x);
         }
-        if (useClampY)
-        {
-            targetPos.y = Mathf.Clamp(targetPos.y, cameraMinPos.y, cameraMaxPos.y);
+        if(useClampY) {
+            targetPos.y = Mathf.Clamp(targetPos.y,cameraMinPos.y,cameraMaxPos.y);
         }
 
-        // ƒJƒƒ‰‚ÌˆÊ’u‚ğ–Ú•WˆÊ’u‚Éİ’è
+        // ã‚«ãƒ¡ãƒ©ã®ä½ç½®ã‚’ç›®æ¨™ä½ç½®ã«è¨­å®š
         transform.position = targetPos;
     }
 }
