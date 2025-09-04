@@ -175,7 +175,7 @@ public class ScoreManager : MonoBehaviour
                 int score = entries[i].Key;
                 float time = entries[i].Value;
 
-                leaderboardEntries[i].text = (i + 1).ToString() + ". スコア: " + score.ToString() + " (" + Mathf.RoundToInt(time).ToString() + "秒)";
+                leaderboardEntries[i].text = (i + 1).ToString() + ".スコア:" + score.ToString() + "(" + Mathf.RoundToInt(time).ToString() + "秒)";
 
                 leaderboardEntries[i].gameObject.SetActive(true);
             }
