@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// オブジェクトプールから敵をスポーン（生成）するスクリプトです。

@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// プレイヤーを追跡し、設定された範囲内でカメラの移動を制限するスクリプトです。

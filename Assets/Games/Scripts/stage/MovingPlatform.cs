@@ -1,7 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
-
 // Unityエディタ上でのみ使用する名前空間を定義
 #if UNITY_EDITOR
 using UnityEditor;

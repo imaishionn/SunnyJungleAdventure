@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// スイッチに連動して出現・消滅するギミック付きの足場を管理します。

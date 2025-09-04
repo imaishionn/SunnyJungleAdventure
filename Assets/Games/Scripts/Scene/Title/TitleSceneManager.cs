@@ -1,10 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
-// Debugの曖昧な参照を解消するため明示的に指定
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// タイトルシーンのUIとイベントを管理するスクリプトです。

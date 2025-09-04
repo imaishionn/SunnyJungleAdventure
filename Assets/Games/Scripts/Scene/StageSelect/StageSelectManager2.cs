@@ -1,9 +1,7 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// ステージ選択シーン（2ページ目）のUIとイベントを管理するスクリプトです。

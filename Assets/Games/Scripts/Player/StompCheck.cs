@@ -1,5 +1,4 @@
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// プレイヤーが敵を踏みつけたことを判定するスクリプトです。

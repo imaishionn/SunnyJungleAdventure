@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// 敵が投下するボムの挙動を制御するスクリプトです。

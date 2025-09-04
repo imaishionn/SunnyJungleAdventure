@@ -1,5 +1,4 @@
 using UnityEngine;
-using Debug = UnityEngine.Debug; // 曖昧な参照を解消
 
 /// <summary>
 /// 2Dプラットフォームゲームで、キャラクターが地面に接地しているかを判定するスクリプトです。

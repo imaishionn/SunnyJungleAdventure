@@ -1,5 +1,4 @@
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// 敵キャラクター「恐竜」のAIと動作を制御するスクリプトです。

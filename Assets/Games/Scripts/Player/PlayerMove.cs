@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using System.Collections.Generic;
 
 /// <summary>
 /// プレイヤーキャラクターの移動とジャンプを管理するスクリプトです。

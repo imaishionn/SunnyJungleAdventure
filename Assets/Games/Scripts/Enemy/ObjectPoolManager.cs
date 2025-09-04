@@ -1,7 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Debug = UnityEngine.Debug;
 
+/// <summary>
+/// オブジェクトプールを管理
+/// </summary>
 public class ObjectPoolManager : MonoBehaviour
 {
     // シングルトンインスタンス

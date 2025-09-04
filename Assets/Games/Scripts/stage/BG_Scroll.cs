@@ -1,5 +1,4 @@
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// プレイヤーの横移動に応じて背景をスクロールさせるスクリプトです。
