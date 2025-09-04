@@ -5,20 +5,11 @@ using UnityEngine;
 /// </summary>
 public class BG_Scroll : MonoBehaviour
 {
-    // ----------------------------------------------------------------------------------------------------
-    // インスペクターで設定するパラメーター
-    // ----------------------------------------------------------------------------------------------------
-    [Header("コンポーネント")]
-    [Tooltip("プレイヤーの移動速度を取得するためのPlayerMoveコンポーネント")]
-    [SerializeField] private PlayerMove m_playerMove;
+    [Header("コンポーネント"),Tooltip("プレイヤーの移動速度を取得するためのPlayerMoveコンポーネント"),SerializeField]
+    private PlayerMove m_playerMove;
 
-    [Header("スクロール設定")]
-    [Tooltip("背景のスクロール速度を補正します（大きいほど遅くなる）。ゼロは不可。")]
-    [SerializeField] private float Division = 1.0f;
+    [Header("スクロール設定"),Tooltip("背景のスクロール速度を補正します（大きいほど遅くなる）。ゼロは不可。"),SerializeField] private float Division = 1.0f;
 
-    // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviourのライフサイクルメソッド
-    // ----------------------------------------------------------------------------------------------------
     private void Awake()
     {
         // PlayerMoveがInspectorで割り当てられていない場合、タグで検索して取得

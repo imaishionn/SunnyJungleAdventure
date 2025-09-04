@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// 敵キャラクター「ワシ」のAIと動作を制御するスクリプトです。
