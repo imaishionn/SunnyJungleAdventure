@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // Debug‚ÌB–†‚ÈQÆ‚ğ‰ğÁ‚·‚é‚½‚ß–¾¦“I‚Éw’è

@@ -1,10 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 /// <summary>
 /// ゲーム全体の進行状況、状態、データ、UI、BGMなどを管理するシングルトンクラス。
@@ -76,7 +73,7 @@ public class GameManager : MonoBehaviour
     private int m_currentStageIndex = 0;
     private float m_currentTime;
     private Coroutine m_fadeCoroutine;
-    private UnityEngine.AsyncOperation m_asyncLoadOperation;
+    private AsyncOperation m_asyncLoadOperation;
     private GameObject m_globalFadeCanvasInstance;
     private bool m_isGlobalTransitioning = false; // シーン遷移中かどうかのフラグ
     private AudioSource m_audioSource;

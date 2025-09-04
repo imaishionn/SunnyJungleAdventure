@@ -1,7 +1,5 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using System.Collections;
-using System.Collections.Generic;
 
 /// <summary>
 /// ジャンプボタンUIのタッチイベントを処理し、プレイヤーのジャンプを呼び出すスクリプト。

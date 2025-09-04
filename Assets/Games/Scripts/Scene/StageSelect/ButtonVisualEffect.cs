@@ -3,8 +3,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-
-
 /// <summary>
 /// UIボタンに視覚的なフィードバック効果を追加するスクリプトです。
 /// 選択時の拡大/縮小、クリック時の点滅効果を管理します。

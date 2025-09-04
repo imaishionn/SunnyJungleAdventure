@@ -1,4 +1,3 @@
-
 using TMPro; // TextMeshProUGUI‚ðŽg—p‚·‚é‚½‚ß‚É’Ç‰Á
 using UnityEngine;
 
