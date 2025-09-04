@@ -2,9 +2,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-// Debugの曖昧な参照を解消するため、UnityEngine.Debugを明示的に指定
-using Debug = UnityEngine.Debug;
-
 /// <summary>
 /// UIボタンにクリック音とホバー音（選択音）を付けるためのスクリプトです。
 /// ISelectHandlerインターフェースを実装し、UIのイベントを処理します。

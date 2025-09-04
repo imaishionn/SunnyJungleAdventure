@@ -1,7 +1,8 @@
-using System.Diagnostics;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
+/// <summary>
+/// アイテム取得やアクションに応じた効果音を再生
+/// </summary>
 public class ItemSoundPlayer : MonoBehaviour
 {
     private AudioSource audioSource;

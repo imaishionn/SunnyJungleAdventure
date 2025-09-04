@@ -1,6 +1,4 @@
-using System.Collections;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// 敵キャラクター「犬」のAIと動作を制御するスクリプトです。

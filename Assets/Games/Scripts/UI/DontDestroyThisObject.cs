@@ -11,6 +11,6 @@ public class DontDestroyThisObject : MonoBehaviour
         // DontDestroyOnLoadを呼び出す
         // これにより、このスクリプトがアタッチされたGameObjectは
         // 新しいシーンがロードされても破棄されずに残り続けます。
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(gameObject);
     }
 }

@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// ゲームクリア後のシーンで、UIやシーン遷移を制御するスクリプトです。

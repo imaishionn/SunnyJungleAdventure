@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// ゲームオーバー時にBGMを再生
+/// </summary>
 public class GameOverBGMPlayer : MonoBehaviour
 {
     [SerializeField] private AudioClip gameOverBGM;
