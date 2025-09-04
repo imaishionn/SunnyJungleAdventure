@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7264166586427684912}
   - component: {fileID: 8708915849356979662}
   m_Layer: 0
-  m_Name: crank-down
+  m_Name: Crank-down
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

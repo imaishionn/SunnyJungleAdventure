@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5884480066413036287}
   - component: {fileID: 316295485284489510}
   m_Layer: 0
-  m_Name: crank-up
+  m_Name: Crank-up
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

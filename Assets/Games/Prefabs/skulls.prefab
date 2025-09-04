@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5217670251283847404}
   - component: {fileID: 5994229544580896499}
   m_Layer: 0
-  m_Name: skulls
+  m_Name: Skulls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
