@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 9006134761513463616}
   - component: {fileID: 9006134761513463623}
   m_Layer: 0
-  m_Name: vulture
+  m_Name: Vulture
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

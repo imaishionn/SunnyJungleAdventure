@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6103119500744559535}
   - component: {fileID: 3797132304685203564}
   m_Layer: 0
-  m_Name: cherry
+  m_Name: Cherry
   m_TagString: Gem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

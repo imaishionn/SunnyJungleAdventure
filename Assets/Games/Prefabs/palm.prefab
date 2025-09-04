@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2897458186548319993}
   - component: {fileID: 4394197561379276550}
   m_Layer: 0
-  m_Name: palm
+  m_Name: Palm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
