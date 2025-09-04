@@ -1,72 +1,61 @@
 using UnityEngine;
 
 /// <summary>
-/// ƒAƒCƒeƒ€æ“¾‚âƒAƒNƒVƒ‡ƒ“‚É‰‚¶‚½Œø‰Ê‰¹‚ğÄ¶
+/// ã‚¢ã‚¤ãƒ†ãƒ å–å¾—ã‚„ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã«å¿œã˜ãŸåŠ¹æœéŸ³ã‚’å†ç”Ÿ
 /// </summary>
-public class ItemSoundPlayer : MonoBehaviour
-{
+public class ItemSoundPlayer : MonoBehaviour {
     private AudioSource audioSource;
 
-    [Header("•óÎŠl“¾‰¹")]
+    [Header("å®çŸ³ç²å¾—éŸ³")]
     public AudioClip gemClip;
 
-    [Header("ƒWƒƒƒ“ƒv‰¹")]
+    [Header("ã‚¸ãƒ£ãƒ³ãƒ—éŸ³")]
     public AudioClip jumpClip;
 
-    [Header("ƒQ[ƒ€ƒI[ƒo[‰¹")]
+    [Header("ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼éŸ³")]
     public AudioClip gameOverClip;
 
-    [Header("“GŒ‚”j‰¹")]
+    [Header("æ•µæ’ƒç ´éŸ³")]
     public AudioClip enemyDefeatClip;
 
-    // š’Ç‰Á: “GŒ‚”j‰¹‚ÆƒQ[ƒ€ƒI[ƒo[‰¹‚Ì‰¹—Êİ’è
-    [Header("‰¹—Êİ’è")]
-    [Tooltip("“GŒ‚”j‰¹‚ÌÄ¶‰¹—Ê")]
+    // â˜…è¿½åŠ : æ•µæ’ƒç ´éŸ³ã¨ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼éŸ³ã®éŸ³é‡è¨­å®š
+    [Header("éŸ³é‡è¨­å®š")]
+    [Tooltip("æ•µæ’ƒç ´éŸ³ã®å†ç”ŸéŸ³é‡")]
     [Range(0f, 1f)]
     [SerializeField] private float enemyDefeatVolume = 1.0f;
-    [Tooltip("ƒQ[ƒ€ƒI[ƒo[‰¹‚ÌÄ¶‰¹—Ê")]
+    [Tooltip("ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼éŸ³ã®å†ç”ŸéŸ³é‡")]
     [Range(0f, 1f)]
     [SerializeField] private float gameOverVolume = 1.0f;
 
-    void Awake()
-    {
+    void Awake() {
         audioSource = GetComponent<AudioSource>();
-        if (audioSource == null)
-        {
-            Debug.LogError("ItemSoundPlayer: AudioSourceƒRƒ“ƒ|[ƒlƒ“ƒg‚ªƒAƒ^ƒbƒ`‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+        if (audioSource == null) {
+            Debug.LogError("ItemSoundPlayer: AudioSourceã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒã‚¢ã‚¿ãƒƒãƒã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚");
         }
     }
 
-    public void PlayGemSound()
-    {
-        if (audioSource != null && gemClip != null)
-        {
+    public void PlayGemSound() {
+        if (audioSource != null && gemClip != null) {
             audioSource.PlayOneShot(gemClip);
         }
     }
 
-    public void PlayJumpSound()
-    {
-        if (audioSource != null && jumpClip != null)
-        {
+    public void PlayJumpSound() {
+        if (audioSource != null && jumpClip != null) {
             audioSource.PlayOneShot(jumpClip);
         }
     }
 
-    public void PlayGameOverSound()
-    {
-        if (audioSource != null && gameOverClip != null)
-        {
-            // šC³: gameOverVolume‚ğˆø”‚Æ‚µ‚Ä“n‚·
+    public void PlayGameOverSound() {
+        if (audioSource != null && gameOverClip != null) {
+            // â˜…ä¿®æ­£: gameOverVolumeã‚’å¼•æ•°ã¨ã—ã¦æ¸¡ã™
             audioSource.PlayOneShot(gameOverClip, gameOverVolume);
         }
     }
 
-    public void PlayEnemyDefeatSound()
-    {
-        if (audioSource != null && enemyDefeatClip != null)
-        {
-            // šC³: enemyDefeatVolume‚ğˆø”‚Æ‚µ‚Ä“n‚·
+    public void PlayEnemyDefeatSound() {
+        if (audioSource != null && enemyDefeatClip != null) {
+            // â˜…ä¿®æ­£: enemyDefeatVolumeã‚’å¼•æ•°ã¨ã—ã¦æ¸¡ã™
             audioSource.PlayOneShot(enemyDefeatClip, enemyDefeatVolume);
         }
     }

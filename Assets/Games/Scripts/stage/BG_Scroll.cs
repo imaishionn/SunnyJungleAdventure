@@ -1,53 +1,45 @@
 using UnityEngine;
 
 /// <summary>
-/// ƒvƒŒƒCƒ„[‚Ì‰¡ˆÚ“®‚É‰‚¶‚Ä”wŒi‚ğƒXƒNƒ[ƒ‹‚³‚¹‚éƒXƒNƒŠƒvƒg‚Å‚·B
+/// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ¨ªç§»å‹•ã«å¿œã˜ã¦èƒŒæ™¯ã‚’ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã•ã›ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
 /// </summary>
-public class BG_Scroll : MonoBehaviour
-{
-    [Header("ƒRƒ“ƒ|[ƒlƒ“ƒg"),Tooltip("ƒvƒŒƒCƒ„[‚ÌˆÚ“®‘¬“x‚ğæ“¾‚·‚é‚½‚ß‚ÌPlayerMoveƒRƒ“ƒ|[ƒlƒ“ƒg"),SerializeField]
+public class BG_Scroll : MonoBehaviour {
+    [Header("ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ"), Tooltip("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç§»å‹•é€Ÿåº¦ã‚’å–å¾—ã™ã‚‹ãŸã‚ã®PlayerMoveã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ"), SerializeField]
     private PlayerMove m_playerMove;
 
-    [Header("ƒXƒNƒ[ƒ‹İ’è"),Tooltip("”wŒi‚ÌƒXƒNƒ[ƒ‹‘¬“x‚ğ•â³‚µ‚Ü‚·i‘å‚«‚¢‚Ù‚Ç’x‚­‚È‚éjBƒ[ƒ‚Í•s‰ÂB"),SerializeField] private float Division = 1.0f;
+    [Header("ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«è¨­å®š"), Tooltip("èƒŒæ™¯ã®ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«é€Ÿåº¦ã‚’è£œæ­£ã—ã¾ã™ï¼ˆå¤§ãã„ã»ã©é…ããªã‚‹ï¼‰ã€‚ã‚¼ãƒ­ã¯ä¸å¯ã€‚"), SerializeField] private float Division = 1.0f;
 
-    private void Awake()
-    {
-        // PlayerMove‚ªInspector‚ÅŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚È‚¢ê‡Aƒ^ƒO‚ÅŒŸõ‚µ‚Äæ“¾
-        if (m_playerMove == null)
-        {
-            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
-            if (playerObject != null)
-            {
+    private void Awake() {
+        // PlayerMoveãŒInspectorã§å‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ãªã„å ´åˆã€ã‚¿ã‚°ã§æ¤œç´¢ã—ã¦å–å¾—
+        if (m_playerMove == null) {
+            var playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject != null) {
                 m_playerMove = playerObject.GetComponent<PlayerMove>();
             }
 
-            if (m_playerMove == null)
-            {
-                Debug.LogError("BG_Scroll: 'Player'ƒ^ƒO‚ğ‚ÂƒIƒuƒWƒFƒNƒg‚ÉPlayerMoveƒRƒ“ƒ|[ƒlƒ“ƒg‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBInspector‚Åİ’è‚·‚é‚©APlayerƒIƒuƒWƒFƒNƒg‚ÉƒRƒ“ƒ|[ƒlƒ“ƒg‚ªƒAƒ^ƒbƒ`‚³‚ê‚Ä‚¢‚é‚©Šm”F‚µ‚Ä‚­‚¾‚³‚¢B", this);
+            if (m_playerMove == null) {
+                Debug.LogError("BG_Scroll: 'Player'ã‚¿ã‚°ã‚’æŒã¤ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«PlayerMoveã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚Inspectorã§è¨­å®šã™ã‚‹ã‹ã€Playerã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒã‚¢ã‚¿ãƒƒãƒã•ã‚Œã¦ã„ã‚‹ã‹ç¢ºèªã—ã¦ãã ã•ã„ã€‚", this);
             }
         }
 
-        // Division‚ª0‚Ìê‡‚ÌŒx‚ÆC³
-        if (Division == 0.0f)
-        {
-            Debug.LogWarning("BG_Scroll: Division‚Ì’l‚ª0‚Å‚·Bƒ[ƒœZ‚ğ–h‚®‚½‚ßA’l‚ğ1.0f‚Éİ’è‚µ‚Ü‚·B", this);
+        // DivisionãŒ0ã®å ´åˆã®è­¦å‘Šã¨ä¿®æ­£
+        if (Division == 0.0f) {
+            Debug.LogWarning("BG_Scroll: Divisionã®å€¤ãŒ0ã§ã™ã€‚ã‚¼ãƒ­é™¤ç®—ã‚’é˜²ããŸã‚ã€å€¤ã‚’1.0fã«è¨­å®šã—ã¾ã™ã€‚", this);
             Division = 1.0f;
         }
     }
 
-    private void Update()
-    {
-        // ƒvƒŒƒCƒ„[‚ÌQÆ‚ª‚È‚¢‚©ADivision‚ª0‚Ìê‡‚Íˆ—‚ğƒXƒLƒbƒv
-        if (m_playerMove == null || Division == 0.0f)
-        {
+    private void Update() {
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å‚ç…§ãŒãªã„ã‹ã€DivisionãŒ0ã®å ´åˆã¯å‡¦ç†ã‚’ã‚¹ã‚­ãƒƒãƒ—
+        if (m_playerMove == null || Division == 0.0f) {
             return;
         }
 
-        // ƒvƒŒƒCƒ„[‚ÌˆÚ“®•ûŒü‚É‰‚¶‚Ä”wŒi‚ğ“®‚©‚·
-        // PlayerMove‚Ì‘¬“x‚ğDivision‚ÅŠ„‚èAƒ^ƒCƒ€ƒfƒ‹ƒ^‚ÅŠŠ‚ç‚©‚ÉˆÚ“®‚³‚¹‚é
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç§»å‹•æ–¹å‘ã«å¿œã˜ã¦èƒŒæ™¯ã‚’å‹•ã‹ã™
+        // PlayerMoveã®é€Ÿåº¦ã‚’Divisionã§å‰²ã‚Šã€ã‚¿ã‚¤ãƒ ãƒ‡ãƒ«ã‚¿ã§æ»‘ã‚‰ã‹ã«ç§»å‹•ã•ã›ã‚‹
         float move = (-m_playerMove.MoveSpeed / Division) * Time.deltaTime;
 
-        // ”wŒi‚ğ‰¡•ûŒü‚ÉˆÚ“®
+        // èƒŒæ™¯ã‚’æ¨ªæ–¹å‘ã«ç§»å‹•
         transform.Translate(new Vector3(move, 0.0f, 0.0f));
     }
 }

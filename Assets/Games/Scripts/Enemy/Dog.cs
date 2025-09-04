@@ -1,145 +1,125 @@
 using UnityEngine;
 
 /// <summary>
-/// “GƒLƒƒƒ‰ƒNƒ^[uŒ¢v‚ÌAI‚Æ“®ì‚ğ§Œä‚·‚éƒXƒNƒŠƒvƒg‚Å‚·B
-/// ƒvƒŒƒCƒ„[‚ğŒŸ’m‚·‚é‚Æ’n–Ê‚ğ’ÇÕ‚µAŠR‚Ìè‘O‚Å’â~‚Ü‚½‚Í”½“]‚µ‚Ü‚·B
-/// EnemyƒNƒ‰ƒX‚ğŒp³‚µ‚Ä‚¢‚Ü‚·B
+/// æ•µã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã€ŒçŠ¬ã€ã®AIã¨å‹•ä½œã‚’åˆ¶å¾¡ã™ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
+/// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’æ¤œçŸ¥ã™ã‚‹ã¨åœ°é¢ã‚’è¿½è·¡ã—ã€å´–ã®æ‰‹å‰ã§åœæ­¢ã¾ãŸã¯åè»¢ã—ã¾ã™ã€‚
+/// Enemyã‚¯ãƒ©ã‚¹ã‚’ç¶™æ‰¿ã—ã¦ã„ã¾ã™ã€‚
 /// </summary>
-public class Dog : Enemy
-{
+public class Dog : Enemy {
     // ----------------------------------------------------------------------------------------------------
-    // ƒCƒ“ƒXƒyƒNƒ^[‚Åİ’è‚·‚éƒpƒ‰ƒ[ƒ^[
+    // ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§è¨­å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
     // ----------------------------------------------------------------------------------------------------
-    [Header("ƒvƒŒƒCƒ„[ŒŸ’mİ’è")]
-    [Tooltip("ƒvƒŒƒCƒ„[‚ğŒŸ’m‚·‚é”¼Œa")]
+    [Header("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æ¤œçŸ¥è¨­å®š")]
+    [Tooltip("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’æ¤œçŸ¥ã™ã‚‹åŠå¾„")]
     [SerializeField] private float detectRange = 5f;
 
-    [Header("ˆÚ“®İ’è")]
-    [Tooltip("ƒvƒŒƒCƒ„[’ÇÕ‚ÌˆÚ“®‘¬“x")]
+    [Header("ç§»å‹•è¨­å®š")]
+    [Tooltip("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼è¿½è·¡æ™‚ã®ç§»å‹•é€Ÿåº¦")]
     [SerializeField] private float runSpeed = 3f;
-    [Tooltip("ƒvƒŒƒCƒ„[‚ª^ã‚É‚¢‚é‚Æ”»’f‚·‚é…•½‹——£‚Ì‹–—e”ÍˆÍ")]
+    [Tooltip("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒçœŸä¸Šã«ã„ã‚‹ã¨åˆ¤æ–­ã™ã‚‹æ°´å¹³è·é›¢ã®è¨±å®¹ç¯„å›²")]
     [SerializeField] private float m_flipDeadZone = 0.2f;
 
-    [Header("ƒAƒjƒ[ƒVƒ‡ƒ“İ’è")]
-    [Tooltip("‘–‚éƒAƒjƒ[ƒVƒ‡ƒ“‚ğÄ¶‚·‚é‚½‚ß‚ÌƒgƒŠƒK[–¼")]
+    [Header("ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³è¨­å®š")]
+    [Tooltip("èµ°ã‚‹ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’å†ç”Ÿã™ã‚‹ãŸã‚ã®ãƒˆãƒªã‚¬ãƒ¼å")]
     [SerializeField] private string runAnimationTrigger = "run";
 
-    [Header("Ú’nEŠR‚ÌŒŸ’mİ’è")]
-    [Tooltip("’n–Ê‚ğ”»’è‚·‚é‚½‚ß‚ÌqƒIƒuƒWƒFƒNƒg‚ÌTransform")]
+    [Header("æ¥åœ°ãƒ»å´–ã®æ¤œçŸ¥è¨­å®š")]
+    [Tooltip("åœ°é¢ã‚’åˆ¤å®šã™ã‚‹ãŸã‚ã®å­ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®Transform")]
     [SerializeField] private Transform groundCheck;
-    [Tooltip("’n–Ê‚Æ‚µ‚Ä”F¯‚·‚éƒŒƒCƒ„[")]
+    [Tooltip("åœ°é¢ã¨ã—ã¦èªè­˜ã™ã‚‹ãƒ¬ã‚¤ãƒ¤ãƒ¼")]
     [SerializeField] private LayerMask groundLayer;
-    [Tooltip("’n–Ê”»’è‚ÌOverlapCircle‚Ì”¼Œa")]
+    [Tooltip("åœ°é¢åˆ¤å®šã®OverlapCircleã®åŠå¾„")]
     [SerializeField] private float groundCheckRadius = 0.2f;
-    [Tooltip("is•ûŒü‚Ìæ‚ÉŠR‚ª‚ ‚é‚©‚ğƒ`ƒFƒbƒN‚·‚é‹——£")]
+    [Tooltip("é€²è¡Œæ–¹å‘ã®å…ˆã«å´–ãŒã‚ã‚‹ã‹ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹è·é›¢")]
     [SerializeField] private float groundAheadCheckDistance = 0.5f;
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒg•Ï”
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆå¤‰æ•°
     // ----------------------------------------------------------------------------------------------------
     private Transform m_player;
     private bool m_isPlayerDetected = false;
 
     // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviour‚Ìƒ‰ƒCƒtƒTƒCƒNƒ‹ƒƒ\ƒbƒh
+    // MonoBehaviourã®ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
-    protected override void Awake()
-    {
-        // eƒNƒ‰ƒX‚ÌAwake()‚ğŒÄ‚Ño‚µAŠî”Õ‚Æ‚È‚é‰Šú‰»‚ğs‚¤
+    protected override void Awake() {
+        // è¦ªã‚¯ãƒ©ã‚¹ã®Awake()ã‚’å‘¼ã³å‡ºã—ã€åŸºç›¤ã¨ãªã‚‹åˆæœŸåŒ–ã‚’è¡Œã†
         base.Awake();
 
-        // 'Player'ƒ^ƒO‚ğ‚ÂƒIƒuƒWƒFƒNƒg‚ğ’T‚µAŒ©‚Â‚©‚ê‚ÎTransform‚ğæ“¾
+        // 'Player'ã‚¿ã‚°ã‚’æŒã¤ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æ¢ã—ã€è¦‹ã¤ã‹ã‚Œã°Transformã‚’å–å¾—
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null)
-        {
+        if (playerObj != null) {
             m_player = playerObj.transform;
         }
-        else
-        {
-            Debug.LogWarning("Dog: 'Player'ƒ^ƒO‚ğ‚ÂGameObject‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBƒvƒŒƒCƒ„[’ÇÕ‹@”\‚ª–³Œø‚É‚È‚è‚Ü‚·B", this);
+        else {
+            Debug.LogWarning("Dog: 'Player'ã‚¿ã‚°ã‚’æŒã¤GameObjectãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼è¿½è·¡æ©Ÿèƒ½ãŒç„¡åŠ¹ã«ãªã‚Šã¾ã™ã€‚", this);
         }
 
-        // Rigidbody2D‚Ìİ’è
-        if (m_rb != null)
-        {
-            m_rb.gravityScale = 1f; // Dog‚ª’n–Ê‚ğ•à‚­‚æ‚¤‚Éd—Í‚ğ—LŒø‰»
+        // Rigidbody2Dã®è¨­å®š
+        if (m_rb != null) {
+            m_rb.gravityScale = 1f; // DogãŒåœ°é¢ã‚’æ­©ãã‚ˆã†ã«é‡åŠ›ã‚’æœ‰åŠ¹åŒ–
         }
     }
 
-    protected void FixedUpdate()
-    {
-        // €–Só‘Ô‚Ü‚½‚ÍƒvƒŒƒCƒ„[‚ªŒ©‚Â‚©‚ç‚È‚¢ê‡‚Íˆ—‚ğ’â~
-        if (IsDead || m_player == null)
-        {
+    protected void FixedUpdate() {
+        // æ­»äº¡çŠ¶æ…‹ã¾ãŸã¯ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒè¦‹ã¤ã‹ã‚‰ãªã„å ´åˆã¯å‡¦ç†ã‚’åœæ­¢
+        if (IsDead || m_player == null) {
             if (m_rb != null) m_rb.velocity = Vector2.zero;
             return;
         }
 
-        // ƒvƒŒƒCƒ„[‚ğŒŸ’m‚·‚é‚Ü‚Å‘Ò‹@
-        if (!m_isPlayerDetected)
-        {
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’æ¤œçŸ¥ã™ã‚‹ã¾ã§å¾…æ©Ÿ
+        if (!m_isPlayerDetected) {
             float distance = Vector2.Distance(transform.position, m_player.position);
-            if (distance < detectRange)
-            {
+            if (distance < detectRange) {
                 m_isPlayerDetected = true;
-                // ƒvƒŒƒCƒ„[ŒŸ’mŒãA‘–‚éƒAƒjƒ[ƒVƒ‡ƒ“‚ğŠJn
-                if (m_animator != null && HasAnimatorParameter(runAnimationTrigger, AnimatorControllerParameterType.Trigger))
-                {
+                // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æ¤œçŸ¥å¾Œã€èµ°ã‚‹ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’é–‹å§‹
+                if (m_animator != null && HasAnimatorParameter(runAnimationTrigger, AnimatorControllerParameterType.Trigger)) {
                     m_animator.SetTrigger(runAnimationTrigger);
                 }
             }
         }
 
-        // ƒvƒŒƒCƒ„[‚ğŒŸ’m‚µ‚½ê‡‚Ì’ÇÕˆ—
-        if (m_isPlayerDetected)
-        {
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’æ¤œçŸ¥ã—ãŸå ´åˆã®è¿½è·¡å‡¦ç†
+        if (m_isPlayerDetected) {
             bool isGrounded = IsGrounded();
 
-            if (isGrounded)
-            {
-                // ƒvƒŒƒCƒ„[‚Æ‚Ì…•½‹——£‚ğŒvZ
+            if (isGrounded) {
+                // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨ã®æ°´å¹³è·é›¢ã‚’è¨ˆç®—
                 float horizontalDistance = m_player.position.x - transform.position.x;
 
-                // ƒvƒŒƒCƒ„[‚ªƒfƒbƒhƒ][ƒ““à‚É‚¢‚éê‡AŒü‚«‚ğ•Ï‚¦‚¸‚É’â~
-                if (Mathf.Abs(horizontalDistance) < m_flipDeadZone)
-                {
-                    if (m_rb != null)
-                    {
+                // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒãƒ‡ãƒƒãƒ‰ã‚¾ãƒ¼ãƒ³å†…ã«ã„ã‚‹å ´åˆã€å‘ãã‚’å¤‰ãˆãšã«åœæ­¢
+                if (Mathf.Abs(horizontalDistance) < m_flipDeadZone) {
+                    if (m_rb != null) {
                         m_rb.velocity = new Vector2(0, m_rb.velocity.y);
                     }
                 }
-                else // ƒvƒŒƒCƒ„[‚ªƒfƒbƒhƒ][ƒ“ŠO‚É‚¢‚éê‡A’ÇÕ‚ÆŒü‚«‚ÌXV‚ğs‚¤
+                else // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒãƒ‡ãƒƒãƒ‰ã‚¾ãƒ¼ãƒ³å¤–ã«ã„ã‚‹å ´åˆã€è¿½è·¡ã¨å‘ãã®æ›´æ–°ã‚’è¡Œã†
                 {
-                    // ƒvƒŒƒCƒ„[‚ª‰E‚É‚¢‚é‚©¶‚É‚¢‚é‚©‚ÅˆÚ“®•ûŒü‚ğŒˆ’è
+                    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒå³ã«ã„ã‚‹ã‹å·¦ã«ã„ã‚‹ã‹ã§ç§»å‹•æ–¹å‘ã‚’æ±ºå®š
                     Vector2 direction = (horizontalDistance > 0) ? Vector2.right : Vector2.left;
 
-                    // is•ûŒü‚Ìæ‚É‘«ê‚ª‚ ‚é‚©ƒ`ƒFƒbƒN
-                    if (IsGroundAhead(direction))
-                    {
-                        // ‘«ê‚ª‚ ‚ê‚ÎˆÚ“®
-                        if (m_rb != null)
-                        {
+                    // é€²è¡Œæ–¹å‘ã®å…ˆã«è¶³å ´ãŒã‚ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
+                    if (IsGroundAhead(direction)) {
+                        // è¶³å ´ãŒã‚ã‚Œã°ç§»å‹•
+                        if (m_rb != null) {
                             m_rb.velocity = new Vector2(direction.x * runSpeed, m_rb.velocity.y);
                         }
                     }
-                    else
-                    {
-                        // ‘«ê‚Ì’[‚È‚Ì‚Å’â~
-                        if (m_rb != null)
-                        {
+                    else {
+                        // è¶³å ´ã®ç«¯ãªã®ã§åœæ­¢
+                        if (m_rb != null) {
                             m_rb.velocity = new Vector2(0, m_rb.velocity.y);
                         }
                     }
 
-                    // ƒLƒƒƒ‰ƒNƒ^[‚ÌŒü‚«‚ğXV
+                    // ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®å‘ãã‚’æ›´æ–°
                     FlipSprite(direction.x);
                 }
             }
-            else
-            {
-                // ’n–Ê‚É‚¢‚È‚¢ê‡‚Í‰¡ˆÚ“®‚ğ’â~
-                if (m_rb != null)
-                {
+            else {
+                // åœ°é¢ã«ã„ãªã„å ´åˆã¯æ¨ªç§»å‹•ã‚’åœæ­¢
+                if (m_rb != null) {
                     m_rb.velocity = new Vector2(0, m_rb.velocity.y);
                 }
             }
@@ -147,69 +127,61 @@ public class Dog : Enemy
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒgƒƒ\ƒbƒh
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// ’n–Ê‚ÉÚ’n‚µ‚Ä‚¢‚é‚©‚ğ”»’è‚µ‚Ü‚·B
+    /// åœ°é¢ã«æ¥åœ°ã—ã¦ã„ã‚‹ã‹ã‚’åˆ¤å®šã—ã¾ã™ã€‚
     /// </summary>
-    private bool IsGrounded()
-    {
-        if (groundCheck == null || groundLayer == 0)
-        {
-            Debug.LogWarning("IsGrounded: GroundCheck Transform ‚Ü‚½‚Í GroundLayer‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
+    private bool IsGrounded() {
+        if (groundCheck == null || groundLayer == 0) {
+            Debug.LogWarning("IsGrounded: GroundCheck Transform ã¾ãŸã¯ GroundLayerãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
             return false;
         }
-        // w’è‚³‚ê‚½ˆÊ’u‚Æ”¼Œa‚ÅA’n–ÊƒŒƒCƒ„[‚ÌƒRƒ‰ƒCƒ_[‚ğ’T‚·
+        // æŒ‡å®šã•ã‚ŒãŸä½ç½®ã¨åŠå¾„ã§ã€åœ°é¢ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã‚’æ¢ã™
         Collider2D collider = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
         return collider != null;
     }
 
     /// <summary>
-    /// is•ûŒü‚Ìæ‚É‘«ê‚ª‚ ‚é‚©‚ğ”»’è‚µ‚Ü‚·B
+    /// é€²è¡Œæ–¹å‘ã®å…ˆã«è¶³å ´ãŒã‚ã‚‹ã‹ã‚’åˆ¤å®šã—ã¾ã™ã€‚
     /// </summary>
-    /// <param name="direction">ˆÚ“®•ûŒü</param>
-    private bool IsGroundAhead(Vector2 direction)
-    {
-        if (groundCheck == null || groundLayer == 0)
-        {
+    /// <param name="direction">ç§»å‹•æ–¹å‘</param>
+    private bool IsGroundAhead(Vector2 direction) {
+        if (groundCheck == null || groundLayer == 0) {
             return false;
         }
-        // groundCheck‚ÌˆÊ’u‚©‚çis•ûŒü‚ÉŒü‚©‚Á‚Ä­‚µ‚¸‚ç‚µ‚½ˆÊ’u‚ğn“_‚Æ‚·‚é
+        // groundCheckã®ä½ç½®ã‹ã‚‰é€²è¡Œæ–¹å‘ã«å‘ã‹ã£ã¦å°‘ã—ãšã‚‰ã—ãŸä½ç½®ã‚’å§‹ç‚¹ã¨ã™ã‚‹
         Vector2 checkPosition = (Vector2)groundCheck.position + direction * 0.1f;
         RaycastHit2D hit = Physics2D.Raycast(checkPosition, Vector2.down, groundAheadCheckDistance, groundLayer);
 
-        // ƒfƒoƒbƒO—p‚ÉRay‚ğ‰Â‹‰»
+        // ãƒ‡ãƒãƒƒã‚°ç”¨ã«Rayã‚’å¯è¦–åŒ–
         Debug.DrawRay(checkPosition, Vector2.down * groundAheadCheckDistance, Color.red);
 
         return hit.collider != null;
     }
 
     /// <summary>
-    /// ƒLƒƒƒ‰ƒNƒ^[‚Ìx²ƒXƒP[ƒ‹‚ğ”½“]‚³‚¹AŒü‚«‚ğ•Ï‚¦‚Ü‚·B
+    /// ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®xè»¸ã‚¹ã‚±ãƒ¼ãƒ«ã‚’åè»¢ã•ã›ã€å‘ãã‚’å¤‰ãˆã¾ã™ã€‚
     /// </summary>
-    private void FlipSprite(float directionX)
-    {
+    private void FlipSprite(float directionX) {
         Vector3 scale = transform.localScale;
-        // is•ûŒü‚ª‰E‚ÅŒ»İ‚ÌƒXƒP[ƒ‹‚ª¶Œü‚«ix < 0j‚È‚ç”½“]
-        if (directionX > 0 && scale.x < 0)
-        {
+        // é€²è¡Œæ–¹å‘ãŒå³ã§ç¾åœ¨ã®ã‚¹ã‚±ãƒ¼ãƒ«ãŒå·¦å‘ãï¼ˆx < 0ï¼‰ãªã‚‰åè»¢
+        if (directionX > 0 && scale.x < 0) {
             scale.x *= -1;
         }
-        // is•ûŒü‚ª¶‚ÅŒ»İ‚ÌƒXƒP[ƒ‹‚ª‰EŒü‚«ix > 0j‚È‚ç”½“]
-        else if (directionX < 0 && scale.x > 0)
-        {
+        // é€²è¡Œæ–¹å‘ãŒå·¦ã§ç¾åœ¨ã®ã‚¹ã‚±ãƒ¼ãƒ«ãŒå³å‘ãï¼ˆx > 0ï¼‰ãªã‚‰åè»¢
+        else if (directionX < 0 && scale.x > 0) {
             scale.x *= -1;
         }
         transform.localScale = scale;
     }
 
     /// <summary>
-    /// ƒ_ƒ[ƒW‚ğó‚¯‚½Û‚Ìˆ—B
-    /// eƒNƒ‰ƒX‚ÌTakeDamage()‚ğƒI[ƒo[ƒ‰ƒCƒh‚µ‚Ä‚¢‚Ü‚·B
+    /// ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’å—ã‘ãŸéš›ã®å‡¦ç†ã€‚
+    /// è¦ªã‚¯ãƒ©ã‚¹ã®TakeDamage()ã‚’ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰ã—ã¦ã„ã¾ã™ã€‚
     /// </summary>
-    public override void TakeDamage()
-    {
+    public override void TakeDamage() {
         if (IsDead) return;
-        Die(); // eƒNƒ‰ƒX‚ÌDie()ƒƒ\ƒbƒh‚ğŒÄ‚Ño‚·
+        Die(); // è¦ªã‚¯ãƒ©ã‚¹ã®Die()ãƒ¡ã‚½ãƒƒãƒ‰ã‚’å‘¼ã³å‡ºã™
     }
 }

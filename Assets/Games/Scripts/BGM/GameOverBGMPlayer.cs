@@ -2,44 +2,37 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ƒQ[ƒ€ƒI[ƒo[‚ÉBGM‚ğÄ¶
+/// ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼æ™‚ã«BGMã‚’å†ç”Ÿ
 /// </summary>
-public class GameOverBGMPlayer : MonoBehaviour
-{
+public class GameOverBGMPlayer : MonoBehaviour {
     [SerializeField] private AudioClip gameOverBGM;
     [SerializeField, Range(0f, 1f)] private float defaultVolume = 0.5f;
-    [SerializeField] private Slider volumeSlider; // UI‚ÌƒXƒ‰ƒCƒ_[i”CˆÓj
+    [SerializeField] private Slider volumeSlider; // UIã®ã‚¹ãƒ©ã‚¤ãƒ€ãƒ¼ï¼ˆä»»æ„ï¼‰
 
     private AudioSource audioSource;
 
-    void Start()
-    {
+    void Start() {
         audioSource = GetComponent<AudioSource>();
 
-        if (gameOverBGM != null)
-        {
+        if (gameOverBGM != null) {
             audioSource.clip = gameOverBGM;
             audioSource.loop = true;
             audioSource.volume = defaultVolume;
             audioSource.Play();
         }
-        else
-        {
-            Debug.LogWarning("ƒQ[ƒ€ƒI[ƒo[BGM‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñI");
+        else {
+            Debug.LogWarning("ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼BGMãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ï¼");
         }
 
-        // ƒXƒ‰ƒCƒ_[‚ªİ’è‚³‚ê‚Ä‚¢‚ê‚Î‰Šú‰»
-        if (volumeSlider != null)
-        {
+        // ã‚¹ãƒ©ã‚¤ãƒ€ãƒ¼ãŒè¨­å®šã•ã‚Œã¦ã„ã‚Œã°åˆæœŸåŒ–
+        if (volumeSlider != null) {
             volumeSlider.value = defaultVolume;
             volumeSlider.onValueChanged.AddListener(SetVolume);
         }
     }
 
-    public void SetVolume(float volume)
-    {
-        if (audioSource != null)
-        {
+    public void SetVolume(float volume) {
+        if (audioSource != null) {
             audioSource.volume = volume;
         }
     }

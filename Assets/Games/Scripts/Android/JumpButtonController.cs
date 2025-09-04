@@ -2,36 +2,32 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// ƒWƒƒƒ“ƒvƒ{ƒ^ƒ“UI‚Ìƒ^ƒbƒ`ƒCƒxƒ“ƒg‚ğˆ—‚µAƒvƒŒƒCƒ„[‚ÌƒWƒƒƒ“ƒv‚ğŒÄ‚Ño‚·ƒXƒNƒŠƒvƒgB
+/// ã‚¸ãƒ£ãƒ³ãƒ—ãƒœã‚¿ãƒ³UIã®ã‚¿ãƒƒãƒã‚¤ãƒ™ãƒ³ãƒˆã‚’å‡¦ç†ã—ã€ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚¸ãƒ£ãƒ³ãƒ—ã‚’å‘¼ã³å‡ºã™ã‚¹ã‚¯ãƒªãƒ—ãƒˆã€‚
 /// </summary>
-// IPointerDownHandlerƒCƒ“ƒ^[ƒtƒF[ƒX‚ğÀ‘•‚·‚é‚±‚Æ‚ÅA
-// Unity‚ÌEvent System‚©‚çƒ{ƒ^ƒ“‚Ìƒ^ƒbƒvƒCƒxƒ“ƒg‚ğ’¼Úó‚¯æ‚é‚±‚Æ‚ª‚Å‚«‚éB
-public class JumpButtonController : MonoBehaviour, IPointerDownHandler
-{
-    // ƒvƒŒƒCƒ„[‚ÌˆÚ“®‚ğŠÇ—‚·‚éƒXƒNƒŠƒvƒg‚Ö‚ÌQÆ
+// IPointerDownHandlerã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã‚’å®Ÿè£…ã™ã‚‹ã“ã¨ã§ã€
+// Unityã®Event Systemã‹ã‚‰ãƒœã‚¿ãƒ³ã®ã‚¿ãƒƒãƒ—ã‚¤ãƒ™ãƒ³ãƒˆã‚’ç›´æ¥å—ã‘å–ã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚
+public class JumpButtonController : MonoBehaviour, IPointerDownHandler {
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç§»å‹•ã‚’ç®¡ç†ã™ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã¸ã®å‚ç…§
     private PlayerMove m_playerMove;
 
     /// <summary>
-    /// GameManager‚©‚çPlayerMove‚ÌQÆ‚ğó‚¯æ‚é‚½‚ß‚Ìƒƒ\ƒbƒh
+    /// GameManagerã‹ã‚‰PlayerMoveã®å‚ç…§ã‚’å—ã‘å–ã‚‹ãŸã‚ã®ãƒ¡ã‚½ãƒƒãƒ‰
     /// </summary>
-    /// <param name="player">PlayerMoveƒRƒ“ƒ|[ƒlƒ“ƒg</param>
-    public void SetPlayerMove(PlayerMove player)
-    {
-        // ŠO•”i’Êí‚ÍGameManagerj‚©‚çPlayerMove‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğİ’è‚·‚é
+    /// <param name="player">PlayerMoveã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ</param>
+    public void SetPlayerMove(PlayerMove player) {
+        // å¤–éƒ¨ï¼ˆé€šå¸¸ã¯GameManagerï¼‰ã‹ã‚‰PlayerMoveã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’è¨­å®šã™ã‚‹
         m_playerMove = player;
     }
 
     /// <summary>
-    /// ƒ{ƒ^ƒ“‚ªƒ^ƒbƒv‚³‚ê‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B
-    /// ‚±‚Ìƒƒ\ƒbƒh‚ÍAUI‚ÌEventSystem‚É‚æ‚Á‚Ä©“®“I‚ÉÀs‚³‚ê‚Ü‚·B
+    /// ãƒœã‚¿ãƒ³ãŒã‚¿ãƒƒãƒ—ã•ã‚ŒãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
+    /// ã“ã®ãƒ¡ã‚½ãƒƒãƒ‰ã¯ã€UIã®EventSystemã«ã‚ˆã£ã¦è‡ªå‹•çš„ã«å®Ÿè¡Œã•ã‚Œã¾ã™ã€‚
     /// </summary>
-    /// <param name="eventData">ƒ|ƒCƒ“ƒ^[iƒ^ƒbƒvjƒCƒxƒ“ƒg‚ÉŠÖ‚·‚éî•ñ</param>
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        // ƒvƒŒƒCƒ„[ƒIƒuƒWƒFƒNƒg‚ª‘¶İ‚µA‚©‚ÂƒqƒGƒ‰ƒ‹ƒL[‚ÅƒAƒNƒeƒBƒu‚Èê‡‚Ì‚İƒWƒƒƒ“ƒvˆ—‚ğÀs
-        if (m_playerMove != null && m_playerMove.gameObject.activeInHierarchy)
-        {
-            // PlayerMoveƒXƒNƒŠƒvƒg‚ÌJump()ƒƒ\ƒbƒh‚ğŒÄ‚Ño‚µ‚ÄAƒvƒŒƒCƒ„[‚ğƒWƒƒƒ“ƒv‚³‚¹‚é
+    /// <param name="eventData">ãƒã‚¤ãƒ³ã‚¿ãƒ¼ï¼ˆã‚¿ãƒƒãƒ—ï¼‰ã‚¤ãƒ™ãƒ³ãƒˆã«é–¢ã™ã‚‹æƒ…å ±</param>
+    public void OnPointerDown(PointerEventData eventData) {
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒå­˜åœ¨ã—ã€ã‹ã¤ãƒ’ã‚¨ãƒ©ãƒ«ã‚­ãƒ¼ã§ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãªå ´åˆã®ã¿ã‚¸ãƒ£ãƒ³ãƒ—å‡¦ç†ã‚’å®Ÿè¡Œ
+        if (m_playerMove != null && m_playerMove.gameObject.activeInHierarchy) {
+            // PlayerMoveã‚¹ã‚¯ãƒªãƒ—ãƒˆã®Jump()ãƒ¡ã‚½ãƒƒãƒ‰ã‚’å‘¼ã³å‡ºã—ã¦ã€ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ã‚¸ãƒ£ãƒ³ãƒ—ã•ã›ã‚‹
             m_playerMove.Jump();
         }
     }
