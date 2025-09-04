@@ -1,140 +1,126 @@
 using UnityEngine;
 
 /// <summary>
-/// “GƒLƒƒƒ‰ƒNƒ^[uƒJƒuƒgƒ€ƒVv‚ÌAI‚Æ“®ì‚ğ§Œä‚·‚éƒXƒNƒŠƒvƒg‚Å‚·B
-/// ˆê’è‚Ì”ÍˆÍ“à‚Åã‰º‚ÉˆÚ“®‚µAƒvƒŒƒCƒ„[‚ğŒŸ’m‚·‚é‚Æƒ{ƒ€‚ğ“Š‰º‚µ‚Ü‚·B
-/// EnemyƒNƒ‰ƒX‚ğŒp³‚µ‚Ä‚¢‚Ü‚·B
+/// æ•µã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã€Œã‚«ãƒ–ãƒˆãƒ ã‚·ã€ã®AIã¨å‹•ä½œã‚’åˆ¶å¾¡ã™ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
+/// ä¸€å®šã®ç¯„å›²å†…ã§ä¸Šä¸‹ã«ç§»å‹•ã—ã€ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’æ¤œçŸ¥ã™ã‚‹ã¨ãƒœãƒ ã‚’æŠ•ä¸‹ã—ã¾ã™ã€‚
+/// Enemyã‚¯ãƒ©ã‚¹ã‚’ç¶™æ‰¿ã—ã¦ã„ã¾ã™ã€‚
 /// </summary>
-public class Bettle : Enemy
-{
+public class Bettle : Enemy {
     // ----------------------------------------------------------------------------------------------------
-    // ƒCƒ“ƒXƒyƒNƒ^[‚Åİ’è‚·‚éƒpƒ‰ƒ[ƒ^[
+    // ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§è¨­å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
     // ----------------------------------------------------------------------------------------------------
-    [Header("ƒvƒŒƒCƒ„[ŒŸ’mİ’è")]
-    [Tooltip("ƒvƒŒƒCƒ„[‚ÌTransformBŒ©‚Â‚©‚ç‚È‚¢ê‡‚Í'Player'ƒ^ƒO‚Å©“®ŒŸõ‚µ‚Ü‚·B")]
+    [Header("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æ¤œçŸ¥è¨­å®š")]
+    [Tooltip("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®Transformã€‚è¦‹ã¤ã‹ã‚‰ãªã„å ´åˆã¯'Player'ã‚¿ã‚°ã§è‡ªå‹•æ¤œç´¢ã—ã¾ã™ã€‚")]
     [SerializeField] private Transform playerTransform;
-    [Tooltip("ƒvƒŒƒCƒ„[‚ğŒŸ’m‚·‚é”¼Œa")]
+    [Tooltip("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’æ¤œçŸ¥ã™ã‚‹åŠå¾„")]
     [SerializeField] private float detectRange = 5f;
 
-    [Header("ƒ{ƒ€İ’è")]
-    [Tooltip("“Š‰º‚·‚éƒ{ƒ€‚ÌPrefab")]
+    [Header("ãƒœãƒ è¨­å®š")]
+    [Tooltip("æŠ•ä¸‹ã™ã‚‹ãƒœãƒ ã®Prefab")]
     [SerializeField] private GameObject bombPrefab;
-    [Tooltip("ƒ{ƒ€‚ğ“Š‰º‚·‚éˆÊ’u")]
+    [Tooltip("ãƒœãƒ ã‚’æŠ•ä¸‹ã™ã‚‹ä½ç½®")]
     [SerializeField] private Transform launchPoint;
-    [Tooltip("ƒ{ƒ€‚ğ“Š‰º‚·‚é‘¬“x")]
+    [Tooltip("ãƒœãƒ ã‚’æŠ•ä¸‹ã™ã‚‹é€Ÿåº¦")]
     [SerializeField] private float bombLaunchSpeed = 10f;
-    [Tooltip("ƒ{ƒ€‚ğ“Š‰º‚·‚éŠÔŠu (•b)")]
+    [Tooltip("ãƒœãƒ ã‚’æŠ•ä¸‹ã™ã‚‹é–“éš” (ç§’)")]
     [SerializeField] private float attackInterval = 3f;
 
-    [Header("ã‰ºˆÚ“®İ’è")]
-    [Tooltip("ã‰ºˆÚ“®‚Ì‘¬“x")]
+    [Header("ä¸Šä¸‹ç§»å‹•è¨­å®š")]
+    [Tooltip("ä¸Šä¸‹ç§»å‹•ã®é€Ÿåº¦")]
     [SerializeField] private float verticalMoveSpeed = 1f;
-    [Tooltip("ã‰ºˆÚ“®‚ÌU• (’†S‚©‚ç‚Ì‹——£)")]
+    [Tooltip("ä¸Šä¸‹ç§»å‹•ã®æŒ¯å¹… (ä¸­å¿ƒã‹ã‚‰ã®è·é›¢)")]
     [SerializeField] private float verticalMoveRange = 2f;
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒg•Ï”
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆå¤‰æ•°
     // ----------------------------------------------------------------------------------------------------
     private float attackTimer;
     private Vector3 startPosition;
 
     // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviour‚Ìƒ‰ƒCƒtƒTƒCƒNƒ‹ƒƒ\ƒbƒh
+    // MonoBehaviourã®ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
-    protected override void Awake()
-    {
-        // eƒNƒ‰ƒX‚ÌAwake()‚ğŒÄ‚Ño‚µAŠî”Õ‚Æ‚È‚é‰Šú‰»‚ğs‚¤
+    protected override void Awake() {
+        // è¦ªã‚¯ãƒ©ã‚¹ã®Awake()ã‚’å‘¼ã³å‡ºã—ã€åŸºç›¤ã¨ãªã‚‹åˆæœŸåŒ–ã‚’è¡Œã†
         base.Awake();
 
-        // ƒvƒŒƒCƒ„[‚ÌTransform‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚È‚¢ê‡A'Player'ƒ^ƒO‚Å©“®ŒŸõ
-        if (playerTransform == null)
-        {
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®TransformãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ãªã„å ´åˆã€'Player'ã‚¿ã‚°ã§è‡ªå‹•æ¤œç´¢
+        if (playerTransform == null) {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null)
-            {
+            if (playerObj != null) {
                 playerTransform = playerObj.transform;
             }
-            else
-            {
-                Debug.LogWarning("Bettle: 'Player'ƒ^ƒO‚ğ‚ÂGameObject‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBƒvƒŒƒCƒ„[’ÇÕ‹@”\‚ª–³Œø‚É‚È‚è‚Ü‚·B", this);
+            else {
+                Debug.LogWarning("Bettle: 'Player'ã‚¿ã‚°ã‚’æŒã¤GameObjectãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼è¿½è·¡æ©Ÿèƒ½ãŒç„¡åŠ¹ã«ãªã‚Šã¾ã™ã€‚", this);
             }
         }
 
-        // ‰ŠúˆÊ’u‚ğ•Û‘¶
+        // åˆæœŸä½ç½®ã‚’ä¿å­˜
         startPosition = transform.position;
-        // UŒ‚ƒ^ƒCƒ}[‚ğ‰Šú‰»
+        // æ”»æ’ƒã‚¿ã‚¤ãƒãƒ¼ã‚’åˆæœŸåŒ–
         attackTimer = attackInterval;
     }
 
-    private void Update()
-    {
-        // €–Só‘Ô‚Ìê‡‚Íˆ—‚ğ’â~
+    private void Update() {
+        // æ­»äº¡çŠ¶æ…‹ã®å ´åˆã¯å‡¦ç†ã‚’åœæ­¢
         if (IsDead) return;
 
         // ------------------
-        // ã‰ºˆÚ“®ˆ—
+        // ä¸Šä¸‹ç§»å‹•å‡¦ç†
         // ------------------
-        // SinŠÖ”‚ğg‚Á‚ÄA‰ŠúˆÊ’u‚ğ’†S‚ÉŠŠ‚ç‚©‚Èã‰ºˆÚ“®‚ğ•\Œ»
+        // Siné–¢æ•°ã‚’ä½¿ã£ã¦ã€åˆæœŸä½ç½®ã‚’ä¸­å¿ƒã«æ»‘ã‚‰ã‹ãªä¸Šä¸‹ç§»å‹•ã‚’è¡¨ç¾
         float newY = startPosition.y + Mathf.Sin(Time.time * verticalMoveSpeed) * verticalMoveRange;
         transform.position = new Vector3(transform.position.x, newY, transform.position.z);
 
         // ------------------
-        // ƒvƒŒƒCƒ„[’ÇÕEUŒ‚ˆ—
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼è¿½è·¡ãƒ»æ”»æ’ƒå‡¦ç†
         // ------------------
-        if (playerTransform != null)
-        {
+        if (playerTransform != null) {
             float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
 
-            // ƒvƒŒƒCƒ„[‚ªŒŸ’m”ÍˆÍ“à‚É‚¢‚é‚©ƒ`ƒFƒbƒN
-            if (distanceToPlayer < detectRange)
-            {
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒæ¤œçŸ¥ç¯„å›²å†…ã«ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
+            if (distanceToPlayer < detectRange) {
                 attackTimer -= Time.deltaTime;
 
-                // UŒ‚ƒ^ƒCƒ}[‚ªƒ[ƒ‚É‚È‚Á‚½‚çUŒ‚
-                if (attackTimer <= 0)
-                {
+                // æ”»æ’ƒã‚¿ã‚¤ãƒãƒ¼ãŒã‚¼ãƒ­ã«ãªã£ãŸã‚‰æ”»æ’ƒ
+                if (attackTimer <= 0) {
                     Attack();
-                    attackTimer = attackInterval; // ƒ^ƒCƒ}[‚ğƒŠƒZƒbƒg
+                    attackTimer = attackInterval; // ã‚¿ã‚¤ãƒãƒ¼ã‚’ãƒªã‚»ãƒƒãƒˆ
                 }
             }
         }
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒgƒƒ\ƒbƒh
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// ƒ{ƒ€‚ğ¶¬‚µAƒvƒŒƒCƒ„[‚Ì•ûŒü‚Ö“Š‰º‚µ‚Ü‚·B
+    /// ãƒœãƒ ã‚’ç”Ÿæˆã—ã€ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ–¹å‘ã¸æŠ•ä¸‹ã—ã¾ã™ã€‚
     /// </summary>
-    private void Attack()
-    {
-        // •K—v‚ÈQÆ‚ªİ’è‚³‚ê‚Ä‚¢‚é‚©Šm”F
-        if (bombPrefab == null)
-        {
-            Debug.LogError("Bettle: bombPrefab‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
+    private void Attack() {
+        // å¿…è¦ãªå‚ç…§ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹ã‹ç¢ºèª
+        if (bombPrefab == null) {
+            Debug.LogError("Bettle: bombPrefabãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
             return;
         }
-        if (launchPoint == null)
-        {
-            Debug.LogError("Bettle: launchPoint‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
+        if (launchPoint == null) {
+            Debug.LogError("Bettle: launchPointãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
             return;
         }
 
-        // ƒ{ƒ€‚ğ¶¬
+        // ãƒœãƒ ã‚’ç”Ÿæˆ
         GameObject bomb = Instantiate(bombPrefab, launchPoint.position, Quaternion.identity);
 
-        // ƒvƒŒƒCƒ„[‚Ö‚Ì•ûŒü‚ğ³‹K‰»‚µ‚Äæ“¾
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¸ã®æ–¹å‘ã‚’æ­£è¦åŒ–ã—ã¦å–å¾—
         Vector2 direction = (playerTransform.position - launchPoint.position).normalized;
 
-        // ƒ{ƒ€‚ÌƒXƒNƒŠƒvƒg‚ğæ“¾‚µ‚Ä‹N“®
+        // ãƒœãƒ ã®ã‚¹ã‚¯ãƒªãƒ—ãƒˆã‚’å–å¾—ã—ã¦èµ·å‹•
         Bomb bombScript = bomb.GetComponent<Bomb>();
-        if (bombScript != null)
-        {
+        if (bombScript != null) {
             bombScript.Launch(direction, bombLaunchSpeed);
         }
-        else
-        {
-            Debug.LogError("Bettle: ¶¬‚µ‚½ƒ{ƒ€‚ÉBombƒRƒ“ƒ|[ƒlƒ“ƒg‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB", this);
+        else {
+            Debug.LogError("Bettle: ç”Ÿæˆã—ãŸãƒœãƒ ã«Bombã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚", this);
         }
     }
 }

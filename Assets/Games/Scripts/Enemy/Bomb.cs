@@ -2,30 +2,29 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// “G‚ª“Š‰º‚·‚éƒ{ƒ€‚Ì‹““®‚ğ§Œä‚·‚éƒXƒNƒŠƒvƒg‚Å‚·B
-/// ƒvƒŒƒCƒ„[‚â’n–Ê‚ÉÚG‚·‚é‚Æ”š”­‚µAƒRƒ‰ƒCƒ_[‚ğŠg‘å‚µ‚Äƒ_ƒ[ƒW‚ğ—^‚¦‚Ü‚·B
+/// æ•µãŒæŠ•ä¸‹ã™ã‚‹ãƒœãƒ ã®æŒ™å‹•ã‚’åˆ¶å¾¡ã™ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
+/// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚„åœ°é¢ã«æ¥è§¦ã™ã‚‹ã¨çˆ†ç™ºã—ã€ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã‚’æ‹¡å¤§ã—ã¦ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’ä¸ãˆã¾ã™ã€‚
 /// </summary>
-public class Bomb : MonoBehaviour
-{
+public class Bomb : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
-    // ƒCƒ“ƒXƒyƒNƒ^[‚Åİ’è‚·‚éƒpƒ‰ƒ[ƒ^[
+    // ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§è¨­å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
     // ----------------------------------------------------------------------------------------------------
-    [Header("”š”­İ’è")]
-    [Tooltip("”š”­ƒAƒjƒ[ƒVƒ‡ƒ“‚ÌÄ¶ŠÔBƒRƒ‰ƒCƒ_[‚ÌŠg‘åŠÔ‚Æ‡‚í‚¹‚éB")]
+    [Header("çˆ†ç™ºè¨­å®š")]
+    [Tooltip("çˆ†ç™ºã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®å†ç”Ÿæ™‚é–“ã€‚ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®æ‹¡å¤§æ™‚é–“ã¨åˆã‚ã›ã‚‹ã€‚")]
     public float explosionDuration = 0.5f;
 
-    [Header("ƒRƒ‰ƒCƒ_[ƒAƒjƒ[ƒVƒ‡ƒ“İ’è")]
-    [Tooltip("”š”­ŠJn‚ÌƒRƒ‰ƒCƒ_[‚Ì”¼Œa")]
+    [Header("ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³è¨­å®š")]
+    [Tooltip("çˆ†ç™ºé–‹å§‹æ™‚ã®ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®åŠå¾„")]
     [SerializeField] private float startRadius = 0.05f;
-    [Tooltip("”š”­I—¹‚ÌƒRƒ‰ƒCƒ_[‚ÌÅ‘å”¼Œa")]
+    [Tooltip("çˆ†ç™ºçµ‚äº†æ™‚ã®ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®æœ€å¤§åŠå¾„")]
     [SerializeField] private float endRadius = 0.5f;
 
-    [Header("ƒ^[ƒQƒbƒgİ’è")]
-    [Tooltip("ƒvƒŒƒCƒ„[‚Ìƒ^ƒO")]
+    [Header("ã‚¿ãƒ¼ã‚²ãƒƒãƒˆè¨­å®š")]
+    [Tooltip("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚¿ã‚°")]
     [SerializeField] private string playerTag = "Player";
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒg•Ï”
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆå¤‰æ•°
     // ----------------------------------------------------------------------------------------------------
     private Rigidbody2D rb;
     private Animator anim;
@@ -33,60 +32,52 @@ public class Bomb : MonoBehaviour
     private bool hasExploded = false;
 
     // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviour‚Ìƒ‰ƒCƒtƒTƒCƒNƒ‹ƒƒ\ƒbƒh
+    // MonoBehaviourã®ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
-    private void Awake()
-    {
-        // •K—v‚ÈƒRƒ“ƒ|[ƒlƒ“ƒg‚ÌQÆ‚ğæ“¾
+    private void Awake() {
+        // å¿…è¦ãªã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®å‚ç…§ã‚’å–å¾—
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         bombCollider = GetComponent<CircleCollider2D>();
 
-        // ƒRƒ“ƒ|[ƒlƒ“ƒg‚ªæ“¾‚Å‚«‚È‚©‚Á‚½ê‡‚ÌŒx
-        if (rb == null) Debug.LogWarning("Bomb: Rigidbody2D‚ªƒAƒ^ƒbƒ`‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
-        if (anim == null) Debug.LogWarning("Bomb: Animator‚ªƒAƒ^ƒbƒ`‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
-        if (bombCollider == null) Debug.LogWarning("Bomb: CircleCollider2D‚ªƒAƒ^ƒbƒ`‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
+        // ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒå–å¾—ã§ããªã‹ã£ãŸå ´åˆã®è­¦å‘Š
+        if (rb == null) Debug.LogWarning("Bomb: Rigidbody2DãŒã‚¢ã‚¿ãƒƒãƒã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
+        if (anim == null) Debug.LogWarning("Bomb: AnimatorãŒã‚¢ã‚¿ãƒƒãƒã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
+        if (bombCollider == null) Debug.LogWarning("Bomb: CircleCollider2DãŒã‚¢ã‚¿ãƒƒãƒã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
 
-        // ƒRƒ‰ƒCƒ_[‚Ì‰Šúİ’è
-        if (bombCollider != null)
-        {
+        // ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®åˆæœŸè¨­å®š
+        if (bombCollider != null) {
             bombCollider.radius = startRadius;
             bombCollider.isTrigger = true;
         }
     }
 
     /// <summary>
-    /// ƒ{ƒ€‚ğw’è‚³‚ê‚½•ûŒü‚Éw’è‚³‚ê‚½‘¬“x‚Å”­Ë‚µ‚Ü‚·B
+    /// ãƒœãƒ ã‚’æŒ‡å®šã•ã‚ŒãŸæ–¹å‘ã«æŒ‡å®šã•ã‚ŒãŸé€Ÿåº¦ã§ç™ºå°„ã—ã¾ã™ã€‚
     /// </summary>
-    /// <param name="direction">”­Ë•ûŒü</param>
-    /// <param name="speed">”­Ë‘¬“x</param>
-    public void Launch(Vector2 direction, float speed)
-    {
-        if (rb != null)
-        {
+    /// <param name="direction">ç™ºå°„æ–¹å‘</param>
+    /// <param name="speed">ç™ºå°„é€Ÿåº¦</param>
+    public void Launch(Vector2 direction, float speed) {
+        if (rb != null) {
             rb.velocity = direction.normalized * speed;
         }
     }
 
     /// <summary>
-    /// ‘¼‚ÌƒRƒ‰ƒCƒ_[‚ÆÚG‚µ‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B
+    /// ä»–ã®ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã¨æ¥è§¦ã—ãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
     /// </summary>
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        // Šù‚É”š”­Ï‚İ‚È‚çˆ—‚ğƒXƒLƒbƒv
+    private void OnTriggerEnter2D(Collider2D other) {
+        // æ—¢ã«çˆ†ç™ºæ¸ˆã¿ãªã‚‰å‡¦ç†ã‚’ã‚¹ã‚­ãƒƒãƒ—
         if (hasExploded) return;
 
-        // ’n–Ê‚Ü‚½‚ÍƒvƒŒƒCƒ„[‚ÉG‚ê‚½‚ç”š”­ˆ—‚ğŠJn
-        if (other.CompareTag("Ground") || other.CompareTag(playerTag))
-        {
+        // åœ°é¢ã¾ãŸã¯ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«è§¦ã‚ŒãŸã‚‰çˆ†ç™ºå‡¦ç†ã‚’é–‹å§‹
+        if (other.CompareTag("Ground") || other.CompareTag(playerTag)) {
             Explode();
 
-            // ƒvƒŒƒCƒ„[‚É“–‚½‚Á‚½ê‡‚Ìˆ—i”š”­ŠJn‚Ì‚İj
-            if (other.CompareTag(playerTag))
-            {
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«å½“ãŸã£ãŸå ´åˆã®å‡¦ç†ï¼ˆçˆ†ç™ºé–‹å§‹æ™‚ã®ã¿ï¼‰
+            if (other.CompareTag(playerTag)) {
                 PlayerMove playerMove = other.GetComponent<PlayerMove>();
-                if (playerMove != null && !playerMove.IsDead)
-                {
+                if (playerMove != null && !playerMove.IsDead) {
                     playerMove.Die();
                 }
             }
@@ -94,62 +85,53 @@ public class Bomb : MonoBehaviour
     }
 
     /// <summary>
-    /// ‘¼‚ÌƒRƒ‰ƒCƒ_[‚ÆÚG‚µ‚Ä‚¢‚éŠÔA–ˆƒtƒŒ[ƒ€ŒÄ‚Ño‚³‚ê‚Ü‚·B
+    /// ä»–ã®ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã¨æ¥è§¦ã—ã¦ã„ã‚‹é–“ã€æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
     /// </summary>
-    private void OnTriggerStay2D(Collider2D other)
-    {
-        // ”š”­ˆ—’†iƒRƒ‰ƒCƒ_[‚ªŠg‘å’†j‚ÉƒvƒŒƒCƒ„[‚ª”ÍˆÍ“à‚É‚¢‚é‚©ƒ`ƒFƒbƒN
-        if (hasExploded && other.CompareTag(playerTag))
-        {
-            // ƒvƒŒƒCƒ„[‚ÌDie()ƒƒ\ƒbƒh‚ğŒÄ‚Ño‚·
+    private void OnTriggerStay2D(Collider2D other) {
+        // çˆ†ç™ºå‡¦ç†ä¸­ï¼ˆã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ãŒæ‹¡å¤§ä¸­ï¼‰ã«ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒç¯„å›²å†…ã«ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
+        if (hasExploded && other.CompareTag(playerTag)) {
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®Die()ãƒ¡ã‚½ãƒƒãƒ‰ã‚’å‘¼ã³å‡ºã™
             PlayerMove playerMove = other.GetComponent<PlayerMove>();
-            if (playerMove != null && !playerMove.IsDead)
-            {
+            if (playerMove != null && !playerMove.IsDead) {
                 playerMove.Die();
             }
         }
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒgƒƒ\ƒbƒh
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// ƒ{ƒ€‚Ì”š”­ˆ—‚ğŠJn‚µ‚Ü‚·B
+    /// ãƒœãƒ ã®çˆ†ç™ºå‡¦ç†ã‚’é–‹å§‹ã—ã¾ã™ã€‚
     /// </summary>
-    private void Explode()
-    {
-        hasExploded = true; // ”š”­ƒtƒ‰ƒO‚ğ—§‚Ä‚ÄA“ñd‚É”š”­‚µ‚È‚¢‚æ‚¤‚É‚·‚é
+    private void Explode() {
+        hasExploded = true; // çˆ†ç™ºãƒ•ãƒ©ã‚°ã‚’ç«‹ã¦ã¦ã€äºŒé‡ã«çˆ†ç™ºã—ãªã„ã‚ˆã†ã«ã™ã‚‹
 
-        // ƒ{ƒ€‚ÌˆÚ“®‚ğ’â~
-        if (rb != null)
-        {
+        // ãƒœãƒ ã®ç§»å‹•ã‚’åœæ­¢
+        if (rb != null) {
             rb.velocity = Vector2.zero;
         }
 
-        // ”š”­ƒAƒjƒ[ƒVƒ‡ƒ“‚ğÄ¶
-        if (anim != null)
-        {
+        // çˆ†ç™ºã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’å†ç”Ÿ
+        if (anim != null) {
             anim.SetTrigger("Explode");
         }
 
-        // ”š”­ƒRƒ‹[ƒ`ƒ“‚ğŠJn
+        // çˆ†ç™ºã‚³ãƒ«ãƒ¼ãƒãƒ³ã‚’é–‹å§‹
         StartCoroutine(ExplosionRoutine());
     }
 
     /// <summary>
-    /// ”š”­‚ÌƒAƒjƒ[ƒVƒ‡ƒ“‚ÆƒRƒ‰ƒCƒ_[‚ÌŠg‘å‚ğ§Œä‚·‚éƒRƒ‹[ƒ`ƒ“B
+    /// çˆ†ç™ºã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã¨ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®æ‹¡å¤§ã‚’åˆ¶å¾¡ã™ã‚‹ã‚³ãƒ«ãƒ¼ãƒãƒ³ã€‚
     /// </summary>
-    private IEnumerator ExplosionRoutine()
-    {
+    private IEnumerator ExplosionRoutine() {
         float timer = 0f;
-        while (timer < explosionDuration)
-        {
+        while (timer < explosionDuration) {
             timer += Time.deltaTime;
             float t = timer / explosionDuration;
 
-            if (bombCollider != null)
-            {
-                // ”š”­‚É‡‚í‚¹‚ÄƒRƒ‰ƒCƒ_[‚Ì”¼Œa‚ğLerp‚ÅŠŠ‚ç‚©‚ÉL‚°‚é
+            if (bombCollider != null) {
+                // çˆ†ç™ºã«åˆã‚ã›ã¦ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®åŠå¾„ã‚’Lerpã§æ»‘ã‚‰ã‹ã«åºƒã’ã‚‹
                 bombCollider.radius = Mathf.Lerp(startRadius, endRadius, t);
             }
             yield return null;
@@ -157,10 +139,9 @@ public class Bomb : MonoBehaviour
     }
 
     /// <summary>
-    /// ƒIƒuƒWƒFƒNƒg‚ğ”jŠü‚·‚éBƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒg‚©‚çŒÄ‚Ño‚³‚ê‚éB
+    /// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç ´æ£„ã™ã‚‹ã€‚ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆã‹ã‚‰å‘¼ã³å‡ºã•ã‚Œã‚‹ã€‚
     /// </summary>
-    public void DestroyBomb()
-    {
+    public void DestroyBomb() {
         Destroy(gameObject);
     }
 }

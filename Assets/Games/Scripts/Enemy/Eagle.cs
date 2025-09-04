@@ -1,33 +1,31 @@
 using System.Collections;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
-/// “GƒLƒƒƒ‰ƒNƒ^[uƒƒVv‚ÌAI‚Æ“®ì‚ğ§Œä‚·‚éƒXƒNƒŠƒvƒg‚Å‚·B
-/// ƒvƒŒƒCƒ„[‚ğŒŸ’m‚·‚é‚Æ’ÇÕ‚µAƒ_ƒ[ƒW‚ğó‚¯‚é‚ÆHP‚ªŒ¸‚èA“_–Å‚µ‚Ü‚·B
-/// EnemyƒNƒ‰ƒX‚ğŒp³‚µ‚Ä‚¢‚Ü‚·B
+/// æ•µã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã€Œãƒ¯ã‚·ã€ã®AIã¨å‹•ä½œã‚’åˆ¶å¾¡ã™ã‚‹ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
+/// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’æ¤œçŸ¥ã™ã‚‹ã¨è¿½è·¡ã—ã€ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’å—ã‘ã‚‹ã¨HPãŒæ¸›ã‚Šã€ç‚¹æ»…ã—ã¾ã™ã€‚
+/// Enemyã‚¯ãƒ©ã‚¹ã‚’ç¶™æ‰¿ã—ã¦ã„ã¾ã™ã€‚
 /// </summary>
-public class Eagle : Enemy
-{
+public class Eagle : Enemy {
     // ----------------------------------------------------------------------------------------------------
-    // ƒCƒ“ƒXƒyƒNƒ^[‚Åİ’è‚·‚éƒpƒ‰ƒ[ƒ^[
+    // ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§è¨­å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
     // ----------------------------------------------------------------------------------------------------
-    [Header("ƒvƒŒƒCƒ„[ŒŸ’mİ’è")]
-    [Tooltip("ƒvƒŒƒCƒ„[‚ğŒŸ’m‚·‚é”¼Œa")]
+    [Header("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æ¤œçŸ¥è¨­å®š")]
+    [Tooltip("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’æ¤œçŸ¥ã™ã‚‹åŠå¾„")]
     [SerializeField] private float DetectRange = 5f;
 
-    [Header("ˆÚ“®İ’è")]
-    [Tooltip("”òs‘¬“x")]
+    [Header("ç§»å‹•è¨­å®š")]
+    [Tooltip("é£›è¡Œé€Ÿåº¦")]
     [SerializeField] private float FlySpeed = 5f;
 
-    [Header("ƒ_ƒ[ƒWİ’è")]
-    [Tooltip("ƒ_ƒ[ƒW‚ğó‚¯‚½Û‚Ì“_–ÅŠÔ")]
+    [Header("ãƒ€ãƒ¡ãƒ¼ã‚¸æ™‚è¨­å®š")]
+    [Tooltip("ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’å—ã‘ãŸéš›ã®ç‚¹æ»…æ™‚é–“")]
     [SerializeField] private float FlashDuration = 1f;
-    [Tooltip("“_–Å‚ÌŠÔŠu (•\¦/”ñ•\¦‚ÌØ‚è‘Ö‚¦ŠÔ)")]
+    [Tooltip("ç‚¹æ»…ã®é–“éš” (è¡¨ç¤º/éè¡¨ç¤ºã®åˆ‡ã‚Šæ›¿ãˆæ™‚é–“)")]
     [SerializeField] private float FlashInterval = 0.1f;
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒg•Ï”
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆå¤‰æ•°
     // ----------------------------------------------------------------------------------------------------
     [SerializeField] private Transform m_player;
     private bool m_isFlying = false;
@@ -35,209 +33,178 @@ public class Eagle : Enemy
     private SpriteRenderer m_spriteRenderer;
 
     // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviour‚Ìƒ‰ƒCƒtƒTƒCƒNƒ‹ƒƒ\ƒbƒh
+    // MonoBehaviourã®ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
-    protected override void Awake()
-    {
-        // eƒNƒ‰ƒX‚ÌAwake()‚ğŒÄ‚Ño‚µAŠî”Õ‚Æ‚È‚é‰Šú‰»‚ğs‚¤
+    protected override void Awake() {
+        // è¦ªã‚¯ãƒ©ã‚¹ã®Awake()ã‚’å‘¼ã³å‡ºã—ã€åŸºç›¤ã¨ãªã‚‹åˆæœŸåŒ–ã‚’è¡Œã†
         base.Awake();
 
-        // 'Player'ƒ^ƒO‚ğ‚ÂƒIƒuƒWƒFƒNƒg‚ğ’T‚µAŒ©‚Â‚©‚ê‚ÎTransform‚ğæ“¾
-        if (m_player == null)
-        {
+        // 'Player'ã‚¿ã‚°ã‚’æŒã¤ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æ¢ã—ã€è¦‹ã¤ã‹ã‚Œã°Transformã‚’å–å¾—
+        if (m_player == null) {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
                 m_player = playerObj.transform;
-            else
-            {
-                Debug.LogWarning("Eagle: 'Player'ƒ^ƒO‚ğ‚ÂGameObject‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBƒvƒŒƒCƒ„[’ÇÕ‹@”\‚ª–³Œø‚É‚È‚è‚Ü‚·B", this);
+            else {
+                Debug.LogWarning("Eagle: 'Player'ã‚¿ã‚°ã‚’æŒã¤GameObjectãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼è¿½è·¡æ©Ÿèƒ½ãŒç„¡åŠ¹ã«ãªã‚Šã¾ã™ã€‚", this);
             }
         }
 
-        // SpriteRendererƒRƒ“ƒ|[ƒlƒ“ƒg‚ÌQÆ‚ğæ“¾
+        // SpriteRendererã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®å‚ç…§ã‚’å–å¾—
         m_spriteRenderer = GetComponent<SpriteRenderer>();
-        if (m_spriteRenderer == null)
-        {
-            Debug.LogError("Eagle: SpriteRenderer‚ªƒAƒ^ƒbƒ`‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB", this);
+        if (m_spriteRenderer == null) {
+            Debug.LogError("Eagle: SpriteRendererãŒã‚¢ã‚¿ãƒƒãƒã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", this);
         }
 
-        // Rigidbody2D‚Ìİ’è
-        if (m_rb != null)
-        {
-            m_rb.gravityScale = 0f; // d—Í‚ğ–³Œø‰»
-            m_rb.drag = 1f;         // ”òs’†‚ÉŠŠ‚ç‚©‚ÉŒ¸‘¬‚³‚¹‚é‚½‚ß‚Ì’ïR
+        // Rigidbody2Dã®è¨­å®š
+        if (m_rb != null) {
+            m_rb.gravityScale = 0f; // é‡åŠ›ã‚’ç„¡åŠ¹åŒ–
+            m_rb.drag = 1f;         // é£›è¡Œä¸­ã«æ»‘ã‚‰ã‹ã«æ¸›é€Ÿã•ã›ã‚‹ãŸã‚ã®æŠµæŠ—
         }
     }
 
-    protected override void OnEnable()
-    {
-        // eƒNƒ‰ƒX‚ÌOnEnable()‚ğŒÄ‚Ño‚·
+    protected override void OnEnable() {
+        // è¦ªã‚¯ãƒ©ã‚¹ã®OnEnable()ã‚’å‘¼ã³å‡ºã™
         base.OnEnable();
 
-        // ƒIƒuƒWƒFƒNƒg‚ªƒv[ƒ‹‚©‚çÄ—˜—p‚³‚ê‚éÛ‚Ì‰Šú‰»
+        // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒãƒ—ãƒ¼ãƒ«ã‹ã‚‰å†åˆ©ç”¨ã•ã‚Œã‚‹éš›ã®åˆæœŸåŒ–
         IsDead = false;
         m_isFlying = false;
-        m_hp = 3; // HP‚ğƒŠƒZƒbƒg
+        m_hp = 3; // HPã‚’ãƒªã‚»ãƒƒãƒˆ
 
-        // ‘¬“x‚ğƒŠƒZƒbƒg
+        // é€Ÿåº¦ã‚’ãƒªã‚»ãƒƒãƒˆ
         if (m_rb != null) m_rb.velocity = Vector2.zero;
 
-        // ƒAƒjƒ[ƒVƒ‡ƒ“‚ğƒŠƒZƒbƒg
-        if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
-        {
+        // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’ãƒªã‚»ãƒƒãƒˆ
+        if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool)) {
             m_animator.SetBool("fly", false);
         }
 
-        // ƒXƒvƒ‰ƒCƒg‚Ìó‘Ô‚ğƒŠƒZƒbƒg
-        if (m_spriteRenderer != null)
-        {
+        // ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®çŠ¶æ…‹ã‚’ãƒªã‚»ãƒƒãƒˆ
+        if (m_spriteRenderer != null) {
             m_spriteRenderer.enabled = true;
         }
     }
 
-    protected void FixedUpdate()
-    {
-        // €–Só‘Ô‚Ìê‡‚Íˆ—‚ğ’â~
+    protected void FixedUpdate() {
+        // æ­»äº¡çŠ¶æ…‹ã®å ´åˆã¯å‡¦ç†ã‚’åœæ­¢
         if (IsDead) return;
 
-        // ƒvƒŒƒCƒ„[‚âRigidbody2D‚ªİ’è‚³‚ê‚Ä‚¢‚È‚¢ê‡‚ÍA“®‚«‚ğ’â~‚µ‚Äˆ—‚ğ”²‚¯‚é
-        if (m_player == null || m_rb == null)
-        {
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚„Rigidbody2DãŒè¨­å®šã•ã‚Œã¦ã„ãªã„å ´åˆã¯ã€å‹•ãã‚’åœæ­¢ã—ã¦å‡¦ç†ã‚’æŠœã‘ã‚‹
+        if (m_player == null || m_rb == null) {
             if (m_rb != null) m_rb.velocity = Vector2.zero;
-            if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
-            {
+            if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool)) {
                 m_animator.SetBool("fly", false);
             }
             return;
         }
 
-        // ƒvƒŒƒCƒ„[‚Æ‚Ì‹——£‚ğŒvZ
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨ã®è·é›¢ã‚’è¨ˆç®—
         float distance = Vector2.Distance(transform.position, m_player.position);
 
-        // ƒvƒŒƒCƒ„[‚ªŒŸ’m”ÍˆÍ“à‚É‚¢‚é‚©ƒ`ƒFƒbƒN
-        if (distance < DetectRange)
-        {
-            // ƒvƒŒƒCƒ„[‚ÉŒü‚©‚Á‚Ä”òs
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒæ¤œçŸ¥ç¯„å›²å†…ã«ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
+        if (distance < DetectRange) {
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«å‘ã‹ã£ã¦é£›è¡Œ
             FlyToPlayer();
 
-            // ”òsó‘Ô‚ÌƒAƒjƒ[ƒVƒ‡ƒ“‚ğ—LŒø‚É‚·‚éiˆê“x‚¾‚¯Àsj
-            if (!m_isFlying)
-            {
-                if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
-                {
+            // é£›è¡ŒçŠ¶æ…‹ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’æœ‰åŠ¹ã«ã™ã‚‹ï¼ˆä¸€åº¦ã ã‘å®Ÿè¡Œï¼‰
+            if (!m_isFlying) {
+                if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool)) {
                     m_animator.SetBool("fly", true);
                 }
                 m_isFlying = true;
             }
         }
-        else
-        {
-            // ƒvƒŒƒCƒ„[‚ªŒŸ’m”ÍˆÍŠO‚Éo‚½ê‡
-            if (m_isFlying)
-            {
-                // ”òsƒAƒjƒ[ƒVƒ‡ƒ“‚ğ–³Œø‚É‚·‚éiˆê“x‚¾‚¯Àsj
-                if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
-                {
+        else {
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒæ¤œçŸ¥ç¯„å›²å¤–ã«å‡ºãŸå ´åˆ
+            if (m_isFlying) {
+                // é£›è¡Œã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’ç„¡åŠ¹ã«ã™ã‚‹ï¼ˆä¸€åº¦ã ã‘å®Ÿè¡Œï¼‰
+                if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool)) {
                     m_animator.SetBool("fly", false);
                 }
                 m_isFlying = false;
             }
 
-            // ‘¬“x‚ğ’â~
+            // é€Ÿåº¦ã‚’åœæ­¢
             m_rb.velocity = Vector2.zero;
         }
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒpƒuƒŠƒbƒNƒƒ\ƒbƒh‚Æƒvƒ‰ƒCƒx[ƒgƒƒ\ƒbƒh
+    // ãƒ‘ãƒ–ãƒªãƒƒã‚¯ãƒ¡ã‚½ãƒƒãƒ‰ã¨ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// ƒvƒŒƒCƒ„[‚ÉŒü‚©‚Á‚ÄˆÚ“®‚µ‚Ü‚·B
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«å‘ã‹ã£ã¦ç§»å‹•ã—ã¾ã™ã€‚
     /// </summary>
-    private void FlyToPlayer()
-    {
-        // ƒvƒŒƒCƒ„[‚Ö‚Ì•ûŒü‚ğ³‹K‰»‚µ‚Äæ“¾
+    private void FlyToPlayer() {
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¸ã®æ–¹å‘ã‚’æ­£è¦åŒ–ã—ã¦å–å¾—
         Vector2 direction = (m_player.position - transform.position).normalized;
-        // Rigidbody2D‚É‘¬“x‚ğİ’è‚µ‚ÄˆÚ“®
+        // Rigidbody2Dã«é€Ÿåº¦ã‚’è¨­å®šã—ã¦ç§»å‹•
         m_rb.velocity = direction * FlySpeed;
 
-        // ƒLƒƒƒ‰ƒNƒ^[‚ÌŒü‚«‚ğƒvƒŒƒCƒ„[‚É‡‚í‚¹‚Ä”½“]
-        if (m_player.position.x > transform.position.x)
-        {
-            FlipSprite(true); // ‰EŒü‚«
+        // ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®å‘ãã‚’ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«åˆã‚ã›ã¦åè»¢
+        if (m_player.position.x > transform.position.x) {
+            FlipSprite(true); // å³å‘ã
         }
-        else if (m_player.position.x < transform.position.x)
-        {
-            FlipSprite(false); // ¶Œü‚«
+        else if (m_player.position.x < transform.position.x) {
+            FlipSprite(false); // å·¦å‘ã
         }
     }
 
     /// <summary>
-    /// ƒLƒƒƒ‰ƒNƒ^[‚Ìx²ƒXƒP[ƒ‹‚ğ”½“]‚³‚¹AŒü‚«‚ğ•Ï‚¦‚Ü‚·B
+    /// ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®xè»¸ã‚¹ã‚±ãƒ¼ãƒ«ã‚’åè»¢ã•ã›ã€å‘ãã‚’å¤‰ãˆã¾ã™ã€‚
     /// </summary>
-    /// <param name="isFacingRight">‰EŒü‚«‚È‚çtrueA¶Œü‚«‚È‚çfalse</param>
-    private void FlipSprite(bool isFacingRight)
-    {
+    /// <param name="isFacingRight">å³å‘ããªã‚‰trueã€å·¦å‘ããªã‚‰false</param>
+    private void FlipSprite(bool isFacingRight) {
         Vector3 scale = transform.localScale;
-        if (isFacingRight)
-        {
-            scale.x = Mathf.Abs(scale.x); // ‰EŒü‚«
+        if (isFacingRight) {
+            scale.x = Mathf.Abs(scale.x); // å³å‘ã
         }
-        else
-        {
-            scale.x = -Mathf.Abs(scale.x); // ¶Œü‚«
+        else {
+            scale.x = -Mathf.Abs(scale.x); // å·¦å‘ã
         }
         transform.localScale = scale;
     }
 
     /// <summary>
-    /// ƒ_ƒ[ƒW‚ğó‚¯‚½Û‚Ìˆ—B
-    /// eƒNƒ‰ƒX‚ÌTakeDamage()‚ğƒI[ƒo[ƒ‰ƒCƒh‚µ‚Ä‚¢‚Ü‚·B
+    /// ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’å—ã‘ãŸéš›ã®å‡¦ç†ã€‚
+    /// è¦ªã‚¯ãƒ©ã‚¹ã®TakeDamage()ã‚’ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰ã—ã¦ã„ã¾ã™ã€‚
     /// </summary>
-    public override void TakeDamage()
-    {
+    public override void TakeDamage() {
         if (IsDead) return;
 
         m_hp--;
         Debug.Log("Eagle took damage. HP: " + m_hp);
 
-        if (m_hp <= 0)
-        {
-            // HP‚ª0ˆÈ‰º‚É‚È‚Á‚½‚ç€–Sˆ—
+        if (m_hp <= 0) {
+            // HPãŒ0ä»¥ä¸‹ã«ãªã£ãŸã‚‰æ­»äº¡å‡¦ç†
             base.Die();
         }
-        else
-        {
-            // ƒ_ƒ[ƒWƒAƒjƒ[ƒVƒ‡ƒ“‚ğÄ¶
-            if (m_animator != null && HasAnimatorParameter("hurt", AnimatorControllerParameterType.Trigger))
-            {
+        else {
+            // ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’å†ç”Ÿ
+            if (m_animator != null && HasAnimatorParameter("hurt", AnimatorControllerParameterType.Trigger)) {
                 m_animator.SetTrigger("hurt");
             }
-            // “_–ÅƒRƒ‹[ƒ`ƒ“‚ğŠJn
+            // ç‚¹æ»…ã‚³ãƒ«ãƒ¼ãƒãƒ³ã‚’é–‹å§‹
             StartCoroutine(FlashRoutine());
         }
     }
 
     /// <summary>
-    /// SpriteRenderer‚ğˆê’èŠÔA“_–Å‚³‚¹‚éƒRƒ‹[ƒ`ƒ“B
+    /// SpriteRendererã‚’ä¸€å®šæ™‚é–“ã€ç‚¹æ»…ã•ã›ã‚‹ã‚³ãƒ«ãƒ¼ãƒãƒ³ã€‚
     /// </summary>
-    private IEnumerator FlashRoutine()
-    {
+    private IEnumerator FlashRoutine() {
         float timer = 0f;
-        while (timer < FlashDuration)
-        {
-            // SpriteRenderer‚Ì•\¦/”ñ•\¦‚ğØ‚è‘Ö‚¦‚é
-            if (m_spriteRenderer != null)
-            {
+        while (timer < FlashDuration) {
+            // SpriteRendererã®è¡¨ç¤º/éè¡¨ç¤ºã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹
+            if (m_spriteRenderer != null) {
                 m_spriteRenderer.enabled = !m_spriteRenderer.enabled;
             }
             yield return new WaitForSeconds(FlashInterval);
             timer += FlashInterval;
         }
 
-        // “_–ÅI—¹ŒãAƒXƒvƒ‰ƒCƒg‚ğ•K‚¸•\¦ó‘Ô‚É–ß‚·
-        if (m_spriteRenderer != null)
-        {
+        // ç‚¹æ»…çµ‚äº†å¾Œã€ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’å¿…ãšè¡¨ç¤ºçŠ¶æ…‹ã«æˆ»ã™
+        if (m_spriteRenderer != null) {
             m_spriteRenderer.enabled = true;
         }
     }

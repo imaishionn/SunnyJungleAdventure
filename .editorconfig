@@ -1,0 +1,178 @@
+# .editorconfig (Visual Studio / Roslyn / .NET 用 詳細版)
+# 参考: Microsoft C# コーディング規約 / Roslyn Code Style オプション
+# ルート設定
+root = true
+
+############################################################
+# 共通(全ファイル)
+############################################################
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# 参考情報(自動強制は弱め): 行長の目安
+max_line_length = 120
+
+############################################################
+# C# ファイル
+############################################################
+[*.{cs,csx,cake}]
+# --- 名前空間 & using 配置 ---
+csharp_style_namespace_declarations = file_scoped:warning               # ファイルスコープ名前空間
+csharp_using_directive_placement = outside_namespace:warning            # using は名前空間の外
+
+# --- var の使い方 (型が明確なら var、曖昧なら明示型) ---
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:warning
+csharp_style_var_elsewhere = false:warning
+
+# --- 修飾子順序 ---
+csharp_preferred_modifier_order = public, private, protected, internal, file, static, readonly, sealed, abstract, virtual, override, new, partial, required, unsafe, volatile, async:warning
+
+# --- this. / 完全修飾 ---
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+
+# --- 参照型の null 安全 / 演算子系 ---
+dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
+dotnet_style_prefer_conditional_expression_over_return = true:suggestion
+dotnet_style_prefer_null_check_over_type_check = true:suggestion
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
+csharp_style_pattern_local_over_anonymous_function = true:suggestion
+
+# --- 文字列 & 補間 ---
+dotnet_style_prefer_interpolation_over_string_concatenation = true:warning
+csharp_style_prefer_utf8_string_literals = true:suggestion               # C# 11+
+csharp_style_prefer_raw_string_literals = true:suggestion                # C# 11+
+
+# --- オブジェクト/コレクション初期化 ---
+dotnet_style_object_initializer = true:warning
+dotnet_style_collection_initializer = true:warning
+dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
+csharp_style_prefer_collection_expression = true:suggestion              # C# 12+ [ ... ]
+
+# --- 生成/推論の簡素化 ---
+dotnet_style_prefer_simplified_interpolation = true:suggestion
+dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_prefer_inferred_tuple_names = true:suggestion
+dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
+csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion   # new() 省略
+
+# --- using / dispose ---
+csharp_prefer_simple_using_statement = true:warning                      # using 宣言を優先（C# 8+）
+
+# --- 式本体メンバー ---
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_constructors = false:suggestion
+csharp_style_expression_bodied_operators = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_indexers = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+
+# --- ブレース/改行スタイル（Allman 近似） ---
+csharp_prefer_braces = true:warning
+csharp_new_line_before_open_brace = all:warning
+csharp_new_line_between_query_expression_clauses = true:suggestion
+
+# --- フィールド/読み取り専用 等 ---
+dotnet_style_readonly_field = true:warning
+dotnet_style_prefer_readonly_struct = true:suggestion
+csharp_style_prefer_static_local_function = true:suggestion
+
+# --- using の並び/不要 using ---
+dotnet_sort_system_directives_first = true:suggestion
+dotnet_separate_import_directive_groups = true:suggestion
+dotnet_remove_unnecessary_usings = true:warning
+
+# --- 例外/using パターンに関する一般方針（自動化しづらいが近似） ---
+dotnet_style_prefer_simplified_substring = true:suggestion
+dotnet_style_prefer_range_operator = true:suggestion
+dotnet_style_prefer_index_operator = true:suggestion
+
+# --- アクセシビリティ修飾子 ---
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion
+
+# --- タプル & ディコンストラクト ---
+csharp_style_deconstructed_variable_declaration = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+
+# --- スイッチ式/式形式 ---
+csharp_style_prefer_switch_expression = true:suggestion
+
+# --- 名前規則 (Microsoft 推奨の概ね準拠) ---
+# シンボル定義
+dotnet_naming_symbols.types_and_namespaces.applicable_kinds = namespace, class, struct, interface, enum, delegate
+dotnet_naming_symbols.types_and_namespaces.applicable_accessibilities = *
+dotnet_naming_symbols.types_and_namespaces.required_modifiers =
+
+dotnet_naming_symbols.methods_properties_events.applicable_kinds = method, property, event
+dotnet_naming_symbols.methods_properties_events.applicable_accessibilities = *
+dotnet_naming_symbols.methods_properties_events.required_modifiers =
+
+dotnet_naming_symbols.constants.applicable_kinds = field
+dotnet_naming_symbols.constants.applicable_accessibilities = *
+dotnet_naming_symbols.constants.required_modifiers = const
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private, internal, private_protected
+dotnet_naming_symbols.private_fields.required_modifiers =
+
+dotnet_naming_symbols.locals_and_parameters.applicable_kinds = local, parameter
+dotnet_naming_symbols.locals_and_parameters.applicable_accessibilities = *
+dotnet_naming_symbols.locals_and_parameters.required_modifiers =
+
+# スタイル定義
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+dotnet_naming_style.camel_case.capitalization = camel_case
+dotnet_naming_style._camel_case_prefix.capitalization = camel_case
+dotnet_naming_style._camel_case_prefix.required_prefix = _
+
+# 規則: 型/名前空間/メンバーは PascalCase
+dotnet_naming_rule.types_and_namespaces_should_be_pascal_case.symbols = types_and_namespaces
+dotnet_naming_rule.types_and_namespaces_should_be_pascal_case.style = pascal_case
+dotnet_naming_rule.types_and_namespaces_should_be_pascal_case.severity = warning
+
+dotnet_naming_rule.methods_properties_events_should_be_pascal_case.symbols = methods_properties_events
+dotnet_naming_rule.methods_properties_events_should_be_pascal_case.style = pascal_case
+dotnet_naming_rule.methods_properties_events_should_be_pascal_case.severity = warning
+
+# 定数は PascalCase
+dotnet_naming_rule.constants_should_be_pascal_case.symbols = constants
+dotnet_naming_rule.constants_should_be_pascal_case.style = pascal_case
+dotnet_naming_rule.constants_should_be_pascal_case.severity = warning
+
+# プライベート/内部フィールドは _camelCase
+dotnet_naming_rule.private_fields_should_be__camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be__camel_case.style = _camel_case_prefix
+dotnet_naming_rule.private_fields_should_be__camel_case.severity = warning
+
+# ローカル/パラメーターは camelCase
+dotnet_naming_rule.locals_and_parameters_should_be_camel_case.symbols = locals_and_parameters
+dotnet_naming_rule.locals_and_parameters_should_be_camel_case.style = camel_case
+dotnet_naming_rule.locals_and_parameters_should_be_camel_case.severity = suggestion
+
+# --- ドキュコメント ---
+# 公開メンバーの XML コメントを推奨（強制はしない）
+dotnet_diagnostic.CS1591.severity = silent   # 公開メンバーの XML コメントがない
+# 必要なら warning/error に引き上げ可能
+
+# --- よく使う IDE アナライザーの重大度(例) ---
+dotnet_diagnostic.IDE0007.severity = warning   # 'new Type()' の簡略化 (new())
+dotnet_diagnostic.IDE0008.severity = warning   # var の使用規則
+dotnet_diagnostic.IDE0010.severity = warning   # ブレースの使用
+dotnet_diagnostic.IDE0040.severity = suggestion# 非推奨: readonly/const 等
+dotnet_diagnostic.IDE0051.severity = suggestion# 使用されていないプライベートメンバー
+dotnet_diagnostic.IDE0052.severity = suggestion# 書き込まれるが読み取られないプライベートメンバー
+dotnet_diagnostic.IDE0060.severity = suggestion# 未使用パラメーター
+dotnet_diagnostic.IDE0063.severity = warning   # using 宣言の使用
+dotnet_diagnostic.IDE0090.severity = warning   # new(...) の簡素化
+dotnet_diagnostic.IDE0160.severity = suggestion# file 修飾子の利用提案

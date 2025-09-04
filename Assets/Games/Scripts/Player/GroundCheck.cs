@@ -1,53 +1,47 @@
 using UnityEngine;
 
 /// <summary>
-/// 2D�v���b�g�t�H�[���Q�[���ŁA�L�����N�^�[���n�ʂɐڒn���Ă��邩�𔻒肷��X�N���v�g�ł��B
-/// �v���C���[�̑����̎q�I�u�W�F�N�g�ɃA�^�b�`���Ďg�p���܂��B
+/// 2Dプラットフォームゲームで、キャラクターが地面に接地しているかを判定するスクリプトです。
+/// プレイヤーの足元の子オブジェクトにアタッチして使用します。
 /// </summary>
-public class GroundCheck : MonoBehaviour
-{
+public class GroundCheck : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
-    // �v���C�x�[�g�ϐ� (Inspector�Őݒ肷��K�v�͂���܂���)
+    // プライベート変数 (Inspectorで設定する必要はありません)
     // ----------------------------------------------------------------------------------------------------
     private bool m_isGround = false;
 
     // ----------------------------------------------------------------------------------------------------
-    // �p�u���b�N���\�b�h
+    // パブリックメソッド
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// �L�����N�^�[���n�ʂɐڒn���Ă��邩�ǂ����̏�Ԃ�Ԃ��܂��B
+    /// キャラクターが地面に接地しているかどうかの状態を返します。
     /// </summary>
-    /// <returns>�n�ʂɐڒn���Ă����true�A�����łȂ����false</returns>
-    public bool GetIsGround()
-    {
+    /// <returns>地面に接地していればtrue、そうでなければfalse</returns>
+    public bool GetIsGround() {
         return m_isGround;
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // �g���K�[�C�x���g���\�b�h
+    // トリガーイベントメソッド
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// ���̃g���K�[�R���C�_�[������2D�R���C�_�[�ƐڐG���Ă���ԁA���t���[���Ăяo����܂��B
+    /// このトリガーコライダーが他の2Dコライダーと接触している間、毎フレーム呼び出されます。
     /// </summary>
-    /// <param name="collision">�ڐG���Ă��鑼�̃R���C�_�[</param>
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        // �ڐG���Ă���I�u�W�F�N�g���uGround�v�^�O�������`�F�b�N
-        if (collision.CompareTag("Ground"))
-        {
+    /// <param name="collision">接触している他のコライダー</param>
+    private void OnTriggerStay2D(Collider2D collision) {
+        // 接触しているオブジェクトが「Ground」タグを持つかチェック
+        if (collision.CompareTag("Ground")) {
             m_isGround = true;
         }
     }
 
     /// <summary>
-    /// ���̃g���K�[�R���C�_�[������2D�R���C�_�[�Ƃ̐ڐG���I�������Ƃ��ɌĂяo����܂��B
+    /// このトリガーコライダーが他の2Dコライダーとの接触を終了したときに呼び出されます。
     /// </summary>
-    /// <param name="collision">�ڐG���I���������̃R���C�_�[</param>
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        // �ڐG���I�������I�u�W�F�N�g���uGround�v�^�O�������`�F�b�N
-        if (collision.CompareTag("Ground"))
-        {
+    /// <param name="collision">接触を終了した他のコライダー</param>
+    private void OnTriggerExit2D(Collider2D collision) {
+        // 接触を終了したオブジェクトが「Ground」タグを持つかチェック
+        if (collision.CompareTag("Ground")) {
             m_isGround = false;
         }
     }

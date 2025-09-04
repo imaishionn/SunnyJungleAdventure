@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -6,8 +6,7 @@ using UnityEngine;
 /// プレイヤーを検知すると追跡し、ダメージを受けると死亡アニメーションを再生します。
 /// Enemyクラスを継承しています。
 /// </summary>
-public class Bat : Enemy
-{
+public class Bat : Enemy {
     // ----------------------------------------------------------------------------------------------------
     // インスペクターで設定するパラメーター
     // ----------------------------------------------------------------------------------------------------
@@ -32,34 +31,29 @@ public class Bat : Enemy
     // ----------------------------------------------------------------------------------------------------
     // MonoBehaviourのライフサイクルメソッド
     // ----------------------------------------------------------------------------------------------------
-    protected override void Awake()
-    {
+    protected override void Awake() {
         // 親クラスのAwake()を呼び出し、基盤となる初期化を行う
         base.Awake();
 
         // 'Player'タグを持つオブジェクトを探し、見つかればTransformを取得
-        if (m_player == null)
-        {
+        if (m_player == null) {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
                 m_player = playerObj.transform;
-            else
-            {
+            else {
                 // 'Player'タグが見つからない場合は警告ログを出力
                 Debug.LogWarning("Bat: 'Player'タグを持つGameObjectが見つかりません。プレイヤー追跡機能が無効になります。", this);
             }
         }
 
         // Rigidbody2Dの設定
-        if (m_rb != null)
-        {
+        if (m_rb != null) {
             m_rb.gravityScale = 0f; // 重力を無効化
             m_rb.drag = 1f;         // 飛行中に滑らかに減速させるための抵抗
         }
     }
 
-    protected override void OnEnable()
-    {
+    protected override void OnEnable() {
         // 親クラスのOnEnable()を呼び出す
         base.OnEnable();
 
@@ -71,23 +65,19 @@ public class Bat : Enemy
         if (m_rb != null) m_rb.velocity = Vector2.zero;
 
         // アニメーションをリセット
-        if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
-        {
+        if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool)) {
             m_animator.SetBool("fly", false);
         }
     }
 
-    protected void FixedUpdate()
-    {
+    protected void FixedUpdate() {
         // 死亡状態の場合は処理を停止
         if (IsDead) return;
 
         // プレイヤーやRigidbody2Dが設定されていない場合は、動きを停止して処理を抜ける
-        if (m_player == null || m_rb == null)
-        {
+        if (m_player == null || m_rb == null) {
             if (m_rb != null) m_rb.velocity = Vector2.zero;
-            if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
-            {
+            if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool)) {
                 m_animator.SetBool("fly", false);
             }
             return;
@@ -97,29 +87,23 @@ public class Bat : Enemy
         float distance = Vector2.Distance(transform.position, m_player.position);
 
         // プレイヤーが検知範囲内にいるかチェック
-        if (distance < DetectRange)
-        {
+        if (distance < DetectRange) {
             // プレイヤーに向かって飛行
             FlyToPlayer();
 
             // 飛行状態のアニメーションを有効にする（一度だけ実行）
-            if (!m_isFlying)
-            {
-                if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
-                {
+            if (!m_isFlying) {
+                if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool)) {
                     m_animator.SetBool("fly", true);
                 }
                 m_isFlying = true;
             }
         }
-        else
-        {
+        else {
             // プレイヤーが検知範囲外に出た場合
-            if (m_isFlying)
-            {
+            if (m_isFlying) {
                 // 飛行アニメーションを無効にする（一度だけ実行）
-                if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool))
-                {
+                if (m_animator != null && HasAnimatorParameter("fly", AnimatorControllerParameterType.Bool)) {
                     m_animator.SetBool("fly", false);
                 }
                 m_isFlying = false;
@@ -136,20 +120,17 @@ public class Bat : Enemy
     /// <summary>
     /// プレイヤーに向かって移動します。
     /// </summary>
-    private void FlyToPlayer()
-    {
+    private void FlyToPlayer() {
         // プレイヤーへの方向を正規化して取得
         Vector2 direction = (m_player.position - transform.position).normalized;
         // Rigidbody2Dに速度を設定して移動
         m_rb.velocity = direction * FlySpeed;
 
         // キャラクターの向きをプレイヤーに合わせて反転
-        if (direction.x > 0 && transform.localScale.x < 0)
-        {
+        if (direction.x > 0 && transform.localScale.x < 0) {
             FlipSprite();
         }
-        else if (direction.x < 0 && transform.localScale.x > 0)
-        {
+        else if (direction.x < 0 && transform.localScale.x > 0) {
             FlipSprite();
         }
     }
@@ -157,8 +138,7 @@ public class Bat : Enemy
     /// <summary>
     /// キャラクターのx軸スケールを反転させ、向きを変えます。
     /// </summary>
-    private void FlipSprite()
-    {
+    private void FlipSprite() {
         Vector3 scale = transform.localScale;
         scale.x *= -1;
         transform.localScale = scale;
@@ -168,16 +148,14 @@ public class Bat : Enemy
     /// ダメージを受けた際の処理です。
     /// 親クラスのTakeDamage()をオーバーライドしています。
     /// </summary>
-    public override void TakeDamage()
-    {
+    public override void TakeDamage() {
         if (IsDead) return;
 
         // 親クラスのDie()を呼び出してコライダーを無効化
         base.Die();
 
         // 死亡アニメーションを再生
-        if (m_animator != null && HasAnimatorParameter("des", AnimatorControllerParameterType.Trigger))
-        {
+        if (m_animator != null && HasAnimatorParameter("des", AnimatorControllerParameterType.Trigger)) {
             m_animator.SetTrigger("des");
         }
 
@@ -189,8 +167,7 @@ public class Bat : Enemy
     /// 指定された時間待機後、ゲームオブジェクトを非アクティブにするコルーチン。
     /// オブジェクトプールの再利用を前提としています。
     /// </summary>
-    private IEnumerator DeactivateAfterDelay(float delay)
-    {
+    private IEnumerator DeactivateAfterDelay(float delay) {
         yield return new WaitForSeconds(delay);
         gameObject.SetActive(false);
     }

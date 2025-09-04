@@ -3,113 +3,100 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// UIƒ{ƒ^ƒ“‚ÉƒNƒŠƒbƒN‰¹‚Æƒzƒo[‰¹i‘I‘ğ‰¹j‚ğ•t‚¯‚é‚½‚ß‚ÌƒXƒNƒŠƒvƒg‚Å‚·B
-/// ISelectHandlerƒCƒ“ƒ^[ƒtƒF[ƒX‚ğÀ‘•‚µAUI‚ÌƒCƒxƒ“ƒg‚ğˆ—‚µ‚Ü‚·B
+/// UIãƒœã‚¿ãƒ³ã«ã‚¯ãƒªãƒƒã‚¯éŸ³ã¨ãƒ›ãƒãƒ¼éŸ³ï¼ˆé¸æŠéŸ³ï¼‰ã‚’ä»˜ã‘ã‚‹ãŸã‚ã®ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
+/// ISelectHandlerã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã‚’å®Ÿè£…ã—ã€UIã®ã‚¤ãƒ™ãƒ³ãƒˆã‚’å‡¦ç†ã—ã¾ã™ã€‚
 /// </summary>
-public class ButtonSoundEffect : MonoBehaviour, ISelectHandler, IDeselectHandler
-{
+public class ButtonSoundEffect : MonoBehaviour, ISelectHandler, IDeselectHandler {
     // ----------------------------------------------------------------------------------------------------
-    // ƒCƒ“ƒXƒyƒNƒ^[‚Åİ’è‚·‚éƒpƒ‰ƒ[ƒ^[
+    // ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§è¨­å®šã™ã‚‹ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
     // ----------------------------------------------------------------------------------------------------
-    [Header("ƒTƒEƒ“ƒhİ’è")]
-    [Tooltip("ƒ{ƒ^ƒ“‚ªƒNƒŠƒbƒN‚³‚ê‚½‚Æ‚«‚ÉÄ¶‚·‚éŒø‰Ê‰¹")]
+    [Header("ã‚µã‚¦ãƒ³ãƒ‰è¨­å®š")]
+    [Tooltip("ãƒœã‚¿ãƒ³ãŒã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸã¨ãã«å†ç”Ÿã™ã‚‹åŠ¹æœéŸ³")]
     [SerializeField] private AudioClip clickSound;
-    [Tooltip("ƒ{ƒ^ƒ“‚ÉƒJ[ƒ\ƒ‹‚ªæ‚Á‚½‚Æ‚«A‚Ü‚½‚Í‘I‘ğ‚³‚ê‚½‚Æ‚«‚ÉÄ¶‚·‚éŒø‰Ê‰¹")]
+    [Tooltip("ãƒœã‚¿ãƒ³ã«ã‚«ãƒ¼ã‚½ãƒ«ãŒä¹—ã£ãŸã¨ãã€ã¾ãŸã¯é¸æŠã•ã‚ŒãŸã¨ãã«å†ç”Ÿã™ã‚‹åŠ¹æœéŸ³")]
     [SerializeField] private AudioClip hoverSound;
-    [Tooltip("ƒNƒŠƒbƒN‰¹‚Ì‰¹—Ê (0.0 ‚©‚ç 1.0)")]
+    [Tooltip("ã‚¯ãƒªãƒƒã‚¯éŸ³ã®éŸ³é‡ (0.0 ã‹ã‚‰ 1.0)")]
     [SerializeField, Range(0f, 1f)] private float clickVolume = 1.0f;
-    [Tooltip("ƒzƒo[‰¹‚Ì‰¹—Ê (0.0 ‚©‚ç 1.0)")]
+    [Tooltip("ãƒ›ãƒãƒ¼éŸ³ã®éŸ³é‡ (0.0 ã‹ã‚‰ 1.0)")]
     [SerializeField, Range(0f, 1f)] private float hoverVolume = 1.0f;
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒvƒ‰ƒCƒx[ƒg•Ï”
+    // ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆå¤‰æ•°
     // ----------------------------------------------------------------------------------------------------
     private AudioSource m_audioSource;
     private Button m_button;
 
     // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviour‚Ìƒ‰ƒCƒtƒTƒCƒNƒ‹ƒƒ\ƒbƒh
+    // MonoBehaviourã®ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
-    private void Awake()
-    {
-        // AudioSourceƒRƒ“ƒ|[ƒlƒ“ƒg‚ÌQÆ‚ğæ“¾‚Ü‚½‚Í’Ç‰Á
+    private void Awake() {
+        // AudioSourceã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®å‚ç…§ã‚’å–å¾—ã¾ãŸã¯è¿½åŠ 
         m_audioSource = GetComponent<AudioSource>();
-        if (m_audioSource == null)
-        {
+        if (m_audioSource == null) {
             m_audioSource = gameObject.AddComponent<AudioSource>();
-            m_audioSource.playOnAwake = false; // ƒV[ƒ“ŠJn‚É©“®Ä¶‚µ‚È‚¢
-            m_audioSource.loop = false;        // ƒ‹[ƒvÄ¶‚µ‚È‚¢
+            m_audioSource.playOnAwake = false; // ã‚·ãƒ¼ãƒ³é–‹å§‹æ™‚ã«è‡ªå‹•å†ç”Ÿã—ãªã„
+            m_audioSource.loop = false;        // ãƒ«ãƒ¼ãƒ—å†ç”Ÿã—ãªã„
         }
 
-        // ButtonƒRƒ“ƒ|[ƒlƒ“ƒg‚ğæ“¾‚µAonClickƒCƒxƒ“ƒg‚ÉƒŠƒXƒi[‚ğ“o˜^
+        // Buttonã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’å–å¾—ã—ã€onClickã‚¤ãƒ™ãƒ³ãƒˆã«ãƒªã‚¹ãƒŠãƒ¼ã‚’ç™»éŒ²
         m_button = GetComponent<Button>();
-        if (m_button != null)
-        {
+        if (m_button != null) {
             m_button.onClick.AddListener(PlayClickSound);
         }
     }
 
-    private void OnDestroy()
-    {
-        // ƒIƒuƒWƒFƒNƒg‚ª”jŠü‚³‚ê‚é‚Æ‚«‚ÉƒŠƒXƒi[‚ğ‰ğœ
-        if (m_button != null)
-        {
+    private void OnDestroy() {
+        // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒç ´æ£„ã•ã‚Œã‚‹ã¨ãã«ãƒªã‚¹ãƒŠãƒ¼ã‚’è§£é™¤
+        if (m_button != null) {
             m_button.onClick.RemoveListener(PlayClickSound);
         }
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // UIƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰[ (ISelectHandler, IDeselectHandler)
+    // UIã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©ãƒ¼ (ISelectHandler, IDeselectHandler)
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// UI‚ª‘I‘ğ‚³‚ê‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·BiƒL[ƒ{[ƒhAƒQ[ƒ€ƒpƒbƒhAƒ}ƒEƒXƒzƒo[j
+    /// UIãŒé¸æŠã•ã‚ŒãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚ï¼ˆã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã€ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰ã€ãƒã‚¦ã‚¹ãƒ›ãƒãƒ¼ï¼‰
     /// </summary>
-    /// <param name="eventData">ƒCƒxƒ“ƒgƒf[ƒ^</param>
-    public void OnSelect(BaseEventData eventData)
-    {
+    /// <param name="eventData">ã‚¤ãƒ™ãƒ³ãƒˆãƒ‡ãƒ¼ã‚¿</param>
+    public void OnSelect(BaseEventData eventData) {
         PlayHoverSound();
     }
 
     /// <summary>
-    /// UI‚Ì‘I‘ğ‚ªŠO‚ê‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B
+    /// UIã®é¸æŠãŒå¤–ã‚ŒãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
     /// </summary>
-    /// <param name="eventData">ƒCƒxƒ“ƒgƒf[ƒ^</param>
-    public void OnDeselect(BaseEventData eventData)
-    {
-        // ‚±‚ÌƒCƒxƒ“ƒg‚Å‰½‚©ˆ—‚ª•K—v‚Èê‡‚Í‚±‚±‚É’Ç‰Á
+    /// <param name="eventData">ã‚¤ãƒ™ãƒ³ãƒˆãƒ‡ãƒ¼ã‚¿</param>
+    public void OnDeselect(BaseEventData eventData) {
+        // ã“ã®ã‚¤ãƒ™ãƒ³ãƒˆã§ä½•ã‹å‡¦ç†ãŒå¿…è¦ãªå ´åˆã¯ã“ã“ã«è¿½åŠ 
     }
 
-    // OnPointerClickƒƒ\ƒbƒh‚Í•s—v‚É‚È‚Á‚½‚½‚ßíœ
+    // OnPointerClickãƒ¡ã‚½ãƒƒãƒ‰ã¯ä¸è¦ã«ãªã£ãŸãŸã‚å‰Šé™¤
 
     // ----------------------------------------------------------------------------------------------------
-    // ƒTƒEƒ“ƒhÄ¶ƒƒ\ƒbƒh
+    // ã‚µã‚¦ãƒ³ãƒ‰å†ç”Ÿãƒ¡ã‚½ãƒƒãƒ‰
     // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// ƒ{ƒ^ƒ“‚ÌƒNƒŠƒbƒN‰¹‚ğÄ¶‚µ‚Ü‚·B
+    /// ãƒœã‚¿ãƒ³ã®ã‚¯ãƒªãƒƒã‚¯éŸ³ã‚’å†ç”Ÿã—ã¾ã™ã€‚
     /// </summary>
-    public void PlayClickSound()
-    {
-        if (m_audioSource != null && m_audioSource.isActiveAndEnabled && clickSound != null)
-        {
+    public void PlayClickSound() {
+        if (m_audioSource != null && m_audioSource.isActiveAndEnabled && clickSound != null) {
             m_audioSource.PlayOneShot(clickSound, clickVolume);
         }
-        else
-        {
-            string debugMsg = "ButtonSoundEffect: ƒNƒŠƒbƒN‰¹‚ğÄ¶‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½B";
-            if (m_audioSource == null) debugMsg += "AudioSource‚ªnull‚Å‚·B";
-            else if (!m_audioSource.isActiveAndEnabled) debugMsg += "AudioSource‚ª–³Œø‚Ü‚½‚Í”ñƒAƒNƒeƒBƒu‚Å‚·B";
-            else if (clickSound == null) debugMsg += "ƒNƒŠƒbƒN‰¹‚ÌAudioClip‚ªŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB";
+        else {
+            string debugMsg = "ButtonSoundEffect: ã‚¯ãƒªãƒƒã‚¯éŸ³ã‚’å†ç”Ÿã§ãã¾ã›ã‚“ã§ã—ãŸã€‚";
+            if (m_audioSource == null) debugMsg += "AudioSourceãŒnullã§ã™ã€‚";
+            else if (!m_audioSource.isActiveAndEnabled) debugMsg += "AudioSourceãŒç„¡åŠ¹ã¾ãŸã¯éã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã§ã™ã€‚";
+            else if (clickSound == null) debugMsg += "ã‚¯ãƒªãƒƒã‚¯éŸ³ã®AudioClipãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã¾ã›ã‚“ã€‚";
             Debug.LogWarning(debugMsg, this);
         }
     }
 
     /// <summary>
-    /// ƒzƒo[‰¹‚ğÄ¶‚µ‚Ü‚·B
+    /// ãƒ›ãƒãƒ¼éŸ³ã‚’å†ç”Ÿã—ã¾ã™ã€‚
     /// </summary>
-    public void PlayHoverSound()
-    {
-        if (m_audioSource != null && m_audioSource.isActiveAndEnabled && hoverSound != null)
-        {
+    public void PlayHoverSound() {
+        if (m_audioSource != null && m_audioSource.isActiveAndEnabled && hoverSound != null) {
             m_audioSource.PlayOneShot(hoverSound, hoverVolume);
         }
     }
