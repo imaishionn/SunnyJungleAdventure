@@ -6,121 +6,123 @@ using UnityEngine;
 /// Enemyクラスを継承しています。
 /// </summary>
 public class Bettle : Enemy {
+    // プレイヤーのタグを定数で定義
+    private const string PLAYER_TAG = "Player";
+
     // ----------------------------------------------------------------------------------------------------
     // インスペクターで設定するパラメーター
     // ----------------------------------------------------------------------------------------------------
     [Header("プレイヤー検知設定")]
     [Tooltip("プレイヤーのTransform。見つからない場合は'Player'タグで自動検索します。")]
-    [SerializeField] private Transform playerTransform;
+    [SerializeField]
+    private Transform _playerTransform;
     [Tooltip("プレイヤーを検知する半径")]
-    [SerializeField] private float detectRange = 5f;
+    [SerializeField]
+    private float _detectRange = 5f;
 
     [Header("ボム設定")]
     [Tooltip("投下するボムのPrefab")]
-    [SerializeField] private GameObject bombPrefab;
+    [SerializeField]
+    private GameObject _bombPrefab;
     [Tooltip("ボムを投下する位置")]
-    [SerializeField] private Transform launchPoint;
+    [SerializeField]
+    private Transform _launchPoint;
     [Tooltip("ボムを投下する速度")]
-    [SerializeField] private float bombLaunchSpeed = 10f;
+    [SerializeField]
+    private float _bombLaunchSpeed = 10f;
     [Tooltip("ボムを投下する間隔 (秒)")]
-    [SerializeField] private float attackInterval = 3f;
+    [SerializeField]
+    private float _attackInterval = 3f;
 
     [Header("上下移動設定")]
     [Tooltip("上下移動の速度")]
-    [SerializeField] private float verticalMoveSpeed = 1f;
+    [SerializeField]
+    private float _verticalMoveSpeed = 1f;
     [Tooltip("上下移動の振幅 (中心からの距離)")]
-    [SerializeField] private float verticalMoveRange = 2f;
+    [SerializeField]
+    private float _verticalMoveRange = 2f;
 
     // ----------------------------------------------------------------------------------------------------
     // プライベート変数
     // ----------------------------------------------------------------------------------------------------
-    private float attackTimer;
-    private Vector3 startPosition;
+    private float _attackTimer;
+    private Vector3 _startPosition;
 
     // ----------------------------------------------------------------------------------------------------
     // MonoBehaviourのライフサイクルメソッド
     // ----------------------------------------------------------------------------------------------------
     protected override void Awake() {
-        // 親クラスのAwake()を呼び出し、基盤となる初期化を行う
         base.Awake();
-
-        // プレイヤーのTransformが割り当てられていない場合、'Player'タグで自動検索
-        if(playerTransform == null) {
-            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if(playerObj != null) {
-                playerTransform = playerObj.transform;
-            }
-            else {
-                Debug.LogWarning("Bettle: 'Player'タグを持つGameObjectが見つかりません。プレイヤー追跡機能が無効になります。",this);
-            }
-        }
-
-        // 初期位置を保存
-        startPosition = transform.position;
-        // 攻撃タイマーを初期化
-        attackTimer = attackInterval;
+        FindPlayer();
+        _startPosition = transform.position;
+        _attackTimer = _attackInterval;
     }
 
     private void Update() {
-        // 死亡状態の場合は処理を停止
-        if(IsDead) return;
+        if (IsDead) {
+            return;
+        }
 
-        // ------------------
-        // 上下移動処理
-        // ------------------
-        // Sin関数を使って、初期位置を中心に滑らかな上下移動を表現
-        float newY = startPosition.y + Mathf.Sin(Time.time * verticalMoveSpeed) * verticalMoveRange;
-        transform.position = new Vector3(transform.position.x,newY,transform.position.z);
+        MoveVertically();
 
-        // ------------------
-        // プレイヤー追跡・攻撃処理
-        // ------------------
-        if(playerTransform != null) {
-            float distanceToPlayer = Vector2.Distance(transform.position,playerTransform.position);
-
-            // プレイヤーが検知範囲内にいるかチェック
-            if(distanceToPlayer < detectRange) {
-                attackTimer -= Time.deltaTime;
-
-                // 攻撃タイマーがゼロになったら攻撃
-                if(attackTimer <= 0) {
-                    Attack();
-                    attackTimer = attackInterval; // タイマーをリセット
-                }
-            }
+        if (_playerTransform != null) {
+            HandleAttack();
         }
     }
 
     // ----------------------------------------------------------------------------------------------------
     // プライベートメソッド
     // ----------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// ボムを生成し、プレイヤーの方向へ投下します。
-    /// </summary>
+
+    private void FindPlayer() {
+        if (_playerTransform == null) {
+            var playerObj = GameObject.FindGameObjectWithTag(PLAYER_TAG);
+            if (playerObj != null) {
+                _playerTransform = playerObj.transform;
+            }
+            else {
+                Debug.LogWarning($"Bettle: '{PLAYER_TAG}'タグを持つGameObjectが見つかりません。プレイヤー追跡機能が無効になります。", this);
+            }
+        }
+    }
+
+    private void MoveVertically() {
+        float newY = _startPosition.y + Mathf.Sin(Time.time * _verticalMoveSpeed) * _verticalMoveRange;
+        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+    }
+
+    private void HandleAttack() {
+        float distanceToPlayer = Vector2.Distance(transform.position, _playerTransform.position);
+
+        if (distanceToPlayer < _detectRange) {
+            _attackTimer -= Time.deltaTime;
+
+            if (_attackTimer <= 0) {
+                Attack();
+                _attackTimer = _attackInterval;
+            }
+        }
+    }
+
     private void Attack() {
-        // 必要な参照が設定されているか確認
-        if(bombPrefab == null) {
-            Debug.LogError("Bettle: bombPrefabが割り当てられていません。",this);
+        if (_bombPrefab == null) {
+            Debug.LogError("Bettle: bombPrefabが割り当てられていません。", this);
             return;
         }
-        if(launchPoint == null) {
-            Debug.LogError("Bettle: launchPointが割り当てられていません。",this);
+        if (_launchPoint == null) {
+            Debug.LogError("Bettle: launchPointが割り当てられていません。", this);
             return;
         }
 
-        // ボムを生成
-        GameObject bomb = Instantiate(bombPrefab,launchPoint.position,Quaternion.identity);
+        GameObject bomb = Instantiate(_bombPrefab, _launchPoint.position, Quaternion.identity);
 
-        // プレイヤーへの方向を正規化して取得
-        Vector2 direction = (playerTransform.position - launchPoint.position).normalized;
+        Vector2 direction = (_playerTransform.position - _launchPoint.position).normalized;
 
-        // ボムのスクリプトを取得して起動
-        Bomb bombScript = bomb.GetComponent<Bomb>();
-        if(bombScript != null) {
-            bombScript.Launch(direction,bombLaunchSpeed);
+        if (bomb.TryGetComponent<Bomb>(out Bomb bombScript)) {
+            bombScript.Launch(direction, _bombLaunchSpeed);
         }
         else {
-            Debug.LogError("Bettle: 生成したボムにBombコンポーネントが見つかりません。",this);
+            Debug.LogError("Bettle: 生成したボムにBombコンポーネントが見つかりません。", this);
         }
     }
 }

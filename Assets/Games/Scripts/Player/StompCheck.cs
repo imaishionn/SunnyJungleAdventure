@@ -9,17 +9,17 @@ public class StompCheck : MonoBehaviour {
     // プライベート変数 (Inspectorで設定する必要はありません)
     // ----------------------------------------------------------------------------------------------------
     [Header("コンポーネント")]
-    private PlayerMove m_playerMove;
+    private PlayerMove _playerMove;
 
     // ----------------------------------------------------------------------------------------------------
     // MonoBehaviourのライフサイクルメソッド
     // ----------------------------------------------------------------------------------------------------
     private void Awake() {
         // 親オブジェクトからPlayerMoveコンポーネントの参照を取得
-        m_playerMove = transform.parent.GetComponent<PlayerMove>();
+        _playerMove = transform.parent.GetComponent<PlayerMove>();
 
         // 参照が取得できなかった場合、警告を出す
-        if(m_playerMove == null) {
+        if(_playerMove == null) {
             Debug.LogWarning("StompCheck: 親オブジェクトにPlayerMoveコンポーネントが見つかりません。",this);
         }
     }
@@ -32,8 +32,8 @@ public class StompCheck : MonoBehaviour {
         // 敵のタグを持つオブジェクトと接触したかチェック
         if(other.CompareTag("Enemy")) {
             // PlayerMoveコンポーネントが存在する場合、敵を踏みつける処理を呼び出す
-            if(m_playerMove != null) {
-                m_playerMove.StompEnemy(other.gameObject);
+            if(_playerMove != null) {
+                _playerMove.StompEnemy(other.gameObject);
             }
         }
     }

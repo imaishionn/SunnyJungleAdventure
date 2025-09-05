@@ -3,18 +3,18 @@ using UnityEngine.SceneManagement;
 
 public class Goal : MonoBehaviour {
     [Header("シーン遷移設定")]
-    [SerializeField] private string gameClearSceneName = "ClearScene";
+    [SerializeField] private string _gameClearSceneName = "ClearScene";
 
     // 画像は常に表示されるため、スクリプトでの制御は行わない
 
-    private bool m_isTriggered = false;
+    private bool _isTriggered = false;
 
     private void OnTriggerEnter2D(Collider2D other) {
-        if(m_isTriggered || !other.CompareTag("Player")) {
+        if(_isTriggered || !other.CompareTag("Player")) {
             return;
         }
 
-        m_isTriggered = true;
+        _isTriggered = true;
 
         // GameManager.instance を GameManager.Instance に修正
         if(GameManager.Instance != null) {
@@ -23,7 +23,7 @@ public class Goal : MonoBehaviour {
         }
         else {
             Debug.LogWarning("Goal: GameManagerのインスタンスが見つかりません。直接シーンをロードします。",this);
-            SceneManager.LoadScene(gameClearSceneName);
+            SceneManager.LoadScene(_gameClearSceneName);
         }
     }
 }

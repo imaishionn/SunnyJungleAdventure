@@ -6,25 +6,25 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class SoundPlayer : MonoBehaviour {
     [Tooltip("空なら同じ GameObject の AudioSource を自動取得"), SerializeField]
-    private AudioSource audioSource;
+    private AudioSource _audioSource;
 
     [Tooltip("スタートボタンを押したときに鳴る効果音"), SerializeField]
-    private AudioClip geMusutatoClip;
+    private AudioClip _geMusutatoClip;
 
-    void Awake() {
-        if(audioSource == null) {
-            audioSource = GetComponent<AudioSource>();
+    private void Awake() {
+        if(_audioSource == null) {
+            _audioSource = GetComponent<AudioSource>();
         }
 
-        audioSource.playOnAwake = false;
+        _audioSource.playOnAwake = false;
     }
 
     /// <summary>
     /// UIButtonのOnClickから呼ぶメソッド
     /// </summary>
     public void PlayGeMusutato() {
-        if(geMusutatoClip != null) {
-            audioSource.PlayOneShot(geMusutatoClip);
+        if(_geMusutatoClip != null) {
+            _audioSource.PlayOneShot(_geMusutatoClip);
         }
         else {
             Debug.LogWarning("[SoundPlayer] geMusutatoClip が設定されていません");

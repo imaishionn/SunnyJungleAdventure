@@ -17011,12 +17011,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05dfd83522e7241488de951bfbdc0bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  cameraOffset: {x: 0, y: 0, z: -10}
-  useClampX: 0
-  useClampY: 0
-  cameraMaxPos: {x: 0, y: 0}
-  cameraMinPos: {x: 0, y: 0}
+  _player: {fileID: 0}
+  _cameraOffset: {x: 0, y: 0, z: -10}
+  _useClampX: 0
+  _useClampY: 0
+  _cameraMaxPos: {x: 0, y: 0}
+  _cameraMinPos: {x: 0, y: 0}
 --- !u!20 &214063079
 Camera:
   m_ObjectHideFlags: 0
@@ -17727,8 +17727,8 @@ MonoBehaviour:
   jumpClip: {fileID: 8300000, guid: 8fb731e3e4e9fc3448d8795b6ffe4c50, type: 3}
   gameOverClip: {fileID: 8300000, guid: 7ef16f65f4f334845969b2e840fbce67, type: 3}
   enemyDefeatClip: {fileID: 8300000, guid: 4c8ae844b590e4744a639b37826aa73f, type: 3}
-  enemyDefeatVolume: 1
-  gameOverVolume: 1
+  _enemyDefeatVolume: 1
+  _gameOverVolume: 1
 --- !u!4 &717502588
 Transform:
   m_ObjectHideFlags: 0
@@ -18900,9 +18900,9 @@ Transform:
   - {fileID: 2486063675017829646}
   - {fileID: 2486063675253256095}
   - {fileID: 2486063675979882616}
+  - {fileID: 5655435131225150709}
   - {fileID: 18584844}
   - {fileID: 1089900437}
-  - {fileID: 5655435131225150709}
   - {fileID: 5655435131660898081}
   - {fileID: 447954315}
   - {fileID: 996988962}
@@ -19420,10 +19420,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea47d9eb03141f04dada04d2d5a4e80a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 4
-  waitTimeAtPoint: 1
-  moveDistanceX: 6
-  moveDistanceY: 0
+  _moveSpeed: 3
+  _waitTimeAtPoint: 1
+  _moveDistanceX: 6
+  _moveDistanceY: 0
 --- !u!50 &2144322758
 Rigidbody2D:
   serializedVersion: 4
@@ -20288,7 +20288,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c53461a080ec914fb5403e834e04faa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 100
+  _scoreValue: 1
 --- !u!95 &2486063674843878422
 Animator:
   serializedVersion: 4
@@ -20480,7 +20480,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c53461a080ec914fb5403e834e04faa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 100
+  _scoreValue: 1
 --- !u!58 &2486063675017829645
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -20632,7 +20632,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c53461a080ec914fb5403e834e04faa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 100
+  _scoreValue: 1
 --- !u!95 &2486063675253256094
 Animator:
   serializedVersion: 4
@@ -20752,7 +20752,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c53461a080ec914fb5403e834e04faa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 100
+  _scoreValue: 1
 --- !u!58 &2486063675370843577
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -20939,7 +20939,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c53461a080ec914fb5403e834e04faa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 100
+  _scoreValue: 1
 --- !u!212 &2486063675837935616
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -21040,7 +21040,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c53461a080ec914fb5403e834e04faa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 100
+  _scoreValue: 1
 --- !u!95 &2486063675837935630
 Animator:
   serializedVersion: 4
@@ -21195,7 +21195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c53461a080ec914fb5403e834e04faa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 100
+  _scoreValue: 1
 --- !u!58 &2486063675979882619
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -21296,7 +21296,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c53461a080ec914fb5403e834e04faa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 100
+  _scoreValue: 1
 --- !u!58 &2486063676386256761
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -21910,8 +21910,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90097c50829c35341a68e37e13a5941e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerMove: {fileID: 0}
-  Division: 40
+  _playerMove: {fileID: 0}
+  _division: 30
 --- !u!212 &5156161045098867463
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -22043,7 +22043,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 15, y: 0.8}
+  m_Size: {x: 15, y: 2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -22061,8 +22061,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90097c50829c35341a68e37e13a5941e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerMove: {fileID: 0}
-  Division: 40
+  _playerMove: {fileID: 0}
+  _division: 40
 --- !u!1 &5156161045327162137
 GameObject:
   m_ObjectHideFlags: 0
@@ -22093,8 +22093,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90097c50829c35341a68e37e13a5941e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerMove: {fileID: 0}
-  Division: 40
+  _playerMove: {fileID: 0}
+  _division: 30
 --- !u!212 &5156161045327162139
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -22247,7 +22247,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1806939627}
-  m_RootOrder: 20
+  m_RootOrder: 18
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &5655435131660898081
 Transform:
@@ -22435,7 +22435,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c53461a080ec914fb5403e834e04faa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 300
+  _scoreValue: 1
 --- !u!114 &6103119501496570387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22448,7 +22448,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c53461a080ec914fb5403e834e04faa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 300
+  _scoreValue: 1
 --- !u!114 &6103119502032334551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22461,7 +22461,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c53461a080ec914fb5403e834e04faa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 100
+  _scoreValue: 1
 --- !u!212 &7551802828541238729
 SpriteRenderer:
   m_ObjectHideFlags: 0

@@ -7,11 +7,11 @@ using UnityEngine;
 /// </summary>
 public class ScoreDisplay : MonoBehaviour {
     [Header("UI要素"), Tooltip("ジェムのカウントを表示するTextMeshProUGUIコンポーネント"), SerializeField]
-    private TextMeshProUGUI gemCountText;
+    private TextMeshProUGUI _gemCountText;
 
     private void Awake() {
         // 必要なUI要素が割り当てられているか確認
-        if(gemCountText == null) {
+        if(_gemCountText == null) {
             Debug.LogError("ScoreDisplay: gemCountText がインスペクターで割り当てられていません！",this);
         }
     }
@@ -22,7 +22,7 @@ public class ScoreDisplay : MonoBehaviour {
     private void OnEnable() {
         if(GameManager.Instance != null) {
             GameManager.Instance.OnGemCountChanged += UpdateGemCount;
-            UpdateGemCount(GameManager.Instance.currentGemCount);
+            UpdateGemCount(GameManager.Instance.CurrentGemCount);
         }
     }
 
@@ -42,9 +42,9 @@ public class ScoreDisplay : MonoBehaviour {
     /// </summary>
     /// <param name="newCount">新しいジェムの数</param>
     public void UpdateGemCount(int newCount) {
-        if(gemCountText != null) {
+        if(_gemCountText != null) {
             // テキストを短くして1行に収まるように変更
-            gemCountText.text = ":" + newCount;
+            _gemCountText.text = ":" + newCount;
         }
     }
 }

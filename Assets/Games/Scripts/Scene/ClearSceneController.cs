@@ -9,29 +9,31 @@ using UnityEngine.UI;
 public class ClearSceneController : MonoBehaviour {
     [Header("UI設定")]
     [Tooltip("ゲームパッド操作で最初に選択状態にしたいUI要素")]
-    [SerializeField] private Selectable firstSelected;
+    [SerializeField] private Selectable _firstSelected;
 
     [Header("シーン設定")]
     [Tooltip("スコアシーンの名前")]
-    [SerializeField] private string ResultsceneName = "Resultscene";
+    [SerializeField] private string _resultsceneName = "Resultscene";
 
-    private bool m_isTransitioning = false;
+    private bool _isTransitioning = false;
 
     private void Start() {
-        if(firstSelected != null) {
-            EventSystem.current.SetSelectedGameObject(firstSelected.gameObject);
+        if(_firstSelected != null) {
+            EventSystem.current.SetSelectedGameObject(_firstSelected.gameObject);
         }
         else {
             Debug.LogWarning("ClearSceneController: firstSelectedが割り当てられていません。",this);
         }
 
-        m_isTransitioning = false;
+        _isTransitioning = false;
     }
 
     private void Update() {
-        if(m_isTransitioning) return;
+        if (_isTransitioning) {
+            return;
+        }
 
-        if(Input.GetButtonDown("Submit")) {
+        if (Input.GetButtonDown("Submit")) {
             OnClickGoToScoreScene();
         }
     }
@@ -40,17 +42,20 @@ public class ClearSceneController : MonoBehaviour {
     /// スコア画面へ進むボタンが押された際に呼び出されます。
     /// </summary>
     public void OnClickGoToScoreScene() {
-        if(m_isTransitioning) return;
-        m_isTransitioning = true;
+        if (_isTransitioning) {
+            return;
+        }
+
+        _isTransitioning = true;
 
         if(GameManager.Instance != null) {
             // 変数名を ResultsceneName に修正
-            GameManager.Instance.LoadSceneWithFade(ResultsceneName);
+            GameManager.Instance.LoadSceneWithFade(_resultsceneName);
         }
         else {
             Debug.LogError("ClearSceneController: GameManager インスタンスが見つかりません！直接シーンをロードします。",this);
             // 変数名を ResultsceneName に修正
-            SceneManager.LoadScene(ResultsceneName);
+            SceneManager.LoadScene(_resultsceneName);
         }
     }
 }

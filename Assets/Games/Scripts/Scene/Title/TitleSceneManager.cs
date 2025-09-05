@@ -12,31 +12,31 @@ public class TitleSceneManager : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
     [Header("UI設定")]
     [Tooltip("ゲーム開始ボタン")]
-    [SerializeField] private Button startButton;
+    [SerializeField] private Button _startButton;
     [Tooltip("タイトルシーンのメインCanvas")]
-    [SerializeField] private GameObject titleCanvas;
+    [SerializeField] private GameObject _titleCanvas;
 
     // ----------------------------------------------------------------------------------------------------
     // MonoBehaviourのライフサイクルメソッド
     // ----------------------------------------------------------------------------------------------------
     private void Start() {
         // Canvasの存在チェック
-        if(titleCanvas != null) {
+        if(_titleCanvas != null) {
             // Canvasをアクティブにする。フェードインはGameManagerが担当。
-            titleCanvas.SetActive(true);
+            _titleCanvas.SetActive(true);
         }
         else {
             Debug.LogError("TitleSceneManager: Title Canvas が割り当てられていません！",this);
         }
 
         // スタートボタンの存在チェックとリスナーの登録
-        if(startButton != null) {
+        if(_startButton != null) {
             // ボタンがクリックされたときのイベントを登録
-            startButton.onClick.AddListener(OnStartButtonClicked);
+            _startButton.onClick.AddListener(OnStartButtonClicked);
 
             // ゲームパッドやキーボード操作のために、初期選択をStartボタンに設定
             if(EventSystem.current != null) {
-                EventSystem.current.SetSelectedGameObject(startButton.gameObject);
+                EventSystem.current.SetSelectedGameObject(_startButton.gameObject);
             }
             else {
                 Debug.LogWarning("TitleSceneManager: EventSystemが見つかりません。ボタンの初期選択に失敗しました。",this);
@@ -49,8 +49,8 @@ public class TitleSceneManager : MonoBehaviour {
 
     private void OnDestroy() {
         // シーン遷移時にボタンのイベントリスナーを解除する
-        if(startButton != null) {
-            startButton.onClick.RemoveListener(OnStartButtonClicked);
+        if(_startButton != null) {
+            _startButton.onClick.RemoveListener(OnStartButtonClicked);
         }
     }
 

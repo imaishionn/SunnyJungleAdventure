@@ -8,30 +8,34 @@ using UnityEngine.UI;
 /// 選択時の拡大/縮小、クリック時の点滅効果を管理します。
 /// </summary>
 public class ButtonVisualEffect : MonoBehaviour, ISelectHandler, IDeselectHandler, IPointerClickHandler {
-    private Vector3 originalScale; // 元の大きさを保存
-    private Image buttonImage;
-    private Color originalColor;
-    private Coroutine blinkCoroutine;
+    private Vector3 _originalScale; // 元の大きさを保存
+    private Image _buttonImage;
+    private Color _originalColor;
+    private Coroutine _blinkCoroutine;
 
     [Header("拡大/縮小設定")]
     [Tooltip("拡大率")]
-    [SerializeField] private float scaleFactor = 1.1f;
+    [SerializeField] private float _scaleFactor = 1.1f;
     [Tooltip("拡大/縮小にかかる時間")]
-    [SerializeField] private float transitionDuration = 0.1f;
+    [SerializeField] private float _transitionDuration = 0.1f;
 
     [Header("点滅設定")]
     [Tooltip("点滅回数")]
-    [SerializeField] private int blinkCount = 3;
+    [SerializeField] private int _blinkCount = 3;
     [Tooltip("点滅速度（短いほど速い）")]
-    [SerializeField] private float blinkSpeed = 0.1f;
+    [SerializeField] private float _blinkSpeed = 0.1f;
     [Tooltip("点滅時の色")]
-    [SerializeField] private Color blinkColor = Color.white;
+    [SerializeField] private Color _blinkColor = Color.white;
+
+    public ButtonVisualEffect(int blinkCount) {
+        _blinkCount = blinkCount;
+    }
 
     private void Awake() {
-        originalScale = transform.localScale;
-        buttonImage = GetComponent<Image>();
-        if(buttonImage != null) {
-            originalColor = buttonImage.color;
+        _originalScale = transform.localScale;
+        _buttonImage = GetComponent<Image>();
+        if(_buttonImage != null) {
+            _originalColor = _buttonImage.color;
         }
     }
 
@@ -41,7 +45,7 @@ public class ButtonVisualEffect : MonoBehaviour, ISelectHandler, IDeselectHandle
     public void OnSelect(BaseEventData eventData) {
         // 拡大を開始
         StopAllCoroutines();
-        StartCoroutine(ScaleButton(transform.localScale,originalScale * scaleFactor));
+        StartCoroutine(ScaleButton(transform.localScale,_originalScale * _scaleFactor));
     }
 
     /// <summary>
@@ -50,7 +54,7 @@ public class ButtonVisualEffect : MonoBehaviour, ISelectHandler, IDeselectHandle
     public void OnDeselect(BaseEventData eventData) {
         // 元の大きさに戻す
         StopAllCoroutines();
-        StartCoroutine(ScaleButton(transform.localScale,originalScale));
+        StartCoroutine(ScaleButton(transform.localScale,_originalScale));
     }
 
     /// <summary>
@@ -58,10 +62,10 @@ public class ButtonVisualEffect : MonoBehaviour, ISelectHandler, IDeselectHandle
     /// </summary>
     public void OnPointerClick(PointerEventData eventData) {
         if(gameObject.activeInHierarchy) {
-            if(blinkCoroutine != null) {
-                StopCoroutine(blinkCoroutine);
+            if(_blinkCoroutine != null) {
+                StopCoroutine(_blinkCoroutine);
             }
-            blinkCoroutine = StartCoroutine(BlinkEffect());
+            _blinkCoroutine = StartCoroutine(BlinkEffect());
         }
     }
 
@@ -70,9 +74,9 @@ public class ButtonVisualEffect : MonoBehaviour, ISelectHandler, IDeselectHandle
     /// </summary>
     private IEnumerator ScaleButton(Vector3 startScale,Vector3 endScale) {
         float timer = 0f;
-        while(timer < transitionDuration) {
+        while(timer < _transitionDuration) {
             timer += Time.unscaledDeltaTime;
-            transform.localScale = Vector3.Lerp(startScale,endScale,timer / transitionDuration);
+            transform.localScale = Vector3.Lerp(startScale,endScale,timer / _transitionDuration);
             yield return null;
         }
         transform.localScale = endScale;
@@ -82,11 +86,11 @@ public class ButtonVisualEffect : MonoBehaviour, ISelectHandler, IDeselectHandle
     /// ボタンを点滅させるコルーチン
     /// </summary>
     private IEnumerator BlinkEffect() {
-        for(int i = 0;i < blinkCount;i++) {
-            buttonImage.color = blinkColor;
-            yield return new WaitForSecondsRealtime(blinkSpeed);
-            buttonImage.color = originalColor;
-            yield return new WaitForSecondsRealtime(blinkSpeed);
+        for(int i = 0;i < _blinkCount;i++) {
+            _buttonImage.color = _blinkColor;
+            yield return new WaitForSecondsRealtime(_blinkSpeed);
+            _buttonImage.color = _originalColor;
+            yield return new WaitForSecondsRealtime(_blinkSpeed);
         }
     }
 }

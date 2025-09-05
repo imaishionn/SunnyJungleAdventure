@@ -11,43 +11,43 @@ public class SwitchController : MonoBehaviour {
 
     [Header("Visuals")]
     [Tooltip("The SpriteRenderer component of this switch.")]
-    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private SpriteRenderer _spriteRenderer;
     [Tooltip("The sprite for the 'up' state of the crank.")]
-    [SerializeField] private Sprite crankUpSprite;
+    [SerializeField] private Sprite _crankUpSprite;
     [Tooltip("The sprite for the 'down' state of the crank.")]
-    [SerializeField] private Sprite crankDownSprite;
+    [SerializeField] private Sprite _crankDownSprite;
 
     [Header("Audio")] // ★追加: オーディオ設定
     [Tooltip("The sound effect to play when the switch is toggled.")]
-    [SerializeField] private AudioClip switchSoundEffect;
-    private AudioSource audioSource; // AudioSourceコンポーネントへの参照
+    [SerializeField] private AudioClip _switchSoundEffect;
+    private AudioSource _audioSource; // AudioSourceコンポーネントへの参照
 
     // Current state of the switch (true if 'up', false if 'down')
-    private bool isUpState;
+    private bool _isUpState;
 
-    void Start() {
+    private void Start() {
         // Get SpriteRenderer if not assigned in Inspector
-        if(spriteRenderer == null) {
-            spriteRenderer = GetComponent<SpriteRenderer>();
+        if(_spriteRenderer == null) {
+            _spriteRenderer = GetComponent<SpriteRenderer>();
         }
 
         // Get or add AudioSource component
-        audioSource = GetComponent<AudioSource>();
-        if(audioSource == null) {
-            audioSource = gameObject.AddComponent<AudioSource>();
+        _audioSource = GetComponent<AudioSource>();
+        if(_audioSource == null) {
+            _audioSource = gameObject.AddComponent<AudioSource>();
         }
 
         // Initialize the switch state based on its initial sprite
-        if(spriteRenderer != null) {
-            if(spriteRenderer.sprite == crankUpSprite) {
-                isUpState = true;
+        if(_spriteRenderer != null) {
+            if(_spriteRenderer.sprite == _crankUpSprite) {
+                _isUpState = true;
             }
-            else if(spriteRenderer.sprite == crankDownSprite) {
-                isUpState = false;
+            else if(_spriteRenderer.sprite == _crankDownSprite) {
+                _isUpState = false;
             }
             else {
-                isUpState = false;
-                spriteRenderer.sprite = crankDownSprite;
+                _isUpState = false;
+                _spriteRenderer.sprite = _crankDownSprite;
                 UnityEngine.Debug.LogWarning("SwitchController: Initial sprite is not recognized as crankUpSprite or crankDownSprite. Defaulting to crankDownSprite.",this);
             }
         }
@@ -63,15 +63,15 @@ public class SwitchController : MonoBehaviour {
     }
 
     private void ToggleSwitchState() {
-        isUpState = !isUpState;
+        _isUpState = !_isUpState;
 
-        if(spriteRenderer != null) {
-            spriteRenderer.sprite = isUpState ? crankUpSprite : crankDownSprite;
+        if(_spriteRenderer != null) {
+            _spriteRenderer.sprite = _isUpState ? _crankUpSprite : _crankDownSprite;
         }
 
         // Play the sound effect
-        if(audioSource != null && switchSoundEffect != null) {
-            audioSource.PlayOneShot(switchSoundEffect);
+        if(_audioSource != null && _switchSoundEffect != null) {
+            _audioSource.PlayOneShot(_switchSoundEffect);
         }
 
         // Trigger the corresponding action on the target platform

@@ -12,57 +12,57 @@ public class GameOverManager : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
     [Header("UI設定")]
     [Tooltip("ゲームパッド操作で最初に選択状態にしたいUI要素")]
-    [SerializeField] private Selectable firstSelected;
+    [SerializeField] private Selectable _firstSelected;
     [Tooltip("タイトルに戻るボタン")]
-    [SerializeField] private Button returnTitleButton;
+    [SerializeField] private Button _returnTitleButton;
     [Tooltip("もう一度プレイするボタン")]
-    [SerializeField] private Button retryButton;
+    [SerializeField] private Button _retryButton;
 
     // ----------------------------------------------------------------------------------------------------
     // シーン設定
     // ----------------------------------------------------------------------------------------------------
     [Header("シーン設定")]
     [Tooltip("タイトルシーンの名前")]
-    [SerializeField] private string titleSceneName = "TitleScene";
+    [SerializeField] private string _titleSceneName = "TitleScene";
 
     // ----------------------------------------------------------------------------------------------------
     // プライベート変数
     // ----------------------------------------------------------------------------------------------------
-    private bool m_isTransitioning = false;
+    private bool _isTransitioning = false;
 
     // ----------------------------------------------------------------------------------------------------
     // MonoBehaviourのライフサイクルメソッド
     // ----------------------------------------------------------------------------------------------------
     private void Start() {
         // UIの初期選択を設定
-        if(firstSelected != null) {
-            if(EventSystem.current != null) {
-                EventSystem.current.SetSelectedGameObject(firstSelected.gameObject);
+        if (_firstSelected != null) {
+            if (EventSystem.current != null) {
+                EventSystem.current.SetSelectedGameObject(_firstSelected.gameObject);
             }
         }
         else {
-            Debug.LogWarning("GameOverManager: firstSelectedが割り当てられていません。",this);
+            Debug.LogWarning("GameOverManager: firstSelectedが割り当てられていません。", this);
         }
 
         // ボタンのクリックイベントにリスナーを登録
-        if(returnTitleButton != null) {
-            returnTitleButton.onClick.AddListener(OnClickReturnTitle);
+        if (_returnTitleButton != null) {
+            _returnTitleButton.onClick.AddListener(OnClickReturnTitle);
         }
-        if(retryButton != null) {
-            retryButton.onClick.AddListener(OnClickRetry);
+        if (_retryButton != null) {
+            _retryButton.onClick.AddListener(OnClickRetry);
         }
 
         // シーンロード完了時に遷移フラグをリセット
-        m_isTransitioning = false;
+        _isTransitioning = false;
     }
 
     private void OnDestroy() {
         // シーンが破棄される前にイベントリスナーを解除する
-        if(returnTitleButton != null) {
-            returnTitleButton.onClick.RemoveListener(OnClickReturnTitle);
+        if (_returnTitleButton != null) {
+            _returnTitleButton.onClick.RemoveListener(OnClickReturnTitle);
         }
-        if(retryButton != null) {
-            retryButton.onClick.RemoveListener(OnClickRetry);
+        if (_retryButton != null) {
+            _retryButton.onClick.RemoveListener(OnClickRetry);
         }
     }
 
@@ -73,17 +73,19 @@ public class GameOverManager : MonoBehaviour {
     /// タイトルに戻るボタンが押された際に呼び出されます。
     /// </summary>
     public void OnClickReturnTitle() {
-        if(m_isTransitioning) return;
-        m_isTransitioning = true;
+        if (_isTransitioning) {
+            return;
+        }
+        _isTransitioning = true;
         Time.timeScale = 1f;
 
         // GameManager.instance を GameManager.Instance に修正
-        if(GameManager.Instance != null) {
+        if (GameManager.Instance != null) {
             // GameManager.instance.LoadSceneWithFade を GameManager.Instance.LoadSceneWithFade に修正
-            GameManager.Instance.LoadSceneWithFade(titleSceneName);
+            GameManager.Instance.LoadSceneWithFade(_titleSceneName);
         }
         else {
-            SceneManager.LoadScene(titleSceneName);
+            SceneManager.LoadScene(_titleSceneName);
         }
     }
 
@@ -91,12 +93,14 @@ public class GameOverManager : MonoBehaviour {
     /// もう一度プレイするボタンが押された際に呼び出されます。
     /// </summary>
     public void OnClickRetry() {
-        if(m_isTransitioning) return;
-        m_isTransitioning = true;
+        if (_isTransitioning) {
+            return;
+        }
+        _isTransitioning = true;
         Time.timeScale = 1f;
 
         // GameManager.instance を GameManager.Instance に修正
-        if(GameManager.Instance != null) {
+        if (GameManager.Instance != null) {
             // ここでゲームデータをリセットする
             // GameManager.instance.ResetGameData() を GameManager.Instance.ResetGameData() に修正
             // GameManager.instance.RetryLastStage() を GameManager.Instance.RetryLastStage() に修正
@@ -104,8 +108,8 @@ public class GameOverManager : MonoBehaviour {
             GameManager.Instance.RetryLastStage(); // GameManagerのメソッドを呼び出す
         }
         else {
-            Debug.LogError("GameOverManager: GameManager.instanceが見つかりません！タイトルシーンへ直接遷移します。",this);
-            SceneManager.LoadScene(titleSceneName);
+            Debug.LogError("GameOverManager: GameManager.instanceが見つかりません！タイトルシーンへ直接遷移します。", this);
+            SceneManager.LoadScene(_titleSceneName);
         }
     }
 }

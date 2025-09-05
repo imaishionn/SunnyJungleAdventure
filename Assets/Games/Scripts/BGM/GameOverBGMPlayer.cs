@@ -5,35 +5,38 @@ using UnityEngine.UI;
 /// ゲームオーバー時にBGMを再生
 /// </summary>
 public class GameOverBGMPlayer : MonoBehaviour {
-    [SerializeField] private AudioClip gameOverBGM;
-    [SerializeField, Range(0f,1f)] private float defaultVolume = 0.5f;
-    [SerializeField] private Slider volumeSlider; // UIのスライダー（任意）
+    [SerializeField]
+    private AudioClip _gameOverBGM;
+    [SerializeField, Range(0f, 1f)]
+    private float _defaultVolume = 0.5f;
+    [SerializeField]
+    private Slider _volumeSlider; // UIのスライダー（任意）
 
-    private AudioSource audioSource;
+    private AudioSource _audioSource;
 
-    void Start() {
-        audioSource = GetComponent<AudioSource>();
+    private void Start() {
+        _audioSource = GetComponent<AudioSource>();
 
-        if(gameOverBGM != null) {
-            audioSource.clip = gameOverBGM;
-            audioSource.loop = true;
-            audioSource.volume = defaultVolume;
-            audioSource.Play();
+        if (_gameOverBGM != null) {
+            _audioSource.clip = _gameOverBGM;
+            _audioSource.loop = true;
+            _audioSource.volume = _defaultVolume;
+            _audioSource.Play();
         }
         else {
             Debug.LogWarning("ゲームオーバーBGMが設定されていません！");
         }
 
         // スライダーが設定されていれば初期化
-        if(volumeSlider != null) {
-            volumeSlider.value = defaultVolume;
-            volumeSlider.onValueChanged.AddListener(SetVolume);
+        if (_volumeSlider != null) {
+            _volumeSlider.value = _defaultVolume;
+            _volumeSlider.onValueChanged.AddListener(SetVolume);
         }
     }
 
     public void SetVolume(float volume) {
-        if(audioSource != null) {
-            audioSource.volume = volume;
+        if (_audioSource != null) {
+            _audioSource.volume = volume;
         }
     }
 }

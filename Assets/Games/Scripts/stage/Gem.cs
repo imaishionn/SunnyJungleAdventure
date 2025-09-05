@@ -5,39 +5,41 @@ using UnityEngine;
 /// </summary>
 public class Gem : MonoBehaviour {
     [Header("スコア設定")]
-    [SerializeField] private int scoreValue = 1;
+    [SerializeField] private int _scoreValue = 1;
 
     // 既に回収されたかどうかのフラグ
-    private bool m_isCollected = false;
+    private bool _isCollected = false;
 
     // シングルトン化されたItemSoundPlayerへの参照をキャッシュ
-    private static ItemSoundPlayer s_itemSoundPlayer;
+    private static ItemSoundPlayer _itemSoundPlayer;
 
     private void Awake() {
         // GameManagerと同様に、ItemSoundPlayerがシングルトンであることを前提とする
-        if(s_itemSoundPlayer == null) {
-            s_itemSoundPlayer = FindObjectOfType<ItemSoundPlayer>();
+        if(_itemSoundPlayer == null) {
+            _itemSoundPlayer = FindObjectOfType<ItemSoundPlayer>();
         }
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
         // 既に回収済みの場合は何もしない
-        if(m_isCollected) return;
+        if (_isCollected) {
+            return;
+        }
 
         // プレイヤーに触れたかチェック
-        if(other.CompareTag("Player")) {
-            m_isCollected = true;
+        if (other.CompareTag("Player")) {
+            _isCollected = true;
 
             // GameManagerにスコアを加算
             // GameManager.instance を GameManager.Instance に修正
             if(GameManager.Instance != null) {
                 // GameManager.instance.AddGem(scoreValue) を GameManager.Instance.AddGem(scoreValue) に修正
-                GameManager.Instance.AddGem(scoreValue);
+                GameManager.Instance.AddGem(_scoreValue);
             }
 
             // 効果音を再生
-            if(s_itemSoundPlayer != null) {
-                s_itemSoundPlayer.PlayGemSound();
+            if(_itemSoundPlayer != null) {
+                _itemSoundPlayer.PlayGemSound();
             }
 
             // オブジェクトの見た目を即座に非表示にする

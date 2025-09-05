@@ -11,17 +11,17 @@ public class Vulture : Enemy {
     // ----------------------------------------------------------------------------------------------------
     [Header("プレイヤー検知設定")]
     [Tooltip("プレイヤーを検知する半径")]
-    [SerializeField] private float DetectRange = 5f;
+    [SerializeField] private float _detectRange = 5f;
 
     [Header("移動設定")]
     [Tooltip("飛行速度")]
-    [SerializeField] private float FlySpeed = 5f;
+    [SerializeField] private float _flySpeed = 5f;
 
     // ----------------------------------------------------------------------------------------------------
     // プライベート変数
     // ----------------------------------------------------------------------------------------------------
-    [SerializeField] private Transform m_player;
-    private bool m_isFlying = false;
+    [SerializeField] private Transform _player;
+    private bool _isFlying = false;
 
     // ----------------------------------------------------------------------------------------------------
     // MonoBehaviourのライフサイクルメソッド
@@ -31,10 +31,12 @@ public class Vulture : Enemy {
         base.Awake();
 
         // 'Player'タグを持つオブジェクトを探し、見つかればTransformを取得
-        if(m_player == null) {
-            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if(_player == null) {
+            var playerObj = GameObject.FindGameObjectWithTag("Player");
             if(playerObj != null)
-                m_player = playerObj.transform;
+                {
+                _player = playerObj.transform;
+            }
             else {
                 Debug.LogWarning("Vulture: 'Player'タグを持つGameObjectが見つかりません。プレイヤー追跡機能が無効になります。",this);
             }
@@ -53,10 +55,12 @@ public class Vulture : Enemy {
 
         // オブジェクトがプールから再利用される際の初期化
         IsDead = false;
-        m_isFlying = false;
+        _isFlying = false;
 
         // 速度をリセット
-        if(m_rb != null) m_rb.velocity = Vector2.zero;
+        if(m_rb != null) {
+            m_rb.velocity = Vector2.zero;
+        }
 
         // アニメーションをリセット
         if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
@@ -66,11 +70,15 @@ public class Vulture : Enemy {
 
     protected void FixedUpdate() {
         // 死亡状態の場合は処理を停止
-        if(IsDead) return;
+        if(IsDead) {
+            return;
+        }
 
         // プレイヤーやRigidbody2Dが設定されていない場合は、動きを停止して処理を抜ける
-        if(m_player == null || m_rb == null) {
-            if(m_rb != null) m_rb.velocity = Vector2.zero;
+        if(_player == null || m_rb == null) {
+            if(m_rb != null) {
+                m_rb.velocity = Vector2.zero;
+            }
             if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
                 m_animator.SetBool("fly",false);
             }
@@ -78,29 +86,29 @@ public class Vulture : Enemy {
         }
 
         // プレイヤーとの距離を計算
-        float distance = Vector2.Distance(transform.position,m_player.position);
+        float distance = Vector2.Distance(transform.position,_player.position);
 
         // プレイヤーが検知範囲内にいるかチェック
-        if(distance < DetectRange) {
+        if(distance < _detectRange) {
             // プレイヤーに向かって飛行
             FlyToPlayer();
 
             // 飛行状態のアニメーションを有効にする（一度だけ実行）
-            if(!m_isFlying) {
+            if(!_isFlying) {
                 if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
                     m_animator.SetBool("fly",true);
                 }
-                m_isFlying = true;
+                _isFlying = true;
             }
         }
         else {
             // プレイヤーが検知範囲外に出た場合
-            if(m_isFlying) {
+            if(_isFlying) {
                 // 飛行アニメーションを無効にする（一度だけ実行）
                 if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
                     m_animator.SetBool("fly",false);
                 }
-                m_isFlying = false;
+                _isFlying = false;
             }
 
             // 速度を停止
@@ -116,9 +124,9 @@ public class Vulture : Enemy {
     /// </summary>
     private void FlyToPlayer() {
         // プレイヤーへの方向を正規化して取得
-        Vector2 direction = (m_player.position - transform.position).normalized;
+        Vector2 direction = (_player.position - transform.position).normalized;
         // Rigidbody2Dに速度を設定して移動
-        m_rb.velocity = direction * FlySpeed;
+        m_rb.velocity = direction * _flySpeed;
 
         // キャラクターの向きをプレイヤーに合わせて反転
         if(direction.x > 0 && transform.localScale.x < 0) {

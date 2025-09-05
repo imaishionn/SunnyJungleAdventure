@@ -121,13 +121,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c4101a09f37fe142b4c1bcafc9e4740, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 356
-  moveSpeed: 4
-  patrolRange: 4
-  groundCheckDistance: 0.6
-  groundLayer:
+  _scoreValue: 500
+  _moveSpeed: 3
+  _patrolRange: 5
+  _wallLayer:
     serializedVersion: 2
     m_Bits: 8
+  _wallCheckDistance: 0.5
 --- !u!114 &4481031191634856757
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140,7 +140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5991d52fefd0ca44f889db35a6d2984f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 356
+  _scoreValue: 500
 --- !u!70 &283787232873110609
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

@@ -18608,7 +18608,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b74fe72a038af424b9bc1f644f7f65c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameClearSceneName: ClearScene
+  _gameClearSceneName: ClearScene
 --- !u!61 &875608302
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -19333,8 +19333,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90097c50829c35341a68e37e13a5941e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerMove: {fileID: 249318347}
-  Division: 10
+  _playerMove: {fileID: 0}
+  _division: 40
 --- !u!212 &1038446589
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -19780,8 +19780,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90097c50829c35341a68e37e13a5941e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerMove: {fileID: 249318347}
-  Division: 10
+  _playerMove: {fileID: 0}
+  _division: 40
 --- !u!212 &1220447624
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -19979,8 +19979,8 @@ MonoBehaviour:
   jumpClip: {fileID: 8300000, guid: 8fb731e3e4e9fc3448d8795b6ffe4c50, type: 3}
   gameOverClip: {fileID: 8300000, guid: 7ef16f65f4f334845969b2e840fbce67, type: 3}
   enemyDefeatClip: {fileID: 8300000, guid: 4c8ae844b590e4744a639b37826aa73f, type: 3}
-  enemyDefeatVolume: 1
-  gameOverVolume: 1
+  _enemyDefeatVolume: 1
+  _gameOverVolume: 1
 --- !u!4 &1221045570
 Transform:
   m_ObjectHideFlags: 0
@@ -20140,12 +20140,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05dfd83522e7241488de951bfbdc0bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  cameraOffset: {x: 0, y: 0, z: -10}
-  useClampX: 0
-  useClampY: 0
-  cameraMaxPos: {x: 0, y: 0}
-  cameraMinPos: {x: 0, y: 0}
+  _player: {fileID: 0}
+  _cameraOffset: {x: 0, y: 0, z: -10}
+  _useClampX: 0
+  _useClampY: 0
+  _cameraMaxPos: {x: 0, y: 0}
+  _cameraMinPos: {x: 0, y: 0}
 --- !u!20 &1306213638
 Camera:
   m_ObjectHideFlags: 0
@@ -46700,6 +46700,10 @@ PrefabInstance:
     - target: {fileID: 2782465434501871100, guid: e4fb8fa4276d498419cf99c29e058285, type: 3}
       propertyPath: m_Size.x
       value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 2782465434501871101, guid: e4fb8fa4276d498419cf99c29e058285, type: 3}
+      propertyPath: _division
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 2782465434501871101, guid: e4fb8fa4276d498419cf99c29e058285, type: 3}
       propertyPath: m_playerMove

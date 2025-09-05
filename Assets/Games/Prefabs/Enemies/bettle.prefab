@@ -47,7 +47,7 @@ GameObject:
   - component: {fileID: -3884128057256326879}
   - component: {fileID: 8334184645378948283}
   m_Layer: 0
-  m_Name: Bettle
+  m_Name: bettle
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -153,15 +153,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25d7551988bb32b418191f012c942afd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 300
-  playerTransform: {fileID: 0}
-  detectRange: 5
-  bombPrefab: {fileID: 4789463544227173950, guid: 03026989f00004f4d8ed41b280823de4, type: 3}
-  launchPoint: {fileID: 5465275800340486311}
-  bombLaunchSpeed: 4
-  attackInterval: 3
-  verticalMoveSpeed: 2
-  verticalMoveRange: 2
+  _scoreValue: 300
+  _playerTransform: {fileID: 0}
+  _detectRange: 5
+  _bombPrefab: {fileID: 4789463544227173950, guid: 03026989f00004f4d8ed41b280823de4, type: 3}
+  _launchPoint: {fileID: 5465275800340486311}
+  _bombLaunchSpeed: 10
+  _attackInterval: 3
+  _verticalMoveSpeed: 1
+  _verticalMoveRange: 2
 --- !u!114 &1287032410877810327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -174,7 +174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5991d52fefd0ca44f889db35a6d2984f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 200
+  _scoreValue: 300
 --- !u!70 &-3884128057256326879
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

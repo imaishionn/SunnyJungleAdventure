@@ -1,150 +1,92 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 /// <summary>
-/// ステージ選択シーンのUIとイベントを管理するスクリプトです。
-/// 各ステージボタンのクリックイベントを制御し、ステージクリア情報を表示します。
+/// ステージ選択画面のUIとロジックを管理するクラス。
 /// </summary>
 public class StageSelectManager : MonoBehaviour {
-    // ----------------------------------------------------------------------------------------------------
-    // インスペクターで設定するパラメーター
-    // ----------------------------------------------------------------------------------------------------
-    [Header("UI設定")]
-    [Tooltip("ステージ選択シーンのメインCanvas")]
-    [SerializeField] private GameObject stageSelectCanvas;
-    [Tooltip("各ステージボタンの配列")]
-    [SerializeField] private Button[] stageButtons;
-    [Tooltip("タイトルシーンに戻るボタン")]
-    [SerializeField] private Button backButton;
-    [Tooltip("次のページに進むボタン")]
-    [SerializeField] private Button nextButton;
-    [Tooltip("戻るボタンで遷移するタイトルシーン名")]
-    [SerializeField] private string titleSceneName = "TitleScene";
-    [Tooltip("次のステージ選択シーン名")]
-    [SerializeField] private string nextStageSelectSceneName = "StageSelect2Scene";
+    // === インスペクターから設定するステージボタン ===
+    [SerializeField] private Button[] _stageButtons;
+    [SerializeField] private Button _nextButton;
+    [SerializeField] private GameObject _stageSelectPage;
 
+    // === 新しく追加されたクリア表示UI ===
     [Header("クリア表示UI")]
     [Tooltip("各ステージに対応する「クリア」表示のゲームオブジェクト")]
-    [SerializeField] private GameObject[] clearIndicators;
+    [SerializeField] private GameObject[] _clearIndicators;
 
-    // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviourのライフサイクルメソッド
-    // ----------------------------------------------------------------------------------------------------
-    private void Start() {
-        if(stageSelectCanvas != null) {
-            stageSelectCanvas.SetActive(true);
-        }
-        else {
-            Debug.LogError("StageSelectManager: StageSelect Canvas が割り当てられていません！",this);
-        }
+    private void Start() =>
+        // シーンロード時に、すべてのボタンをアクティブ（表示）にし、クリア表示を更新する
+        UpdateButtonsAndClearIndicators();
 
-        if(stageButtons != null && stageButtons.Length > 0) {
-            for(int i = 0;i < stageButtons.Length;i++) {
-                int stageIndex = i;
-                if(stageButtons[i] != null) {
-                    stageButtons[i].onClick.AddListener(() => OnStageButtonClicked(stageIndex));
-                }
-            }
-
-            // 初期選択を設定
-            if(EventSystem.current != null && stageButtons[0] != null) {
-                EventSystem.current.SetSelectedGameObject(stageButtons[0].gameObject);
-            }
-        }
-        else {
-            Debug.LogWarning("StageSelectManager: ステージボタンが割り当てられていません！",this);
-        }
-
-        if(backButton != null) {
-            backButton.onClick.AddListener(OnBackButtonClicked);
-        }
-
-        if(nextButton != null) {
-            nextButton.onClick.AddListener(OnNextButtonClicked);
-        }
-
-        UpdateStageClearIndicators();
-    }
-
-    private void OnDestroy() {
-        if(stageButtons != null) {
-            foreach(var button in stageButtons) {
-                if(button != null) {
-                    button.onClick.RemoveAllListeners();
-                }
-            }
-        }
-
-        if(backButton != null) {
-            backButton.onClick.RemoveAllListeners();
-        }
-
-        if(nextButton != null) {
-            nextButton.onClick.RemoveAllListeners();
-        }
-    }
-
-    // ----------------------------------------------------------------------------------------------------
-    // プライベートメソッド
-    // ----------------------------------------------------------------------------------------------------
-    private void UpdateStageClearIndicators() {
-        if(GameManager.Instance == null) {
-            Debug.LogError("UpdateStageClearIndicators: GameManagerが見つかりません。",this);
+    private void UpdateButtonsAndClearIndicators() {
+        // GameManagerが存在するか確認
+        if (GameManager.Instance == null) {
+            Debug.LogError("UpdateButtonsAndClearIndicators: GameManagerが見つかりません。クリア表示を更新できません。", this);
             return;
         }
 
-        if(clearIndicators == null || stageButtons == null || clearIndicators.Length != stageButtons.Length) {
-            Debug.LogWarning("UpdateStageClearIndicators: clearIndicators配列とstageButtons配列の数が一致しません。または設定されていません。",this);
-            return;
-        }
-
-        for(int i = 0;i < stageButtons.Length;i++) {
-            bool isClear = GameManager.Instance.IsStageClear(i);
-            if(clearIndicators[i] != null) {
-                clearIndicators[i].SetActive(isClear);
+        // 意図的にすべてのボタンを常に表示状態にする
+        foreach (Button button in _stageButtons) {
+            if (button != null) {
+                button.gameObject.SetActive(true);
             }
         }
-    }
 
-    // ----------------------------------------------------------------------------------------------------
-    // UIイベントハンドラー
-    // ----------------------------------------------------------------------------------------------------
-    private void OnStageButtonClicked(int index) {
-        if(GameManager.Instance != null) {
-            if(index >= 0 && index < GameManager.Instance.stageSceneNames.Length) {
-                GameManager.Instance.currentStageIndex = index;
-                GameManager.Instance.LoadSceneWithFade(GameManager.Instance.stageSceneNames[index]);
+        if (_nextButton != null) {
+            _nextButton.gameObject.SetActive(true);
+        }
+
+        // クリア表示の配列がステージボタンの配列と同じサイズか確認
+        if (_clearIndicators.Length != _stageButtons.Length) {
+            Debug.LogWarning("UpdateButtonsAndClearIndicators: クリア表示とステージボタンの配列の数が一致しません。クリア表示が正しく動作しない可能性があります。", this);
+        }
+
+        // ステージクリア情報を確認し、クリアしたステージのクリア表示を有効にする
+        for (int i = 0; i < _stageButtons.Length; i++) {
+            // ステージインデックスがGameManagerのステージ配列内に存在するか確認
+            if (i < GameManager.Instance.StageSceneNames.Length) {
+                bool isClear = GameManager.Instance.IsStageClear(i);
+                if (_clearIndicators.Length > i && _clearIndicators[i] != null) {
+                    _clearIndicators[i].SetActive(isClear);
+                }
             }
             else {
-                Debug.LogError($"StageSelectManager: 無効なステージインデックスが渡されました: {index}",this);
+                // インデックス範囲外の場合、クリア表示を非アクティブにする
+                if (_clearIndicators.Length > i && _clearIndicators[i] != null) {
+                    _clearIndicators[i].SetActive(false);
+                }
             }
         }
-        else {
-            Debug.LogError("StageSelectManager: GameManagerが見つかりません！フェードなしで遷移します。",this);
-            // GameManagerがない場合、ステージ名がわからないため遷移できない
-            // 処理を中止
+    }
+
+    /// <summary>
+    /// ステージボタンがクリックされたときに呼び出されるメソッド
+    /// </summary>
+    /// <param name="stageIndex">クリックされたステージのインデックス</param>
+    public void OnStageButtonClicked(int stageIndex) {
+        if (GameManager.Instance != null && stageIndex < GameManager.Instance.StageSceneNames.Length) {
+            string sceneName = GameManager.Instance.StageSceneNames[stageIndex];
+            GameManager.Instance.LoadSceneWithFade(sceneName);
+        }
+        else if (GameManager.Instance == null) {
+            Debug.LogError("StageSelectManager: GameManagerが見つかりません！シーン遷移できません。", this);
         }
     }
 
-    private void OnBackButtonClicked() {
-        if(GameManager.Instance != null) {
-            GameManager.Instance.LoadSceneWithFade(GameManager.Instance.TitleSceneName);
+    /// <summary>
+    /// NEXTボタンがクリックされたときに呼び出されるメソッド
+    /// </summary>
+    public void OnNextButtonClicked() {
+        if (GameManager.Instance != null) {
+            // NEXTボタンはStageSelect2Sceneへ遷移
+            GameManager.Instance.LoadSceneWithFade("StageSelect2Scene");
         }
         else {
-            Debug.LogError("StageSelectManager: GameManagerが見つかりません！フェードなしでタイトルに遷移します。",this);
-            SceneManager.LoadScene(titleSceneName);
-        }
-    }
-
-    private void OnNextButtonClicked() {
-        if(GameManager.Instance != null) {
-            GameManager.Instance.LoadSceneWithFade(nextStageSelectSceneName);
-        }
-        else {
-            Debug.LogError("StageSelectManager: GameManagerが見つかりません！フェードなしで次のステージ選択画面に遷移します。",this);
-            SceneManager.LoadScene(nextStageSelectSceneName);
+            Debug.LogError("StageSelectManager: GameManagerが見つかりません！フェードなしで次のステージ選択画面に遷移します。", this);
+            SceneManager.LoadScene("StageSelect2Scene");
         }
     }
 }

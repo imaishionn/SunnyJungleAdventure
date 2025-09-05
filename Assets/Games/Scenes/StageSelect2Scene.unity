@@ -172,7 +172,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 0}
+  m_FirstSelected: {fileID: 431049036}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
 --- !u!4 &81427603
@@ -676,11 +676,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23775c7130733e24f8634f545a2823ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scaleFactor: 1.2
-  transitionDuration: 0.1
-  blinkCount: 3
-  blinkSpeed: 0.5
-  blinkColor: {r: 1, g: 1, b: 1, a: 1}
+  _scaleFactor: 1.3
+  _transitionDuration: 0.1
+  _blinkCount: 3
+  _blinkSpeed: 0.1
+  _blinkColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &431049040
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -693,10 +693,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ef862cc59142445b11d4f7e8b40d8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clickSound: {fileID: 8300000, guid: 76b96f3363f30de47a810dc4f7d5d86f, type: 3}
-  hoverSound: {fileID: 8300000, guid: 0456594b565ada04d9f581ed0b2a56c3, type: 3}
-  clickVolume: 1
-  hoverVolume: 1
+  _clickSound: {fileID: 8300000, guid: 76b96f3363f30de47a810dc4f7d5d86f, type: 3}
+  _hoverSound: {fileID: 8300000, guid: 0456594b565ada04d9f581ed0b2a56c3, type: 3}
+  _clickVolume: 1
+  _hoverVolume: 1
 --- !u!114 &431049041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -806,7 +806,7 @@ GameObject:
   - component: {fileID: 544019562}
   - component: {fileID: 544019561}
   m_Layer: 5
-  m_Name: NEKT
+  m_Name: NEXT
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -844,11 +844,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23775c7130733e24f8634f545a2823ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scaleFactor: 1.1
-  transitionDuration: 0.1
-  blinkCount: 3
-  blinkSpeed: 0.5
-  blinkColor: {r: 1, g: 1, b: 1, a: 1}
+  _scaleFactor: 1.3
+  _transitionDuration: 0.1
+  _blinkCount: 3
+  _blinkSpeed: 0.1
+  _blinkColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &544019562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -861,10 +861,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ef862cc59142445b11d4f7e8b40d8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clickSound: {fileID: 8300000, guid: 76b96f3363f30de47a810dc4f7d5d86f, type: 3}
-  hoverSound: {fileID: 8300000, guid: 0456594b565ada04d9f581ed0b2a56c3, type: 3}
-  clickVolume: 1
-  hoverVolume: 1
+  _clickSound: {fileID: 8300000, guid: 76b96f3363f30de47a810dc4f7d5d86f, type: 3}
+  _hoverSound: {fileID: 8300000, guid: 0456594b565ada04d9f581ed0b2a56c3, type: 3}
+  _clickVolume: 1
+  _hoverVolume: 1
 --- !u!114 &544019563
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1003,12 +1003,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed2907c3a7ab8c74da127360113e6987, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageSelectCanvas: {fileID: 1583283991}
-  stageButtons:
+  _stageSelectCanvas: {fileID: 1583283991}
+  _stageButtons:
   - {fileID: 431049041}
-  backButton: {fileID: 544019565}
-  previousStageSelectSceneName: StageSelectScene
-  clearIndicators:
+  _nextButton: {fileID: 544019565}
+  _nextStageSelectSceneName: StageSelectScene
+  _clearIndicators:
   - {fileID: 218775825}
 --- !u!1 &1583283991
 GameObject:

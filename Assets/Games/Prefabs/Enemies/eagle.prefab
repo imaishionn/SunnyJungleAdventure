@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 1898939383255242599}
   - component: {fileID: -1342032745571806887}
   m_Layer: 0
-  m_Name: Eagle
+  m_Name: eagle
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -121,12 +121,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 493a2731c7b9a9e4392bf5ea6227861b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 500
-  DetectRange: 8
-  FlySpeed: 6
-  FlashDuration: 1
-  FlashInterval: 0.1
-  m_player: {fileID: 0}
+  _scoreValue: 1000
+  _detectRange: 6
+  _flySpeed: 6
+  _flashDuration: 1
+  _flashInterval: 0.1
+  _player: {fileID: 0}
 --- !u!114 &-2656533665915792902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -139,7 +139,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5991d52fefd0ca44f889db35a6d2984f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 500
+  _scoreValue: 100
 --- !u!70 &1898939383255242599
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

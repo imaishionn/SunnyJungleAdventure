@@ -302,8 +302,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5bfb9af59976b94e8c1b75a2ae99ccc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  firstSelected: {fileID: 1648741139}
-  ResultsceneName: Resultscene
+  _firstSelected: {fileID: 1648741139}
+  _resultsceneName: Resultscene
 --- !u!1 &929078957
 GameObject:
   m_ObjectHideFlags: 0
@@ -634,10 +634,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ef862cc59142445b11d4f7e8b40d8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clickSound: {fileID: 8300000, guid: 76b96f3363f30de47a810dc4f7d5d86f, type: 3}
-  hoverSound: {fileID: 8300000, guid: 0456594b565ada04d9f581ed0b2a56c3, type: 3}
-  clickVolume: 1
-  hoverVolume: 1
+  _clickSound: {fileID: 8300000, guid: 76b96f3363f30de47a810dc4f7d5d86f, type: 3}
+  _hoverSound: {fileID: 8300000, guid: 0456594b565ada04d9f581ed0b2a56c3, type: 3}
+  _clickVolume: 1
+  _hoverVolume: 1
 --- !u!114 &1648741145
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -650,11 +650,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23775c7130733e24f8634f545a2823ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scaleFactor: 1.2
-  transitionDuration: 0.1
-  blinkCount: 3
-  blinkSpeed: 0.1
-  blinkColor: {r: 1, g: 1, b: 1, a: 1}
+  _scaleFactor: 1.3
+  _transitionDuration: 0.2
+  _blinkCount: 3
+  _blinkSpeed: 0.2
+  _blinkColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &1683008244
 GameObject:
   m_ObjectHideFlags: 0

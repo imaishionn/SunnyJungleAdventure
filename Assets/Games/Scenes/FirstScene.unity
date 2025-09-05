@@ -665,9 +665,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0080c74de97c4a46956fc9d5041ca34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  joystickBase: {fileID: 442573830}
-  joystickKnob: {fileID: 329769860}
-  joystickRadius: 100
+  _joystickBase: {fileID: 442573830}
+  _joystickKnob: {fileID: 329769860}
+  _joystickRadius: 100
 --- !u!114 &442573832
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -827,50 +827,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fe830f5fd4a6614196eace7b4d62324, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_permanentUICanvas: {fileID: 1700652245}
-  m_globalFadeCanvasGroup: {fileID: 387811464}
-  m_globalFadePanelImage: {fileID: 387811462}
-  m_permanentEventSystem: {fileID: 957534964}
-  m_scoreDisplay: {fileID: 1685015533}
-  m_scorePanel: {fileID: 558137469}
-  m_timeLimitText: {fileID: 694925643}
-  m_mobileControlCanvas: {fileID: 1259887336}
-  m_titleSceneName: TitleScene
-  m_bootstrapSceneName: FirstScene
-  m_stageSelectSceneName: StageSelectScene
-  m_gameOverSceneName: GameOverScene
-  m_clearSceneName: ClearScene
-  m_stageSceneNames:
-  - Stage1Scene
-  - Stage2Scene
-  - Stage3Scene
-  - OpenCampus
-  m_scoreSceneName: Resultscene
-  m_isTimeLimited: 1
-  m_timeLimitSeconds: 180
-  m_sceneBGMList:
+  _permanentUICanvas: {fileID: 1700652245}
+  _globalFadeCanvasGroup: {fileID: 387811464}
+  _globalFadePanelImage: {fileID: 387811462}
+  _permanentEventSystem: {fileID: 957534964}
+  _scoreDisplay: {fileID: 1685015533}
+  _scorePanel: {fileID: 558137469}
+  _timeLimitText: {fileID: 694925643}
+  _mobileControlCanvas: {fileID: 1259887336}
+  _gameOverSceneName: GameOverScene
+  _clearSceneName: ClearScene
+  _scoreSceneName: Resultscene
+  _isTimeLimited: 1
+  _timeLimitSeconds: 180
+  _sceneBGMList:
   - sceneName: TitleScene
+    bgmClip: {fileID: 8300000, guid: 6979d52fda0579441a2122b95abaf337, type: 3}
+  - sceneName: StageSelectScene
+    bgmClip: {fileID: 8300000, guid: 6979d52fda0579441a2122b95abaf337, type: 3}
+  - sceneName: StageSelect2Scene
     bgmClip: {fileID: 8300000, guid: 6979d52fda0579441a2122b95abaf337, type: 3}
   - sceneName: Stage1Scene
     bgmClip: {fileID: 8300000, guid: b6dc04f2884eb5b46b675390b1e75e84, type: 3}
   - sceneName: Stage2Scene
-    bgmClip: {fileID: 8300000, guid: 0c2f5e196afe4644d9b1ffb8d644851d, type: 3}
+    bgmClip: {fileID: 8300000, guid: 596e0f53d0760684897f73aa6d85324a, type: 3}
   - sceneName: Stage3Scene
     bgmClip: {fileID: 8300000, guid: 9e972459eddc5964081d0c2d813320d8, type: 3}
+  - sceneName: OpenCampus
+    bgmClip: {fileID: 8300000, guid: b6dc04f2884eb5b46b675390b1e75e84, type: 3}
   - sceneName: ClearScene
     bgmClip: {fileID: 8300000, guid: be32cc3454e0aae4abdc89209994930f, type: 3}
   - sceneName: GameOverScene
     bgmClip: {fileID: 8300000, guid: 2213a9cacad754d4c934719bcda7293d, type: 3}
-  - sceneName: StageSelectScene
-    bgmClip: {fileID: 8300000, guid: 6979d52fda0579441a2122b95abaf337, type: 3}
   - sceneName: Resultscene
     bgmClip: {fileID: 8300000, guid: faad9009b1a8a1a42aaab4b7b0411138, type: 3}
-  - sceneName: StageSelect2Scene
-    bgmClip: {fileID: 8300000, guid: 6979d52fda0579441a2122b95abaf337, type: 3}
-  - sceneName: OpenCampus
-    bgmClip: {fileID: 8300000, guid: b6dc04f2884eb5b46b675390b1e75e84, type: 3}
-  m_initialBGMVolume: 1
-  m_fadeDuration: 1
+  _initialBGMVolume: 1
 --- !u!1 &639121591
 GameObject:
   m_ObjectHideFlags: 0
@@ -1516,7 +1507,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05290a6350348434a802b0ce080e12fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gemCountText: {fileID: 1685015534}
+  _gemCountText: {fileID: 1685015534}
 --- !u!114 &1685015534
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1668,7 +1659,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0.5
+  m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -1759,7 +1750,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0.003921569}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1774,7 +1765,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 42
+  field of view: 56.510265
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -1800,7 +1791,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1722312284}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 682, y: 386, z: 0}
+  m_LocalPosition: {x: 960, y: 540, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

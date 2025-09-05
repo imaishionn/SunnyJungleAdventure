@@ -47,7 +47,7 @@ GameObject:
   - component: {fileID: 7266816844761238991}
   - component: {fileID: 5407940427505359804}
   m_Layer: 0
-  m_Name: Dog
+  m_Name: dog
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -174,16 +174,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4353c4005f6beac48b117c43fca978ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 100
-  detectRange: 10
-  runSpeed: 7
-  runAnimationTrigger: run
-  groundCheck: {fileID: 304672271902390264}
-  groundLayer:
+  _scoreValue: 150
+  _detectRange: 5
+  _runSpeed: 3
+  _flipDeadZone: 0.2
+  _groundCheck: {fileID: 304672271902390264}
+  _groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  groundCheckRadius: 0.3
-  groundAheadCheckDistance: 0.5
+  _groundCheckRadius: 0.2
+  _groundAheadCheckDistance: 0.5
 --- !u!61 &7266816844761238991
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -222,4 +222,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5991d52fefd0ca44f889db35a6d2984f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 100
+  _scoreValue: 100

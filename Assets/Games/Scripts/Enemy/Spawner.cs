@@ -11,27 +11,27 @@ public class Spawner : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
     [Header("スポーン設定")]
     [Tooltip("利用するObjectPoolManagerの参照")]
-    [SerializeField] private ObjectPoolManager objectPoolManager;
+    [SerializeField] private ObjectPoolManager _objectPoolManager;
     [Tooltip("敵をスポーンする間隔 (秒)")]
-    [SerializeField] private float spawnInterval = 3f;
+    [SerializeField] private float _spawnInterval = 3f;
     [Tooltip("スポーンする敵の総数")]
-    [SerializeField] private int spawnCount = 5;
+    [SerializeField] private int _spawnCount = 5;
 
     // ----------------------------------------------------------------------------------------------------
     // プライベート変数
     // ----------------------------------------------------------------------------------------------------
-    private int spawnedCount = 0;
+    private int _spawnedCount = 0;
 
     // ----------------------------------------------------------------------------------------------------
     // MonoBehaviourのライフサイクルメソッド
     // ----------------------------------------------------------------------------------------------------
     private void Start() {
         // 必要なコンポーネントが割り当てられているか確認
-        if(objectPoolManager == null) {
+        if(_objectPoolManager == null) {
             Debug.LogError("Spawner: ObjectPoolManagerが割り当てられていません！",this);
             // 代わりにシングルトンインスタンスを試す
-            objectPoolManager = ObjectPoolManager.Instance;
-            if(objectPoolManager == null) {
+            _objectPoolManager = ObjectPoolManager.Instance;
+            if(_objectPoolManager == null) {
                 Debug.LogError("Spawner: シングルトンインスタンスも見つかりません。スポーンを中止します。");
                 return;
             }
@@ -48,12 +48,12 @@ public class Spawner : MonoBehaviour {
     /// 指定された間隔で敵を生成するコルーチンです。
     /// </summary>
     private IEnumerator SpawnEnemyRoutine() {
-        while(spawnedCount < spawnCount) {
+        while(_spawnedCount < _spawnCount) {
             // 次の生成まで待機
-            yield return new WaitForSeconds(spawnInterval);
+            yield return new WaitForSeconds(_spawnInterval);
 
             // オブジェクトプールから敵を取得
-            GameObject enemy = objectPoolManager.GetEnemyFromPool();
+            GameObject enemy = _objectPoolManager.GetEnemyFromPool();
             if(enemy != null) {
                 // スポナーの周囲にランダムな位置を生成
                 float offsetX = UnityEngine.Random.Range(-1f,1f);
@@ -62,8 +62,8 @@ public class Spawner : MonoBehaviour {
 
                 // 敵を配置
                 enemy.transform.position = spawnPosition;
-                spawnedCount++;
-                Debug.Log($"Spawner: 敵をスポーンしました。現在 {spawnedCount} 体 / {spawnCount} 体");
+                _spawnedCount++;
+                Debug.Log($"Spawner: 敵をスポーンしました。現在 {_spawnedCount} 体 / {_spawnCount} 体");
             }
         }
         Debug.Log("Spawner: 指定された数の敵をすべてスポーンしました。");

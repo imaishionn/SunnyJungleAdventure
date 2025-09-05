@@ -10,21 +10,21 @@ public class GameCamera : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
     [Header("追跡対象")]
     [Tooltip("追跡するプレイヤーオブジェクト")]
-    [SerializeField] private GameObject player;
+    [SerializeField] private GameObject _player;
 
     [Header("カメラ設定")]
     [Tooltip("プレイヤーからのカメラの相対位置。Zは通常負の値でカメラの奥行きを設定します。")]
-    [SerializeField] private Vector3 cameraOffset = new Vector3(0f,0f,-10f);
+    [SerializeField] private Vector3 _cameraOffset = new(0f, 0f, -10f);
 
     [Header("カメラ追跡範囲の制限")]
     [Tooltip("X座標の追跡を制限するかどうか")]
-    [SerializeField] private bool useClampX = false;
+    [SerializeField] private bool _useClampX = false;
     [Tooltip("Y座標の追跡を制限するかどうか")]
-    [SerializeField] private bool useClampY = false;
+    [SerializeField] private bool _useClampY = false;
     [Tooltip("カメラが移動できる最大位置 (X, Y)")]
-    [SerializeField] private Vector2 cameraMaxPos = Vector2.zero;
+    [SerializeField] private Vector2 _cameraMaxPos = Vector2.zero;
     [Tooltip("カメラが移動できる最小位置 (X, Y)")]
-    [SerializeField] private Vector2 cameraMinPos = Vector2.zero;
+    [SerializeField] private Vector2 _cameraMinPos = Vector2.zero;
 
     // ----------------------------------------------------------------------------------------------------
     // プライベート変数
@@ -37,12 +37,12 @@ public class GameCamera : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
     private void Start() {
         // "Player"タグを持つオブジェクトを検索して設定
-        if(player == null) {
-            player = GameObject.FindGameObjectWithTag("Player");
+        if(_player == null) {
+            _player = GameObject.FindGameObjectWithTag("Player");
         }
 
         // カメラ追跡の有効性をチェック
-        if(player == null) {
+        if(_player == null) {
             Debug.LogError("GameCamera: 'Player'タグのゲームオブジェクトが見つかりません！カメラ追跡ができません。",this);
             return;
         }
@@ -51,7 +51,7 @@ public class GameCamera : MonoBehaviour {
         string currentSceneName = SceneManager.GetActiveScene().name;
         if(currentSceneName == "ClearScene") {
             Debug.Log("GameCamera: ClearSceneのため、カメラの追跡を無効化します。");
-            player = null; // 追跡を停止するため、参照をクリア
+            _player = null; // 追跡を停止するため、参照をクリア
             return;
         }
 
@@ -61,7 +61,9 @@ public class GameCamera : MonoBehaviour {
 
     private void LateUpdate() {
         // LateUpdateでカメラを更新することで、プレイヤーの移動後に追跡し、より滑らかな動きになります。
-        if(player == null) return;
+        if (_player == null) {
+            return;
+        }
 
         // カメラの追跡ロジックを実行
         CameraUpdate();
@@ -75,14 +77,14 @@ public class GameCamera : MonoBehaviour {
     /// </summary>
     private void CameraUpdate() {
         // プレイヤーの位置にオフセットを加えた目標位置を計算
-        Vector3 targetPos = player.transform.position + cameraOffset;
+        Vector3 targetPos = _player.transform.position + _cameraOffset;
 
         // 追跡範囲の制限を適用
-        if(useClampX) {
-            targetPos.x = Mathf.Clamp(targetPos.x,cameraMinPos.x,cameraMaxPos.x);
+        if(_useClampX) {
+            targetPos.x = Mathf.Clamp(targetPos.x,_cameraMinPos.x,_cameraMaxPos.x);
         }
-        if(useClampY) {
-            targetPos.y = Mathf.Clamp(targetPos.y,cameraMinPos.y,cameraMaxPos.y);
+        if(_useClampY) {
+            targetPos.y = Mathf.Clamp(targetPos.y,_cameraMinPos.y,_cameraMaxPos.y);
         }
 
         // カメラの位置を目標位置に設定

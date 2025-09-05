@@ -8,7 +8,7 @@ public class GroundCheck : MonoBehaviour {
     // ----------------------------------------------------------------------------------------------------
     // プライベート変数 (Inspectorで設定する必要はありません)
     // ----------------------------------------------------------------------------------------------------
-    private bool m_isGround = false;
+    private bool _isGround = false;
 
     // ----------------------------------------------------------------------------------------------------
     // パブリックメソッド
@@ -17,9 +17,7 @@ public class GroundCheck : MonoBehaviour {
     /// キャラクターが地面に接地しているかどうかの状態を返します。
     /// </summary>
     /// <returns>地面に接地していればtrue、そうでなければfalse</returns>
-    public bool GetIsGround() {
-        return m_isGround;
-    }
+    public bool GetIsGround() => _isGround;
 
     // ----------------------------------------------------------------------------------------------------
     // トリガーイベントメソッド
@@ -31,7 +29,7 @@ public class GroundCheck : MonoBehaviour {
     private void OnTriggerStay2D(Collider2D collision) {
         // 接触しているオブジェクトが「Ground」タグを持つかチェック
         if(collision.CompareTag("Ground")) {
-            m_isGround = true;
+            _isGround = true;
         }
     }
 
@@ -42,7 +40,7 @@ public class GroundCheck : MonoBehaviour {
     private void OnTriggerExit2D(Collider2D collision) {
         // 接触を終了したオブジェクトが「Ground」タグを持つかチェック
         if(collision.CompareTag("Ground")) {
-            m_isGround = false;
+            _isGround = false;
         }
     }
 }
