@@ -3,20 +3,19 @@ using UnityEngine.EventSystems;
 
 /// <summary>
 /// ジャンプボタンUIのタッチイベントを処理し、プレイヤーのジャンプを呼び出すスクリプト。
+/// IPointerDownHandlerインターフェースを実装することで、
+/// UnityのEvent Systemからボタンのタップイベントを直接受け取ることができる。
 /// </summary>
-// IPointerDownHandlerインターフェースを実装することで、
-// UnityのEvent Systemからボタンのタップイベントを直接受け取ることができる。
 public class JumpButtonController : MonoBehaviour, IPointerDownHandler {
     // プレイヤーの移動を管理するスクリプトへの参照
     private PlayerMove _playerMove;
 
     /// <summary>
     /// GameManagerからPlayerMoveの参照を受け取るためのメソッド
+    /// 外部（通常はGameManager）からPlayerMoveのインスタンスを設定する
     /// </summary>
     /// <param name="player">PlayerMoveコンポーネント</param>
-    public void SetPlayerMove(PlayerMove player) =>
-        // 外部（通常はGameManager）からPlayerMoveのインスタンスを設定する
-        _playerMove = player;
+    public void SetPlayerMove(PlayerMove player) => _playerMove = player;
 
     /// <summary>
     /// ボタンがタップされたときに呼び出されます。
@@ -29,5 +28,9 @@ public class JumpButtonController : MonoBehaviour, IPointerDownHandler {
             // PlayerMoveスクリプトのJump()メソッドを呼び出して、プレイヤーをジャンプさせる
             _playerMove.Jump();
         }
+    }
+
+    private void AbleJump() {
+
     }
 }
