@@ -11,11 +11,16 @@ public class JumpButtonController : MonoBehaviour, IPointerDownHandler {
     private PlayerMove _playerMove;
 
     /// <summary>
+    /// ジャンプが出来るかどうか
+    /// </summary>
+    private bool AbleJump => _playerMove != null && _playerMove.gameObject.activeInHierarchy;
+
+    /// <summary>
     /// GameManagerからPlayerMoveの参照を受け取るためのメソッド
     /// 外部（通常はGameManager）からPlayerMoveのインスタンスを設定する
     /// </summary>
-    /// <param name="player">PlayerMoveコンポーネント</param>
-    public void SetPlayerMove(PlayerMove player) => _playerMove = player;
+    /// <param name="playerMove">PlayerMoveコンポーネント</param>
+    public void SetPlayerMove(PlayerMove playerMove) => _playerMove = playerMove;
 
     /// <summary>
     /// ボタンがタップされたときに呼び出されます。
@@ -24,13 +29,9 @@ public class JumpButtonController : MonoBehaviour, IPointerDownHandler {
     /// <param name="eventData">ポインター（タップ）イベントに関する情報</param>
     public void OnPointerDown(PointerEventData eventData) {
         // プレイヤーオブジェクトが存在し、かつヒエラルキーでアクティブな場合のみジャンプ処理を実行
-        if (_playerMove != null && _playerMove.gameObject.activeInHierarchy) {
+        if (AbleJump) {
             // PlayerMoveスクリプトのJump()メソッドを呼び出して、プレイヤーをジャンプさせる
             _playerMove.Jump();
         }
-    }
-
-    private void AbleJump() {
-
     }
 }

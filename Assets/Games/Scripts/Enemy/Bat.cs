@@ -23,6 +23,7 @@ public class Bat : Enemy {
     [SerializeField]
     private float _detectRange = 5f;
 
+
     [Header("移動設定")]
     [Tooltip("飛行速度")]
     [SerializeField]

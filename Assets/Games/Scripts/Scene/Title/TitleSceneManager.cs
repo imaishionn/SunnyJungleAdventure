@@ -7,20 +7,18 @@ using UnityEngine.UI;
 /// ボタンクリックによるシーン遷移を制御します。
 /// </summary>
 public class TitleSceneManager : MonoBehaviour {
-    // ----------------------------------------------------------------------------------------------------
-    // インスペクターで設定するパラメーター
-    // ----------------------------------------------------------------------------------------------------
     [Header("UI設定")]
-    [Tooltip("ゲーム開始ボタン")]
-    [SerializeField] private Button _startButton;
-    [Tooltip("タイトルシーンのメインCanvas")]
-    [SerializeField] private GameObject _titleCanvas;
 
-    // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviourのライフサイクルメソッド
-    // ----------------------------------------------------------------------------------------------------
+    [Tooltip("ゲーム開始ボタン"), SerializeField]
+    private Button _startButton;
+
+    [Tooltip("タイトルシーンのメインCanvas"), SerializeField]
+    private GameObject _titleCanvas;
+
+    /// <summary>
+    /// Start
+    /// </summary>
     private void Start() {
-        // Canvasの存在チェック
         if(_titleCanvas != null) {
             // Canvasをアクティブにする。フェードインはGameManagerが担当。
             _titleCanvas.SetActive(true);
@@ -29,7 +27,6 @@ public class TitleSceneManager : MonoBehaviour {
             Debug.LogError("TitleSceneManager: Title Canvas が割り当てられていません！",this);
         }
 
-        // スタートボタンの存在チェックとリスナーの登録
         if(_startButton != null) {
             // ボタンがクリックされたときのイベントを登録
             _startButton.onClick.AddListener(OnStartButtonClicked);
@@ -47,18 +44,19 @@ public class TitleSceneManager : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// コンポーネントが破棄されるときに呼ばれる
+    /// </summary>
     private void OnDestroy() {
-        // シーン遷移時にボタンのイベントリスナーを解除する
-        if(_startButton != null) {
-            _startButton.onClick.RemoveListener(OnStartButtonClicked);
+        if(_startButton) {
+            return;
         }
+        // シーン遷移時にボタンのイベントリスナーを解除する
+        _startButton.onClick.RemoveListener(OnStartButtonClicked);
     }
 
-    // ----------------------------------------------------------------------------------------------------
-    // UIイベントハンドラー
-    // ----------------------------------------------------------------------------------------------------
     /// <summary>
-    /// スタートボタンがクリックされたときに呼ばれます。
+    /// スタートボタンがクリックされたときに呼ばれる
     /// </summary>
     private void OnStartButtonClicked() {
         if(GameManager.Instance != null) {

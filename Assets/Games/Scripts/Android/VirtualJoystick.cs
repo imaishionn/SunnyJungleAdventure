@@ -3,29 +3,28 @@ using UnityEngine.EventSystems;
 
 /// <summary>
 /// タッチ操作でプレイヤーを動かすためのバーチャルジョイスティックを制御します。
+/// IDragHandler, IPointerUpHandler, IPointerDownHandlerインターフェースを実装することで、
+/// UnityのEvent Systemからタッチイベントを直接受け取ることができるようになります。
 /// </summary>
-// IDragHandler, IPointerUpHandler, IPointerDownHandlerインターフェースを実装することで、
-// UnityのEvent Systemからタッチイベントを直接受け取ることができるようになります。
 public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPointerDownHandler {
-    // ====================================================================================================
-    // #region: インスペクターから設定する変数
-    // ====================================================================================================
-    [SerializeField] private RectTransform _joystickBase; // ジョイスティックのベース部分（背景画像など）
-    [SerializeField] private RectTransform _joystickKnob; // ジョイスティックのツマミ部分（動く部分）
-    [SerializeField] private float _joystickRadius = 100f; // ジョイスティックの操作可能な半径
+    [Header("ジョイスティックのベース部分（背景画像など）"),SerializeField]
+    private RectTransform _joystickBase;
 
-    // ====================================================================================================
-    // #region: スクリプト内部で管理する変数
-    // ====================================================================================================
-    // 現在の入力方向を保持する変数。X軸とY軸のベクトルで表される。
+    [Header("ジョイスティックのツマミ部分（動く部分）"), SerializeField]
+    private RectTransform _joystickKnob;
+
+    [Header("ジョイスティックの操作可能な半径"), SerializeField]
+    private float _joystickRadius = 100f;
+
+    /// <summary>
+    /// 現在の入力方向を保持する変数。X軸とY軸のベクトルで表される。
+    /// </summary>
     private Vector2 _inputDirection = Vector2.zero;
 
-    // 入力方向を外部（例: PlayerMove.cs）から取得するためのプロパティ
+    /// <summary>
+    /// 入力方向を外部（例: PlayerMove.cs）から取得するためのプロパティ
+    /// </summary>
     public Vector2 InputDirection => _inputDirection;
-
-    // ====================================================================================================
-    // #region: MonoBehaviour ライフサイクル
-    // ====================================================================================================
 
     /// <summary>
     /// オブジェクトがアクティブになった時に一度だけ実行される初期化処理
@@ -33,24 +32,18 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
     private void Awake() {
         // 必須コンポーネントが正しく割り当てられているか確認し、エラーをログに出力
         if(_joystickBase == null) {
-            UnityEngine.Debug.LogError("VirtualJoystick: ジョイスティックのベースが割り当てられていません！");
+            Debug.LogError("VirtualJoystick: ジョイスティックのベースが割り当てられていません！");
         }
         if(_joystickKnob == null) {
-            UnityEngine.Debug.LogError("VirtualJoystick: ジョイスティックのツマミが割り当てられていません！");
+            Debug.LogError("VirtualJoystick: ジョイスティックのツマミが割り当てられていません！");
         }
     }
 
-    // ====================================================================================================
-    // #region: ポインターイベント
-    // ====================================================================================================
-
     /// <summary>
-    /// 指が画面に触れたときに呼び出されます。
+    /// 指が画面に触れたときドラッグ処理を開始
     /// </summary>
     /// <param name="eventData">タッチに関する情報</param>
-    public void OnPointerDown(PointerEventData eventData) =>
-        // 指が触れた時点でドラッグ処理を開始
-        OnDrag(eventData);
+    public void OnPointerDown(PointerEventData eventData) => OnDrag(eventData);
 
     /// <summary>
     /// 指を動かしている間、毎フレーム呼び出されます。

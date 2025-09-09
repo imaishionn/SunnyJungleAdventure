@@ -121,7 +121,7 @@ public class GameManager : MonoBehaviour {
         if(Instance == null) {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            UnityEngine.Debug.Log("GameManagerインスタンスが作成され、DontDestroyOnLoadに設定されました。",this);
+            Debug.Log("GameManagerインスタンスが作成され、DontDestroyOnLoadに設定されました。",this);
 
             // UIやオーディオの初期化はAwake()で行う
             CheckUIReferences();
@@ -221,7 +221,7 @@ public class GameManager : MonoBehaviour {
             LoadSceneWithFade(sceneName);
         }
         else {
-            UnityEngine.Debug.LogError("GameManager: 再プレイするステージが見つかりません。ステージ選択へ戻ります。",this);
+            Debug.LogError("GameManager: 再プレイするステージが見つかりません。ステージ選択へ戻ります。",this);
             LoadSceneWithFade(StageSelectSceneName);
         }
     }
@@ -233,7 +233,7 @@ public class GameManager : MonoBehaviour {
         }
 
         if(_globalFadePanelImage == null || _globalFadeCanvasGroup == null) {
-            UnityEngine.Debug.LogError("GameManager: フェードに必要なUI要素が割り当てられていません！フェードなしでロードします。",this);
+            Debug.LogError("GameManager: フェードに必要なUI要素が割り当てられていません！フェードなしでロードします。",this);
             SceneManager.LoadScene(sceneName);
             return;
         }

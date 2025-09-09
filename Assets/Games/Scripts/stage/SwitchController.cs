@@ -48,11 +48,11 @@ public class SwitchController : MonoBehaviour {
             else {
                 _isUpState = false;
                 _spriteRenderer.sprite = _crankDownSprite;
-                UnityEngine.Debug.LogWarning("SwitchController: Initial sprite is not recognized as crankUpSprite or crankDownSprite. Defaulting to crankDownSprite.",this);
+                Debug.LogWarning("SwitchController: Initial sprite is not recognized as crankUpSprite or crankDownSprite. Defaulting to crankDownSprite.",this);
             }
         }
         else {
-            UnityEngine.Debug.LogError("SwitchController: SpriteRenderer is not assigned or found.",this);
+            Debug.LogError("SwitchController: SpriteRenderer is not assigned or found.",this);
         }
     }
 
@@ -80,7 +80,7 @@ public class SwitchController : MonoBehaviour {
             targetPlatform.ToggleVisibilityWithBGM();
         }
         else {
-            UnityEngine.Debug.LogWarning("SwitchController: Target Platform not assigned for switch with ID: " + switchId,this);
+            Debug.LogWarning("SwitchController: Target Platform not assigned for switch with ID: " + switchId,this);
         }
     }
 }
