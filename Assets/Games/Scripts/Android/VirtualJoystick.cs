@@ -32,10 +32,10 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
     /// </summary>
     private void Awake() {
         // 必須コンポーネントが正しく割り当てられているか確認し、エラーをログに出力
-        if (_joystickBase == null) {
+        if(_joystickBase == null) {
             UnityEngine.Debug.LogError("VirtualJoystick: ジョイスティックのベースが割り当てられていません！");
         }
-        if (_joystickKnob == null) {
+        if(_joystickKnob == null) {
             UnityEngine.Debug.LogError("VirtualJoystick: ジョイスティックのツマミが割り当てられていません！");
         }
     }
@@ -72,7 +72,7 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
         // 3. 入力方向を計算
         _inputDirection = position;
         // 入力ベクトルの長さが1.0を超えた場合、正規化して円内に収める
-        if (_inputDirection.magnitude > 1.0f) {
+        if(_inputDirection.magnitude > 1.0f) {
             _inputDirection.Normalize();
         }
 

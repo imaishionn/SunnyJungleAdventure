@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// プレイヤーの横移動に応じて背景をスクロールさせるスクリプトです。
 /// </summary>
-public class BG_Scroll : MonoBehaviour {
+public class BackGroundScroll : MonoBehaviour {
     [Header("コンポーネント"), Tooltip("プレイヤーの移動速度を取得するためのPlayerMoveコンポーネント"), SerializeField]
     private PlayerMove _playerMove;
 

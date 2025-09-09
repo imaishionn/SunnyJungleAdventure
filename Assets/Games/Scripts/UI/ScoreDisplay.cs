@@ -44,7 +44,7 @@ public class ScoreDisplay : MonoBehaviour {
     public void UpdateGemCount(int newCount) {
         if(_gemCountText != null) {
             // テキストを短くして1行に収まるように変更
-            _gemCountText.text = ":" + newCount;
+            _gemCountText.text = $"{newCount}";
         }
     }
 }

@@ -1,10 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 /// <summary>
 /// ゲーム全体の進行状況、状態、データ、UI、BGMなどを管理するシングルトンクラス。
@@ -53,7 +50,7 @@ public class GameManager : MonoBehaviour {
     [Tooltip("シーン名とBGMのAudioClipをマッピングします。")]
     [SerializeField] private List<SceneBGMData> _sceneBGMList;
     [Tooltip("BGMの初期音量 (0.0fから1.0f)")]
-    [Range(0f, 1f)]
+    [Range(0f,1f)]
     [SerializeField] private float _initialBGMVolume = 0.5f;
 
     // ====================================================================================================
@@ -62,12 +59,12 @@ public class GameManager : MonoBehaviour {
     private GameState _currentGameState = GameState.Gameplay;
     private float _currentTime;
     private Coroutine _fadeCoroutine;
-    private UnityEngine.AsyncOperation _asyncLoadOperation;
+    private AsyncOperation _asyncLoadOperation;
     private GameObject _globalFadeCanvasInstance;
     private bool _isGlobalTransitioning = false;
     private AudioSource _audioSource;
     private PlayerMove _player;
-    private readonly Dictionary<string, AudioClip> _sceneBGMMap = new();
+    private readonly Dictionary<string,AudioClip> _sceneBGMMap = new();
 
     private const string STAGE_CLEAR_KEY_PREFIX = "StageClear_";
 
@@ -103,7 +100,7 @@ public class GameManager : MonoBehaviour {
     public int CurrentGemCount { get; private set; } = 0;
     [field: Tooltip("ステージシーンの配列")]
     [field: SerializeField]
-    public string[] StageSceneNames { get; } = { "Stage1Scene", "Stage2Scene", "Stage3Scene", "OpenCampus" };
+    public string[] StageSceneNames { get; } = { "Stage1Scene","Stage2Scene","Stage3Scene","OpenCampus" };
     public int CurrentStageIndex { get; set; } = 0;
     [field: Header("シーン名 (Build Settingsに登録必須)")]
     [field: Tooltip("タイトルシーンの名前")]
@@ -121,10 +118,10 @@ public class GameManager : MonoBehaviour {
     // #region: MonoBehaviour ライフサイクル
     // ====================================================================================================
     private void Awake() {
-        if (Instance == null) {
+        if(Instance == null) {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            UnityEngine.Debug.Log("GameManagerインスタンスが作成され、DontDestroyOnLoadに設定されました。", this);
+            UnityEngine.Debug.Log("GameManagerインスタンスが作成され、DontDestroyOnLoadに設定されました。",this);
 
             // UIやオーディオの初期化はAwake()で行う
             CheckUIReferences();
@@ -133,7 +130,7 @@ public class GameManager : MonoBehaviour {
             InitializeFadeCanvas();
         }
         else {
-            UnityEngine.Debug.LogWarning("GameManagerのインスタンスが既に存在するため、このオブジェクトは破棄されました。", this);
+            Debug.LogWarning("GameManagerのインスタンスが既に存在するため、このオブジェクトは破棄されました。",this);
             Destroy(gameObject);
         }
     }
@@ -141,7 +138,7 @@ public class GameManager : MonoBehaviour {
     private void Start() {
         // 初回起動時（FirstScene）のみ、タイトルへ遷移する
         string currentSceneName = SceneManager.GetActiveScene().name;
-        if (currentSceneName == "FirstScene") {
+        if(currentSceneName == "FirstScene") {
             // ここを修正：フェードなしのシーンロードに変更
             SceneManager.LoadScene(TitleSceneName);
         }
@@ -150,7 +147,7 @@ public class GameManager : MonoBehaviour {
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
     private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
     private void OnDestroy() {
-        if (Instance == this) {
+        if(Instance == this) {
             Instance = null;
         }
 
@@ -158,11 +155,11 @@ public class GameManager : MonoBehaviour {
     }
 
     private void Update() {
-        if (_isTimeLimited && _currentGameState == GameState.Gameplay) {
+        if(_isTimeLimited && _currentGameState == GameState.Gameplay) {
             _currentTime -= Time.deltaTime;
             UpdateTimeDisplay();
 
-            if (_currentTime <= 0) {
+            if(_currentTime <= 0) {
                 _currentTime = 0;
                 GameOver();
             }
@@ -175,7 +172,7 @@ public class GameManager : MonoBehaviour {
     public GameState GetCurrentGameState() => _currentGameState;
     public void SetState(GameState newState) {
         _currentGameState = newState;
-        switch (newState) {
+        switch(newState) {
             case GameState.Gameplay:
             case GameState.Cutscene:
                 Time.timeScale = 1;
@@ -200,9 +197,9 @@ public class GameManager : MonoBehaviour {
         OnGemCountChanged?.Invoke(CurrentGemCount);
     }
     public void SetGameOverStateImmediately() {
-        if (_currentGameState != GameState.GameOver) {
+        if(_currentGameState != GameState.GameOver) {
             SetState(GameState.GameOver);
-            if (_isGlobalTransitioning) {
+            if(_isGlobalTransitioning) {
                 return;
             }
 
@@ -214,29 +211,29 @@ public class GameManager : MonoBehaviour {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     public void RetryLastStage() {
-        if (_isGlobalTransitioning) {
+        if(_isGlobalTransitioning) {
             return;
         }
 
         SetState(GameState.Gameplay);
-        if (CurrentStageIndex >= 0 && CurrentStageIndex < StageSceneNames.Length) {
+        if(CurrentStageIndex >= 0 && CurrentStageIndex < StageSceneNames.Length) {
             string sceneName = StageSceneNames[CurrentStageIndex];
             LoadSceneWithFade(sceneName);
         }
         else {
-            UnityEngine.Debug.LogError("GameManager: 再プレイするステージが見つかりません。ステージ選択へ戻ります。", this);
+            UnityEngine.Debug.LogError("GameManager: 再プレイするステージが見つかりません。ステージ選択へ戻ります。",this);
             LoadSceneWithFade(StageSelectSceneName);
         }
     }
     public void SetBGMVolume(float volume) => BGMVolume = volume;
     public PlayerMove GetPlayerMove() => _player;
-    public void LoadSceneWithFade(string sceneName, float duration = 1.0f, System.Action onFadeOutComplete = null) {
-        if (_isGlobalTransitioning) {
+    public void LoadSceneWithFade(string sceneName,float duration = 1.0f,System.Action onFadeOutComplete = null) {
+        if(_isGlobalTransitioning) {
             return;
         }
 
-        if (_globalFadePanelImage == null || _globalFadeCanvasGroup == null) {
-            UnityEngine.Debug.LogError("GameManager: フェードに必要なUI要素が割り当てられていません！フェードなしでロードします。", this);
+        if(_globalFadePanelImage == null || _globalFadeCanvasGroup == null) {
+            UnityEngine.Debug.LogError("GameManager: フェードに必要なUI要素が割り当てられていません！フェードなしでロードします。",this);
             SceneManager.LoadScene(sceneName);
             return;
         }
@@ -244,11 +241,11 @@ public class GameManager : MonoBehaviour {
         _globalFadeCanvasInstance.SetActive(true);
         _globalFadePanelImage.gameObject.SetActive(true);
 
-        _fadeCoroutine = StartCoroutine(FadeOutAndLoadScene(sceneName, duration, onFadeOutComplete));
+        _fadeCoroutine = StartCoroutine(FadeOutAndLoadScene(sceneName,duration,onFadeOutComplete));
     }
     public void GameOver() {
-        if (_currentGameState == GameState.GameOver || _isGlobalTransitioning) {
-            UnityEngine.Debug.LogWarning("GameManager: 既にゲームオーバー状態か、シーン遷移中のため、GameOver処理をスキップしました。", this);
+        if(_currentGameState == GameState.GameOver || _isGlobalTransitioning) {
+            UnityEngine.Debug.LogWarning("GameManager: 既にゲームオーバー状態か、シーン遷移中のため、GameOver処理をスキップしました。",this);
             return;
         }
         SetState(GameState.GameOver);
@@ -258,8 +255,8 @@ public class GameManager : MonoBehaviour {
         LoadSceneWithFade(_gameOverSceneName);
     }
     public void GameClear() {
-        if (_currentGameState == GameState.StageClear || _isGlobalTransitioning) {
-            UnityEngine.Debug.LogWarning("GameManager: 既にゲームクリア状態か、シーン遷移中のため、GameClear処理をスキップしました。", this);
+        if(_currentGameState == GameState.StageClear || _isGlobalTransitioning) {
+            UnityEngine.Debug.LogWarning("GameManager: 既にゲームクリア状態か、シーン遷移中のため、GameClear処理をスキップしました。",this);
             return;
         }
         SetState(GameState.StageClear);
@@ -270,12 +267,12 @@ public class GameManager : MonoBehaviour {
         LoadSceneWithFade(_clearSceneName);
     }
     public void GoToNextStage() {
-        if (_isGlobalTransitioning) {
+        if(_isGlobalTransitioning) {
             return;
         }
 
         CurrentStageIndex++;
-        if (CurrentStageIndex < StageSceneNames.Length) {
+        if(CurrentStageIndex < StageSceneNames.Length) {
             LoadSceneWithFade(StageSceneNames[CurrentStageIndex]);
         }
         else {
@@ -284,13 +281,13 @@ public class GameManager : MonoBehaviour {
         }
     }
     public void SetStageClear(int stageIndex) {
-        PlayerPrefs.SetInt(STAGE_CLEAR_KEY_PREFIX + stageIndex, 1);
+        PlayerPrefs.SetInt(STAGE_CLEAR_KEY_PREFIX + stageIndex,1);
         PlayerPrefs.Save();
         UnityEngine.Debug.Log($"ステージ{stageIndex + 1}をクリアしました。");
     }
-    public bool IsStageClear(int stageIndex) => PlayerPrefs.GetInt(STAGE_CLEAR_KEY_PREFIX + stageIndex, 0) == 1;
+    public bool IsStageClear(int stageIndex) => PlayerPrefs.GetInt(STAGE_CLEAR_KEY_PREFIX + stageIndex,0) == 1;
     public void ClearAllStageData() {
-        for (int i = 0; i < StageSceneNames.Length; i++) {
+        for(int i = 0;i < StageSceneNames.Length;i++) {
             PlayerPrefs.DeleteKey(STAGE_CLEAR_KEY_PREFIX + i);
         }
         PlayerPrefs.Save();
@@ -306,18 +303,18 @@ public class GameManager : MonoBehaviour {
     // ====================================================================================================
     // #region: プライベートメソッド（ヘルパー）
     // ====================================================================================================
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+    private void OnSceneLoaded(Scene scene,LoadSceneMode mode) {
         SetGameStateByScene(scene.name);
         UpdateSceneReferences(scene.name);
         PlayBGMForScene(scene.name);
 
         // ここを修正：_isGlobalTransitioningがtrueの場合のみフェードインを開始
-        if (_isGlobalTransitioning) {
+        if(_isGlobalTransitioning) {
             StartFadeIn();
         }
         else {
             // 通常のシーンロード（フェードなし）の場合、フェードUIを非表示にする
-            if (_globalFadeCanvasGroup != null) {
+            if(_globalFadeCanvasGroup != null) {
                 _globalFadeCanvasGroup.alpha = 0f;
                 _globalFadeCanvasGroup.blocksRaycasts = false;
                 _globalFadeCanvasGroup.interactable = false;
@@ -326,28 +323,28 @@ public class GameManager : MonoBehaviour {
         _isGlobalTransitioning = false;
     }
 
-    private void UpdateSceneReferences(string sceneName) => UpdateSceneReferences(sceneName, _mobileControlCanvas);
+    private void UpdateSceneReferences(string sceneName) => UpdateSceneReferences(sceneName,_mobileControlCanvas);
 
-    private void UpdateSceneReferences(string sceneName, GameObject mobileControlCanvas) {
+    private void UpdateSceneReferences(string sceneName,GameObject mobileControlCanvas) {
         bool isGameplay = IsGameplayScene(sceneName);
         _player = isGameplay ? FindObjectOfType<PlayerMove>() : null;
-        if (_player != null && mobileControlCanvas != null) {
+        if(_player != null && mobileControlCanvas != null) {
             // 修正: ヌル合意演算子を明示的なヌルチェックに変更
             Transform joystickComponent = mobileControlCanvas.transform.Find("JoystickBase");
             VirtualJoystick joystick = null;
-            if (joystickComponent != null) {
+            if(joystickComponent != null) {
                 joystick = joystickComponent.GetComponent<VirtualJoystick>();
             }
             Transform jumpButtonComponent = mobileControlCanvas.transform.Find("JumpButton");
             JumpButtonController jumpButton = null;
-            if (jumpButtonComponent != null) {
+            if(jumpButtonComponent != null) {
                 jumpButton = jumpButtonComponent.GetComponent<JumpButtonController>();
             }
 
-            _player.SetMobileControls(joystick, jumpButton);
+            _player.SetMobileControls(joystick,jumpButton);
 
             // 追加: ジャンプボタンにプレイヤーの参照を渡す
-            if (jumpButton != null) {
+            if(jumpButton != null) {
                 jumpButton.SetPlayerMove(_player);
             }
         }
@@ -360,32 +357,32 @@ public class GameManager : MonoBehaviour {
             sceneName == "OpenCampus");
     }
     private void SetGameStateByScene(string sceneName) {
-        if (sceneName == TitleSceneName || sceneName == "FirstScene") {
+        if(sceneName == TitleSceneName || sceneName == "FirstScene") {
             SetState(GameState.Title);
             ResetGameData();
         }
-        else if (sceneName == StageSelectSceneName || sceneName.Contains("StageSelect")) {
+        else if(sceneName == StageSelectSceneName || sceneName.Contains("StageSelect")) {
             SetState(GameState.StageSelect);
         }
-        else if (sceneName == _gameOverSceneName) {
+        else if(sceneName == _gameOverSceneName) {
             SetState(GameState.GameOver);
         }
-        else if (sceneName == _clearSceneName || sceneName == _scoreSceneName) {
+        else if(sceneName == _clearSceneName || sceneName == _scoreSceneName) {
             SetState(GameState.StageClear);
         }
-        else if (IsGameplayScene(sceneName)) {
+        else if(IsGameplayScene(sceneName)) {
             SetState(GameState.Gameplay);
             InitializeGameplayState();
         }
         else {
-            UnityEngine.Debug.LogWarning($"GameManager: 未知のシーン'{sceneName}'から起動しました。デフォルトのゲーム状態をGameplayに設定。", this);
+            UnityEngine.Debug.LogWarning($"GameManager: 未知のシーン'{sceneName}'から起動しました。デフォルトのゲーム状態をGameplayに設定。",this);
             SetState(GameState.Gameplay);
         }
     }
     private void InitializeGameplayState() => _currentTime = _timeLimitSeconds;
     private void UpdateTimeDisplay() {
-        if (_timeLimitText != null) {
-            _timeLimitText.text = ": " + Mathf.CeilToInt(_currentTime).ToString();
+        if(_timeLimitText != null) {
+            _timeLimitText.text = Mathf.CeilToInt(_currentTime).ToString();
             _timeLimitText.color = _currentTime <= 10f ? Color.red : Color.white;
         }
     }
@@ -394,23 +391,23 @@ public class GameManager : MonoBehaviour {
     /// BGMを再生します。clipがnullの場合は停止します。
     /// </summary>
     public void PlayBGM(AudioClip clip) {
-        if (_audioSource == null) {
-            UnityEngine.Debug.LogWarning("GameManager: BGM再生用のAudioSourceが割り当てられていません。", this);
+        if(_audioSource == null) {
+            UnityEngine.Debug.LogWarning("GameManager: BGM再生用のAudioSourceが割り当てられていません。",this);
             return;
         }
-        if (_audioSource.clip == clip && _audioSource.isPlaying) {
+        if(_audioSource.clip == clip && _audioSource.isPlaying) {
             return;
         }
 
         _audioSource.Stop();
-        if (clip != null) {
+        if(clip != null) {
             _audioSource.clip = clip;
             _audioSource.volume = _initialBGMVolume;
             _audioSource.Play();
         }
     }
     private void PlayBGMForScene(string sceneName) {
-        if (_sceneBGMMap.ContainsKey(sceneName)) {
+        if(_sceneBGMMap.ContainsKey(sceneName)) {
             PlayBGM(_sceneBGMMap[sceneName]);
         }
         else {
@@ -419,46 +416,46 @@ public class GameManager : MonoBehaviour {
     }
     private void UpdatePermanentUIForScene(string sceneName) {
         bool isGameplay = IsGameplayScene(sceneName);
-        if (_permanentUICanvas != null) {
+        if(_permanentUICanvas != null) {
             _permanentUICanvas.SetActive(isGameplay);
         }
 
-        if (_scorePanel != null) {
+        if(_scorePanel != null) {
             _scorePanel.SetActive(isGameplay);
         }
 
-        if (_timeLimitText != null) {
+        if(_timeLimitText != null) {
             _timeLimitText.gameObject.SetActive(isGameplay && _isTimeLimited);
         }
 
-        if (_mobileControlCanvas != null) {
+        if(_mobileControlCanvas != null) {
             _mobileControlCanvas.SetActive(isGameplay && UnityEngine.Application.isMobilePlatform);
         }
     }
-    private IEnumerator FadeOutAndLoadScene(string sceneName, float duration, System.Action onFadeOutComplete) {
-        if (_globalFadeCanvasGroup != null) {
+    private IEnumerator FadeOutAndLoadScene(string sceneName,float duration,System.Action onFadeOutComplete) {
+        if(_globalFadeCanvasGroup != null) {
             _globalFadeCanvasGroup.blocksRaycasts = true;
             _globalFadeCanvasGroup.interactable = true;
         }
         // 修正: ヌル合意演算子から明示的なヌルチェックに変更
-        yield return StartCoroutine(FadeCanvasGroup(0f, 1f, duration, () => {
+        yield return StartCoroutine(FadeCanvasGroup(0f,1f,duration,() => {
             onFadeOutComplete?.Invoke();
         }));
 
         _asyncLoadOperation = SceneManager.LoadSceneAsync(sceneName);
         _asyncLoadOperation.allowSceneActivation = false;
-        while (_asyncLoadOperation.progress < 0.9f) {
+        while(_asyncLoadOperation.progress < 0.9f) {
             yield return null;
         }
 
-        while (_globalFadeCanvasGroup.alpha < 0.99f) {
+        while(_globalFadeCanvasGroup.alpha < 0.99f) {
             yield return null;
         }
 
         _asyncLoadOperation.allowSceneActivation = true;
     }
-    private IEnumerator FadeCanvasGroup(float startAlpha, float endAlpha, float duration, System.Action onComplete = null) {
-        if (_globalFadeCanvasGroup == null || _globalFadePanelImage == null) {
+    private IEnumerator FadeCanvasGroup(float startAlpha,float endAlpha,float duration,System.Action onComplete = null) {
+        if(_globalFadeCanvasGroup == null || _globalFadePanelImage == null) {
             // 修正: ヌル合意演算子から明示的なヌルチェックに変更
             onComplete?.Invoke();
             yield break;
@@ -466,11 +463,11 @@ public class GameManager : MonoBehaviour {
         _globalFadeCanvasGroup.alpha = startAlpha;
         _globalFadeCanvasGroup.blocksRaycasts = startAlpha > 0;
         _globalFadeCanvasGroup.interactable = startAlpha > 0;
-        _globalFadePanelImage.color = new Color(0f, 0f, 0f, _globalFadePanelImage.color.a);
+        _globalFadePanelImage.color = new Color(0f,0f,0f,_globalFadePanelImage.color.a);
         float timer = 0f;
-        while (timer < duration) {
+        while(timer < duration) {
             timer += Time.unscaledDeltaTime;
-            _globalFadeCanvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, timer / duration);
+            _globalFadeCanvasGroup.alpha = Mathf.Lerp(startAlpha,endAlpha,timer / duration);
             yield return null;
         }
         _globalFadeCanvasGroup.alpha = endAlpha;
@@ -478,18 +475,18 @@ public class GameManager : MonoBehaviour {
         onComplete?.Invoke();
     }
     private void StartFadeIn() {
-        if (_fadeCoroutine != null) {
+        if(_fadeCoroutine != null) {
             StopCoroutine(_fadeCoroutine);
         }
 
         _globalFadeCanvasInstance.SetActive(true);
         _globalFadePanelImage.gameObject.SetActive(true);
-        if (_globalFadeCanvasGroup != null) {
+        if(_globalFadeCanvasGroup != null) {
             _globalFadeCanvasGroup.blocksRaycasts = true;
             _globalFadeCanvasGroup.interactable = true;
         }
-        _fadeCoroutine = StartCoroutine(FadeCanvasGroup(1f, 0f, FadeDuration, () => {
-            if (_globalFadeCanvasGroup != null) {
+        _fadeCoroutine = StartCoroutine(FadeCanvasGroup(1f,0f,FadeDuration,() => {
+            if(_globalFadeCanvasGroup != null) {
                 _globalFadeCanvasGroup.alpha = 0f;
                 _globalFadeCanvasGroup.blocksRaycasts = false;
                 _globalFadeCanvasGroup.interactable = false;
@@ -497,41 +494,41 @@ public class GameManager : MonoBehaviour {
         }));
     }
     private void CheckUIReferences() {
-        if (_permanentUICanvas == null) {
-            UnityEngine.Debug.LogError("GameManager: Permanent UICanvasが割り当てられていません。", this);
+        if(_permanentUICanvas == null) {
+            Debug.LogError("GameManager: Permanent UICanvasが割り当てられていません。",this);
         }
 
-        if (_globalFadePanelImage == null) {
-            UnityEngine.Debug.LogError("GameManager: Global Fade Panel Imageが割り当てられていません。", this);
+        if(_globalFadePanelImage == null) {
+            Debug.LogError("GameManager: Global Fade Panel Imageが割り当てられていません。",this);
         }
 
-        if (_globalFadeCanvasGroup == null) {
-            UnityEngine.Debug.LogError("GameManager: Global Fade Canvas Groupが割り当てられていません。", this);
+        if(_globalFadeCanvasGroup == null) {
+            Debug.LogError("GameManager: Global Fade Canvas Groupが割り当てられていません。",this);
         }
 
-        if (_permanentEventSystem == null) {
-            UnityEngine.Debug.LogError("GameManager: Permanent Event Systemが割り当てられていません。", this);
+        if(_permanentEventSystem == null) {
+            Debug.LogError("GameManager: Permanent Event Systemが割り当てられていません。",this);
         }
 
-        if (_scoreDisplay == null) {
-            UnityEngine.Debug.LogError("GameManager: Score Displayが割り当てられていません。", this);
+        if(_scoreDisplay == null) {
+            Debug.LogError("GameManager: Score Displayが割り当てられていません。",this);
         }
 
-        if (_scorePanel == null) {
-            UnityEngine.Debug.LogError("GameManager: Score Panelが割り当てられていません。", this);
+        if(_scorePanel == null) {
+            Debug.LogError("GameManager: Score Panelが割り当てられていません。",this);
         }
 
-        if (_timeLimitText == null) {
-            UnityEngine.Debug.LogWarning("GameManager: Time Limit Textが割り当てられていません。時間制限UIは表示されません。", this);
+        if(_timeLimitText == null) {
+            Debug.LogWarning("GameManager: Time Limit Textが割り当てられていません。時間制限UIは表示されません。",this);
         }
 
-        if (_mobileControlCanvas == null) {
-            UnityEngine.Debug.LogError("GameManager: Mobile Control Canvasが割り当てられていません。", this);
+        if(_mobileControlCanvas == null) {
+            Debug.LogError("GameManager: Mobile Control Canvasが割り当てられていません。",this);
         }
     }
     private void InitializeAudioSource() {
         _audioSource = GetComponent<AudioSource>();
-        if (_audioSource == null) {
+        if(_audioSource == null) {
             _audioSource = gameObject.AddComponent<AudioSource>();
         }
 
@@ -539,14 +536,14 @@ public class GameManager : MonoBehaviour {
         _audioSource.volume = _initialBGMVolume;
     }
     private void InitializeBGMMap() {
-        foreach (SceneBGMData data in _sceneBGMList) {
-            if (!_sceneBGMMap.ContainsKey(data.sceneName)) {
-                _sceneBGMMap.Add(data.sceneName, data.bgmClip);
+        foreach(SceneBGMData data in _sceneBGMList) {
+            if(!_sceneBGMMap.ContainsKey(data.sceneName)) {
+                _sceneBGMMap.Add(data.sceneName,data.bgmClip);
             }
         }
     }
     private void InitializeFadeCanvas() {
-        if (_globalFadeCanvasGroup != null) {
+        if(_globalFadeCanvasGroup != null) {
             _globalFadeCanvasInstance = _globalFadeCanvasGroup.gameObject;
             _globalFadeCanvasGroup.alpha = 0f;
             _globalFadeCanvasGroup.blocksRaycasts = false;
@@ -555,8 +552,8 @@ public class GameManager : MonoBehaviour {
     }
     private void SaveCurrentStageIndex() {
         string currentSceneName = SceneManager.GetActiveScene().name;
-        for (int i = 0; i < StageSceneNames.Length; i++) {
-            if (StageSceneNames[i] == currentSceneName) {
+        for(int i = 0;i < StageSceneNames.Length;i++) {
+            if(StageSceneNames[i] == currentSceneName) {
                 CurrentStageIndex = i;
                 break;
             }

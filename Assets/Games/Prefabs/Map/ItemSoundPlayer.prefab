@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2652290102684083746}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.5, y: 0.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -49,6 +49,8 @@ MonoBehaviour:
   jumpClip: {fileID: 8300000, guid: 8fb731e3e4e9fc3448d8795b6ffe4c50, type: 3}
   gameOverClip: {fileID: 8300000, guid: 2d21f7dd9c189b945a8782c662b98aab, type: 3}
   enemyDefeatClip: {fileID: 8300000, guid: b7db36b7c4a149e44a31a7586874f044, type: 3}
+  _enemyDefeatVolume: 1
+  _gameOverVolume: 1
 --- !u!82 &2652290102684083759
 AudioSource:
   m_ObjectHideFlags: 0

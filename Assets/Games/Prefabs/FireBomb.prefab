@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3761402359351478239}
   - component: {fileID: 8730948069998953218}
   m_Layer: 0
-  m_Name: Fire Bomb
+  m_Name: FireBomb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

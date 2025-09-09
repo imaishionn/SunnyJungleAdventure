@@ -4066,7 +4066,7 @@ GameObject:
   - component: {fileID: 544430323}
   - component: {fileID: 544430324}
   m_Layer: 2
-  m_Name: Main Camera
+  m_Name: Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4128,7 +4128,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &544430322
 MonoBehaviour:
@@ -58914,7 +58914,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &670958347
 PrefabInstance:
@@ -59828,7 +59828,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &755076056
 PrefabInstance:
@@ -63481,7 +63481,7 @@ Transform:
   - {fileID: 1813787028}
   - {fileID: 864029005}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1207409333 stripped
 Transform:
@@ -84065,7 +84065,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1523949180
 GameObject:
@@ -84172,7 +84172,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1523949184
 MonoBehaviour:
@@ -84954,7 +84954,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &1608549247
 AudioSource:
@@ -85233,7 +85233,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1663036868 stripped
 Transform:
@@ -88448,7 +88448,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2782465434501871099, guid: e4fb8fa4276d498419cf99c29e058285, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2782465434501871099, guid: e4fb8fa4276d498419cf99c29e058285, type: 3}
       propertyPath: m_LocalPosition.x
@@ -88513,7 +88513,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5660758627347551235, guid: b09f7ba30e4b0ae4f8b4c028d6050f5c, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5660758627347551235, guid: b09f7ba30e4b0ae4f8b4c028d6050f5c, type: 3}
       propertyPath: m_LocalPosition.x
