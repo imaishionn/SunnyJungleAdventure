@@ -2,74 +2,68 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// オブジェクトプールを管理
+/// オブジェクトプールを管理するシングルトンクラスです。
 /// </summary>
 public class ObjectPoolManager : MonoBehaviour {
-    // シングルトンインスタンス
     public static ObjectPoolManager Instance { get; private set; }
 
-    [Header("プール設定")]
-    [Tooltip("プールするゲームオブジェクトのPrefab")]
-    [SerializeField] private GameObject _enemyPrefab;
-    [Tooltip("事前に生成しておくオブジェクトの数")]
-    [SerializeField] private int _poolSize = 10;
+    [Header("オブジェクトプール（大量のオブジェクト）の設定"), SerializeField]
+    private GameObject _enemyPrefab; // プールする敵のプレハブ
+    [Header("プールの初期サイズ"), SerializeField]
+    private int _poolSize = 10; // プールの初期サイズ
 
     private List<GameObject> _enemyPool;
 
     private void Awake() {
-        // シングルトンパターンの実装（DontDestroyOnLoadを削除）
-        if(Instance != null && Instance != this) {
+        if (Instance != null && Instance != this) {
             Destroy(gameObject);
             return;
         }
         Instance = this;
-
         InitializePool();
     }
 
     private void OnDestroy() {
-        // オブジェクトが破棄される際に、シングルトンインスタンスをクリア
-        if(Instance == this) {
+        if (Instance == this) {
             Instance = null;
         }
     }
 
     private void InitializePool() {
-        _enemyPool = new List<GameObject>();
-        if(_enemyPrefab == null) {
-            Debug.LogError("ObjectPoolManager: enemyPrefabが設定されていません。プールの初期化を中止します。",this);
+        if (_enemyPrefab == null) {
+            Debug.LogError("ObjectPoolManager: 敵のプレハブが割り当てられていません。プールの初期化を中止します。", this);
             return;
         }
-        for(int i = 0;i < _poolSize;i++) {
-            GameObject enemy = Instantiate(_enemyPrefab);
-            if(enemy == null) {
-                Debug.LogError($"ObjectPoolManager: {i + 1}番目の敵の生成に失敗しました。Prefabが壊れている可能性があります。",this);
-                continue;
-            }
+
+        _enemyPool = new List<GameObject>();
+        for (int i = 0; i < _poolSize; i++) {
+            GameObject enemy = Instantiate(_enemyPrefab, transform);
             enemy.SetActive(false);
             _enemyPool.Add(enemy);
         }
     }
 
+    /// <summary>
+    /// プールから使用可能な敵オブジェクトを取得します。
+    /// </summary>
+    /// <returns>使用可能な敵オブジェクト</returns>
     public GameObject GetEnemyFromPool() {
-        foreach(GameObject enemy in _enemyPool) {
-            if(enemy != null && !enemy.activeInHierarchy) {
+        if (_enemyPrefab == null) {
+            Debug.LogError("ObjectPoolManager: 敵のプレハブが割り当てられていません。プールから敵を取得できません。", this);
+            return null;
+        }
+
+        foreach (GameObject enemy in _enemyPool) {
+            if (!enemy.activeInHierarchy) {
                 enemy.SetActive(true);
                 return enemy;
             }
         }
 
-        if(_enemyPrefab == null) {
-            Debug.LogError("ObjectPoolManager: enemyPrefabが設定されていません。",this);
-            return null;
-        }
-        GameObject newEnemy = Instantiate(_enemyPrefab);
-        if(newEnemy == null) {
-            Debug.LogError("ObjectPoolManager: 新しい敵の生成に失敗しました。",this);
-            return null;
-        }
+        // プールが空の場合、新しいオブジェクトを生成してプールに追加
+        GameObject newEnemy = Instantiate(_enemyPrefab, transform);
         _enemyPool.Add(newEnemy);
-        Debug.LogWarning("ObjectPoolManager: プールが枯渇しました。新しくオブジェクトを生成しました。",this);
+        Debug.LogWarning("ObjectPoolManager: プールが枯渇しました。新しいオブジェクトを作成します。", this);
         return newEnemy;
     }
 }

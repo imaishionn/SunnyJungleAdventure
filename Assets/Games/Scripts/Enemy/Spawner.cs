@@ -2,70 +2,52 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// オブジェクトプールから敵をスポーン（生成）するスクリプトです。
+/// オブジェクトプールから敵をスポーン（生成）するスクリプト。
 /// 指定した数と間隔で、敵を定期的に配置します。
 /// </summary>
 public class Spawner : MonoBehaviour {
-    // ----------------------------------------------------------------------------------------------------
-    // インスペクターで設定するパラメーター
-    // ----------------------------------------------------------------------------------------------------
-    [Header("スポーン設定")]
-    [Tooltip("利用するObjectPoolManagerの参照")]
-    [SerializeField] private ObjectPoolManager _objectPoolManager;
-    [Tooltip("敵をスポーンする間隔 (秒)")]
-    [SerializeField] private float _spawnInterval = 3f;
-    [Tooltip("スポーンする敵の総数")]
-    [SerializeField] private int _spawnCount = 5;
+    [Header("オブジェクトプールを管理するクラス"), SerializeField]
+    private ObjectPoolManager _objectPoolManager;
 
-    // ----------------------------------------------------------------------------------------------------
-    // プライベート変数
-    // ----------------------------------------------------------------------------------------------------
-    private int _spawnedCount = 0;
+    [ Header("敵をスポーンする間隔（秒）"), SerializeField]
+    private float _spawnInterval = 3f; 
 
-    // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviourのライフサイクルメソッド
-    // ----------------------------------------------------------------------------------------------------
+    [ Header("スポーンする敵の総数"), SerializeField]
+    private int _spawnCount = 5; 
+
+
+    private int _spawnedCount;
+
     private void Start() {
-        // 必要なコンポーネントが割り当てられているか確認
-        if(_objectPoolManager == null) {
-            Debug.LogError("Spawner: ObjectPoolManagerが割り当てられていません！",this);
-            // 代わりにシングルトンインスタンスを試す
-            _objectPoolManager = ObjectPoolManager.Instance;
-            if(_objectPoolManager == null) {
-                Debug.LogError("Spawner: シングルトンインスタンスも見つかりません。スポーンを中止します。");
-                return;
-            }
+        if (_objectPoolManager == null) {
+            Debug.LogError("ObjectPoolManagerが割り当てられていません。スポーンは実行されません。", this);
+            return;
         }
 
-        // コルーチンを開始
+        _spawnedCount = 0;
         StartCoroutine(SpawnEnemyRoutine());
     }
 
-    // ----------------------------------------------------------------------------------------------------
-    // プライベートメソッド
-    // ----------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// 指定された間隔で敵を生成するコルーチンです。
-    /// </summary>
     private IEnumerator SpawnEnemyRoutine() {
-        while(_spawnedCount < _spawnCount) {
-            // 次の生成まで待機
+        while (_spawnedCount < _spawnCount) {
             yield return new WaitForSeconds(_spawnInterval);
 
-            // オブジェクトプールから敵を取得
             GameObject enemy = _objectPoolManager.GetEnemyFromPool();
-            if(enemy != null) {
-                // スポナーの周囲にランダムな位置を生成
-                float offsetX = UnityEngine.Random.Range(-1f,1f);
-                float offsetY = UnityEngine.Random.Range(-1f,1f);
-                Vector3 spawnPosition = transform.position + new Vector3(offsetX,offsetY,0);
-
-                // 敵を配置
-                enemy.transform.position = spawnPosition;
-                _spawnedCount++;
-                Debug.Log($"Spawner: 敵をスポーンしました。現在 {_spawnedCount} 体 / {_spawnCount} 体");
+            if (enemy == null) {
+                Debug.LogWarning("プールから敵を取得できませんでした。スポーンをスキップします。");
+                continue;
             }
+
+            // スポーン位置をランダムに調整
+            float offsetX = UnityEngine.Random.Range(-1f, 1f);
+            float offsetY = UnityEngine.Random.Range(-1f, 1f);
+            Vector3 spawnPosition = transform.position + new Vector3(offsetX, offsetY, 0);
+
+            enemy.transform.position = spawnPosition;
+            _spawnedCount++;
+            Debug.Log($"{_spawnedCount}体目の敵をスポーンしました。");
         }
-        Debug.Log("Spawner: 指定された数の敵をすべてスポーンしました。");
+
+        Debug.Log("すべての敵のスポーンが完了しました。");
     }
 }

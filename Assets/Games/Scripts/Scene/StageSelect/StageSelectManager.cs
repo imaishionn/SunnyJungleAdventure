@@ -1,61 +1,92 @@
-using UnityEngine;
-using UnityEngine.UI;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
-/// ステージ選択画面のUIとロジックを管理するクラス。
+/// ステージ選択シーンのUIとイベントを管理するスクリプトです。
 /// </summary>
 public class StageSelectManager : MonoBehaviour {
-    // === インスペクターから設定するステージボタン ===
-    [SerializeField] private Button[] _stageButtons;
-    [SerializeField] private Button _nextButton;
-    [SerializeField] private GameObject _stageSelectPage;
+    [Header("ページ設定"), SerializeField]
+    private int _pageIndex = 0;
 
-    // === 新しく追加されたクリア表示UI ===
-    [Header("クリア表示UI")]
-    [Tooltip("各ステージに対応する「クリア」表示のゲームオブジェクト")]
-    [SerializeField] private GameObject[] _clearIndicators;
+    [Header("UIコンポーネント"), SerializeField]
+    private Transform _stageButtonsParent;
 
-    private void Start() =>
-        // シーンロード時に、すべてのボタンをアクティブ（表示）にし、クリア表示を更新する
-        UpdateButtonsAndClearIndicators();
+    [Header("クリア時に出る文字"), SerializeField]
+    private GameObject[] _clearIndicators;
 
-    private void UpdateButtonsAndClearIndicators() {
-        // GameManagerが存在するか確認
-        if (GameManager.Instance == null) {
-            Debug.LogError("UpdateButtonsAndClearIndicators: GameManagerが見つかりません。クリア表示を更新できません。", this);
+    [Header("次のページへ行くボタン"), SerializeField]
+    private Button _pageButton;
+
+    [Header("ステージ選択画面全体のページオブジェクト"), SerializeField]
+    private GameObject _stageSelectPage;
+
+    private Button[] _stageButtons;
+    private const int STAGES_PER_PAGE = 3;
+
+    private void Awake() {
+        if (_stageButtonsParent != null) {
+            // "StageButton"タグを持つボタンだけを正確に取得する
+            _stageButtons = _stageButtonsParent.GetComponentsInChildren<Button>();
+        }
+        else {
+            Debug.LogError("StageSelectManager: ステージボタン親が設定されていません。インスペクターを確認してください。", this);
             return;
         }
 
-        // 意図的にすべてのボタンを常に表示状態にする
-        foreach (Button button in _stageButtons) {
-            if (button != null) {
-                button.gameObject.SetActive(true);
-            }
-        }
-
-        if (_nextButton != null) {
-            _nextButton.gameObject.SetActive(true);
-        }
-
-        // クリア表示の配列がステージボタンの配列と同じサイズか確認
         if (_clearIndicators.Length != _stageButtons.Length) {
-            Debug.LogWarning("UpdateButtonsAndClearIndicators: クリア表示とステージボタンの配列の数が一致しません。クリア表示が正しく動作しない可能性があります。", this);
+            Debug.LogWarning($"StageSelectManager: クリア表示とボタンの数が一致しません。 ボタン数:{_stageButtons.Length}, クリア表示数:{_clearIndicators.Length}", this);
         }
 
-        // ステージクリア情報を確認し、クリアしたステージのクリア表示を有効にする
+        SetupStageButtons();
+
+        if (_pageButton != null) {
+            _pageButton.onClick.RemoveAllListeners();
+            _pageButton.onClick.AddListener(OnPageButtonClicked);
+        }
+    }
+
+    private void Start() {
+        if (EventSystem.current != null && _stageButtons.Length > 0 && _stageButtons[0] != null) {
+            EventSystem.current.SetSelectedGameObject(_stageButtons[0].gameObject);
+        }
+    }
+
+    private void SetupStageButtons() {
+        if (GameManager.Instance == null) {
+            Debug.LogError("StageSelectManager: GameManagerインスタンスが見つかりません。ゲームの開始シーンを確認してください。", this);
+            return;
+        }
+
         for (int i = 0; i < _stageButtons.Length; i++) {
-            // ステージインデックスがGameManagerのステージ配列内に存在するか確認
-            if (i < GameManager.Instance.StageSceneNames.Length) {
-                bool isClear = GameManager.Instance.IsStageClear(i);
-                if (_clearIndicators.Length > i && _clearIndicators[i] != null) {
-                    _clearIndicators[i].SetActive(isClear);
+            if (_stageButtons[i] == null) {
+                continue;
+            }
+
+            int globalStageIndex = (_pageIndex * STAGES_PER_PAGE) + i;
+
+            // ボタンがクリックされた時のイベントリスナーを設定
+            _stageButtons[i].onClick.RemoveAllListeners();
+            _stageButtons[i].onClick.AddListener(() => OnStageButtonClicked(globalStageIndex));
+
+            // ステージが存在するかどうかに基づいてボタンを有効化/無効化
+            if (globalStageIndex < GameManager.Instance.StageSceneNames.Length) {
+                _stageButtons[i].interactable = true;
+
+                // クリア表示のオブジェクトを正しく設定
+                if (i < _clearIndicators.Length && _clearIndicators[i] != null) {
+                    _clearIndicators[i].SetActive(GameManager.Instance.IsStageClear(globalStageIndex));
                 }
             }
             else {
-                // インデックス範囲外の場合、クリア表示を非アクティブにする
-                if (_clearIndicators.Length > i && _clearIndicators[i] != null) {
+                _stageButtons[i].interactable = false;
+
+                if (i < _clearIndicators.Length && _clearIndicators[i] != null) {
                     _clearIndicators[i].SetActive(false);
                 }
             }
@@ -63,30 +94,35 @@ public class StageSelectManager : MonoBehaviour {
     }
 
     /// <summary>
-    /// ステージボタンがクリックされたときに呼び出されるメソッド
+    /// ステージボタンがクリックされたときに呼び出されます。
+    /// 該当ステージをロードし、シーン遷移を開始します。
     /// </summary>
-    /// <param name="stageIndex">クリックされたステージのインデックス</param>
-    public void OnStageButtonClicked(int stageIndex) {
-        if (GameManager.Instance != null && stageIndex < GameManager.Instance.StageSceneNames.Length) {
-            string sceneName = GameManager.Instance.StageSceneNames[stageIndex];
-            GameManager.Instance.LoadSceneWithFade(sceneName);
+    /// <param name="globalStageIndex">クリックされたボタンに対応するステージのインデックス。</param>
+    private void OnStageButtonClicked(int globalStageIndex) {
+        if (GameManager.Instance != null && globalStageIndex < GameManager.Instance.StageSceneNames.Length) {
+            GameManager.Instance.CurrentStageIndex = globalStageIndex;
+            GameManager.Instance.LoadSceneWithFade(GameManager.Instance.StageSceneNames[globalStageIndex]);
         }
-        else if (GameManager.Instance == null) {
-            Debug.LogError("StageSelectManager: GameManagerが見つかりません！シーン遷移できません。", this);
+        else {
+            Debug.LogError($"StageSelectManager: 無効なステージインデックス、またはGameManagerが見つかりません。インデックス: {globalStageIndex}", this);
         }
     }
 
     /// <summary>
-    /// NEXTボタンがクリックされたときに呼び出されるメソッド
+    /// ページ切り替えボタンがクリックされたときに呼び出されます。
+    /// 次のページまたは前のページへ遷移します。
     /// </summary>
-    public void OnNextButtonClicked() {
-        if (GameManager.Instance != null) {
-            // NEXTボタンはStageSelect2Sceneへ遷移
-            GameManager.Instance.LoadSceneWithFade("StageSelect2Scene");
+    private void OnPageButtonClicked() {
+        if (GameManager.Instance == null) {
+            Debug.LogError("GameManagerが見つかりません。");
+            return;
         }
-        else {
-            Debug.LogError("StageSelectManager: GameManagerが見つかりません！フェードなしで次のステージ選択画面に遷移します。", this);
-            SceneManager.LoadScene("StageSelect2Scene");
+
+        if (_pageIndex == 0) {
+            GameManager.Instance.LoadSceneWithFade(GameManager.Instance.StageSelect2SceneName);
+        }
+        else if (_pageIndex == 1) {
+            GameManager.Instance.LoadSceneWithFade(GameManager.Instance.StageSelectSceneName);
         }
     }
 }

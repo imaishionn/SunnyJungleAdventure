@@ -7,32 +7,20 @@ using UnityEngine.UI;
 /// ゲームオーバー画面のUIとシーン遷移を管理するスクリプトです。
 /// </summary>
 public class GameOverManager : MonoBehaviour {
-    // ----------------------------------------------------------------------------------------------------
-    // インスペクターで設定するパラメーター
-    // ----------------------------------------------------------------------------------------------------
-    [Header("UI設定")]
-    [Tooltip("ゲームパッド操作で最初に選択状態にしたいUI要素")]
-    [SerializeField] private Selectable _firstSelected;
-    [Tooltip("タイトルに戻るボタン")]
-    [SerializeField] private Button _returnTitleButton;
-    [Tooltip("もう一度プレイするボタン")]
-    [SerializeField] private Button _retryButton;
+    [Header("UI設定"), SerializeField]
+    private Selectable _firstSelected; // ゲームパッド操作で最初に選択状態にしたいUI要素
 
-    // ----------------------------------------------------------------------------------------------------
-    // シーン設定
-    // ----------------------------------------------------------------------------------------------------
-    [Header("シーン設定")]
-    [Tooltip("タイトルシーンの名前")]
-    [SerializeField] private string _titleSceneName = "TitleScene";
+    [Header("タイトルに戻るボタン"), SerializeField]
+    private Button _returnTitleButton;
 
-    // ----------------------------------------------------------------------------------------------------
-    // プライベート変数
-    // ----------------------------------------------------------------------------------------------------
+    [Header("もう一度プレイするボタン"), SerializeField]
+    private Button _retryButton; 
+
+    [Header("タイトルシーンの名前"), SerializeField]
+    private string _titleSceneName = "TitleScene"; 
+
     private bool _isTransitioning = false;
 
-    // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviourのライフサイクルメソッド
-    // ----------------------------------------------------------------------------------------------------
     private void Start() {
         // UIの初期選択を設定
         if (_firstSelected != null) {
@@ -66,9 +54,6 @@ public class GameOverManager : MonoBehaviour {
         }
     }
 
-    // ----------------------------------------------------------------------------------------------------
-    // UIイベントハンドラー
-    // ----------------------------------------------------------------------------------------------------
     /// <summary>
     /// タイトルに戻るボタンが押された際に呼び出されます。
     /// </summary>
@@ -79,9 +64,7 @@ public class GameOverManager : MonoBehaviour {
         _isTransitioning = true;
         Time.timeScale = 1f;
 
-        // GameManager.instance を GameManager.Instance に修正
         if (GameManager.Instance != null) {
-            // GameManager.instance.LoadSceneWithFade を GameManager.Instance.LoadSceneWithFade に修正
             GameManager.Instance.LoadSceneWithFade(_titleSceneName);
         }
         else {
@@ -99,16 +82,13 @@ public class GameOverManager : MonoBehaviour {
         _isTransitioning = true;
         Time.timeScale = 1f;
 
-        // GameManager.instance を GameManager.Instance に修正
         if (GameManager.Instance != null) {
-            // ここでゲームデータをリセットする
-            // GameManager.instance.ResetGameData() を GameManager.Instance.ResetGameData() に修正
-            // GameManager.instance.RetryLastStage() を GameManager.Instance.RetryLastStage() に修正
+            // GameManagerにゲームプレイ中は常に出るようにしている情報が保存されているので、それを活用してリトライを行う
             GameManager.Instance.ResetGameData();
-            GameManager.Instance.RetryLastStage(); // GameManagerのメソッドを呼び出す
+            GameManager.Instance.RetryLastStage();
         }
         else {
-            Debug.LogError("GameOverManager: GameManager.instanceが見つかりません！タイトルシーンへ直接遷移します。", this);
+            Debug.LogError("GameOverManager: GameManagerが見つかりません！タイトルシーンへ直接遷移します。", this);
             SceneManager.LoadScene(_titleSceneName);
         }
     }

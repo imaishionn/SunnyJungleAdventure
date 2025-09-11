@@ -800,10 +800,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ef862cc59142445b11d4f7e8b40d8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _clickSound: {fileID: 8300000, guid: 76b96f3363f30de47a810dc4f7d5d86f, type: 3}
-  _hoverSound: {fileID: 8300000, guid: 0456594b565ada04d9f581ed0b2a56c3, type: 3}
-  _clickVolume: 1
-  _hoverVolume: 1
+  "_\u30AF\u30EA\u30C3\u30AF\u97F3": {fileID: 8300000, guid: 76b96f3363f30de47a810dc4f7d5d86f, type: 3}
+  "_\u30DB\u30D0\u30FC\u97F3": {fileID: 8300000, guid: 0456594b565ada04d9f581ed0b2a56c3, type: 3}
+  "_\u30AF\u30EA\u30C3\u30AF\u97F3\u91CF": 1
+  "_\u30DB\u30D0\u30FC\u97F3\u91CF": 1
 --- !u!222 &1296611023
 CanvasRenderer:
   m_ObjectHideFlags: 0

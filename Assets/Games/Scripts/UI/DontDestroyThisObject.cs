@@ -6,8 +6,7 @@ using UnityEngine;
 /// </summary>
 public class DontDestroyThisObject : MonoBehaviour {
     private void Awake() =>
-        // DontDestroyOnLoadを呼び出す
-        // これにより、このスクリプトがアタッチされたGameObjectは
-        // 新しいシーンがロードされても破棄されずに残り続けます。
+        // DontDestroyOnLoadを呼び出し、このスクリプトがアタッチされた
+        // GameObjectがシーン遷移後も破棄されないようにします。
         DontDestroyOnLoad(gameObject);
 }

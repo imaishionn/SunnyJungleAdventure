@@ -5,30 +5,20 @@ using UnityEngine;
 /// プレイヤーの足元の子オブジェクトにアタッチして使用します。
 /// </summary>
 public class GroundCheck : MonoBehaviour {
-    // ----------------------------------------------------------------------------------------------------
-    // プライベート変数 (Inspectorで設定する必要はありません)
-    // ----------------------------------------------------------------------------------------------------
     private bool _isGround = false;
 
-    // ----------------------------------------------------------------------------------------------------
-    // パブリックメソッド
-    // ----------------------------------------------------------------------------------------------------
     /// <summary>
     /// キャラクターが地面に接地しているかどうかの状態を返します。
     /// </summary>
     /// <returns>地面に接地していればtrue、そうでなければfalse</returns>
     public bool GetIsGround() => _isGround;
 
-    // ----------------------------------------------------------------------------------------------------
-    // トリガーイベントメソッド
-    // ----------------------------------------------------------------------------------------------------
     /// <summary>
     /// このトリガーコライダーが他の2Dコライダーと接触している間、毎フレーム呼び出されます。
     /// </summary>
     /// <param name="collision">接触している他のコライダー</param>
     private void OnTriggerStay2D(Collider2D collision) {
-        // 接触しているオブジェクトが「Ground」タグを持つかチェック
-        if(collision.CompareTag("Ground")) {
+        if (collision.CompareTag("Ground")) {
             _isGround = true;
         }
     }
@@ -38,8 +28,7 @@ public class GroundCheck : MonoBehaviour {
     /// </summary>
     /// <param name="collision">接触を終了した他のコライダー</param>
     private void OnTriggerExit2D(Collider2D collision) {
-        // 接触を終了したオブジェクトが「Ground」タグを持つかチェック
-        if(collision.CompareTag("Ground")) {
+        if (collision.CompareTag("Ground")) {
             _isGround = false;
         }
     }

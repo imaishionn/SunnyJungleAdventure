@@ -2,65 +2,42 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// 敵が投下するボムの挙動を制御するスクリプトです。
+/// 敵が投下するボムの挙動を制御するスクリプト。
 /// プレイヤーや地面に接触すると爆発し、コライダーを拡大してダメージを与えます。
 /// </summary>
 public class Bomb : MonoBehaviour {
-    // 爆発アニメーターのパラメーター名を定数で定義
     private static class AnimatorParams {
         public const string ExplodeTrigger = "Explode";
     }
 
-    // タグ名を定数で定義
     private const string PLAYER_TAG = "Player";
     private const string GROUND_TAG = "Ground";
 
-    // ----------------------------------------------------------------------------------------------------
-    // インスペクターで設定するパラメーター
-    // ----------------------------------------------------------------------------------------------------
-    [Header("爆発設定")]
-    [Tooltip("爆発アニメーションの再生時間。コライダーの拡大時間と合わせる。")]
-    public float explosionDuration = 0.5f;
+    [Header("爆発アニメーションの再生時間とコライダー拡大にかかる時間"), SerializeField]
+    private float _explosionDuration = 0.5f; 
 
-    [Header("コライダーアニメーション設定")]
-    [Tooltip("爆発開始時のコライダーの半径")]
-    [SerializeField]
-    private float _startRadius = 0.05f;
-    [Tooltip("爆発終了時のコライダーの最大半径")]
-    [SerializeField]
-    private float _endRadius = 0.5f;
+    [Header("爆発の当たり判定"), SerializeField]
+    private float _startRadius = 0.05f; // 爆発コライダーの初期半径
 
-    // ----------------------------------------------------------------------------------------------------
-    // プライベート変数
-    // ----------------------------------------------------------------------------------------------------
+    [Header("爆発の最終の当たり判定"), SerializeField]
+    private float _endRadius = 0.5f; // 爆発コライダーの最終半径
+
     private Rigidbody2D _rb;
     private Animator _anim;
     private CircleCollider2D _bombCollider;
     private bool _hasExploded = false;
 
-    // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviourのライフサイクルメソッド
-    // ----------------------------------------------------------------------------------------------------
     private void Awake() {
-        // 必要なコンポーネントの参照を取得
         _rb = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
         _bombCollider = GetComponent<CircleCollider2D>();
 
-        // コンポーネントが取得できなかった場合の警告
-        if (_rb == null) {
-            Debug.LogWarning("Bomb: Rigidbody2Dがアタッチされていません。", this);
-        }
-        if (_anim == null) {
-            Debug.LogWarning("Bomb: Animatorがアタッチされていません。", this);
-        }
-        if (_bombCollider == null) {
-            Debug.LogWarning("Bomb: CircleCollider2Dがアタッチされていません。", this);
+        if (_rb == null || _anim == null || _bombCollider == null) {
+            Debug.LogWarning("Bomb: 必要なコンポーネント（Rigidbody2D, Animator, CircleCollider2D）が一つ以上見つかりません。", this);
         }
     }
 
     private void OnEnable() {
-        // オブジェクトプールからの再利用時に状態をリセット
         _hasExploded = false;
         if (_bombCollider != null) {
             _bombCollider.radius = _startRadius;
@@ -69,19 +46,16 @@ public class Bomb : MonoBehaviour {
     }
 
     /// <summary>
-    /// ボムを指定された方向に指定された速度で発射します。
+    /// ボムを投射します。
     /// </summary>
-    /// <param name="direction">発射方向</param>
-    /// <param name="speed">発射速度</param>
+    /// <param name="direction">投射方向</param>
+    /// <param name="speed">投射速度</param>
     public void Launch(Vector2 direction, float speed) {
         if (_rb != null) {
             _rb.velocity = direction.normalized * speed;
         }
     }
 
-    /// <summary>
-    /// 他のコライダーと接触したときに呼び出されます。
-    /// </summary>
     private void OnTriggerEnter2D(Collider2D other) {
         if (_hasExploded) {
             return;
@@ -90,17 +64,12 @@ public class Bomb : MonoBehaviour {
         if (other.CompareTag(GROUND_TAG) || other.CompareTag(PLAYER_TAG)) {
             Explode();
 
-            if (other.CompareTag(PLAYER_TAG)) {
-                if (other.TryGetComponent<PlayerMove>(out PlayerMove playerMove) && !playerMove.IsDead) {
-                    playerMove.Die();
-                }
+            if (other.CompareTag(PLAYER_TAG) && other.TryGetComponent<PlayerMove>(out PlayerMove player)) {
+                player.Die();
             }
         }
     }
 
-    // ----------------------------------------------------------------------------------------------------
-    // プライベートメソッド
-    // ----------------------------------------------------------------------------------------------------
     private void Explode() {
         _hasExploded = true;
 
@@ -117,9 +86,9 @@ public class Bomb : MonoBehaviour {
 
     private IEnumerator ExplosionRoutine() {
         float timer = 0f;
-        while (timer < explosionDuration) {
+        while (timer < _explosionDuration) {
             timer += Time.deltaTime;
-            float t = timer / explosionDuration;
+            float t = timer / _explosionDuration;
 
             if (_bombCollider != null) {
                 _bombCollider.radius = Mathf.Lerp(_startRadius, _endRadius, t);
@@ -127,11 +96,7 @@ public class Bomb : MonoBehaviour {
             yield return null;
         }
 
+        // オブジェクトプールを考慮し、非アクティブ化
         gameObject.SetActive(false);
     }
-
-    /// <summary>
-    /// アニメーションイベントから呼び出され、オブジェクトを非アクティブ化します。
-    /// </summary>
-    public void DeactivateBomb() => gameObject.SetActive(false);
 }

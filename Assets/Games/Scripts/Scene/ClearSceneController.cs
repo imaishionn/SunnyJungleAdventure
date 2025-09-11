@@ -7,22 +7,20 @@ using UnityEngine.UI;
 /// ゲームクリア後のシーンで、UIやシーン遷移を制御するスクリプトです。
 /// </summary>
 public class ClearSceneController : MonoBehaviour {
-    [Header("UI設定")]
-    [Tooltip("ゲームパッド操作で最初に選択状態にしたいUI要素")]
-    [SerializeField] private Selectable _firstSelected;
+    [Header("ゲームパッド操作で最初に選択状態にしたいUI要素"), SerializeField]
+    private Selectable _firstSelected;
 
-    [Header("シーン設定")]
-    [Tooltip("スコアシーンの名前")]
-    [SerializeField] private string _resultsceneName = "Resultscene";
+    [Header("スコアシーンの名前"), SerializeField]
+    private string _resultsceneName = "Resultscene"; 
 
     private bool _isTransitioning = false;
 
     private void Start() {
-        if(_firstSelected != null) {
+        if (_firstSelected != null) {
             EventSystem.current.SetSelectedGameObject(_firstSelected.gameObject);
         }
         else {
-            Debug.LogWarning("ClearSceneController: firstSelectedが割り当てられていません。",this);
+            Debug.LogWarning("ClearSceneController: firstSelectedが割り当てられていません。", this);
         }
 
         _isTransitioning = false;
@@ -48,13 +46,13 @@ public class ClearSceneController : MonoBehaviour {
 
         _isTransitioning = true;
 
-        if(GameManager.Instance != null) {
-            // 変数名を ResultsceneName に修正
+        if (GameManager.Instance != null) {
+            // GameManagerを使ってシーンをフェード付きでロード
             GameManager.Instance.LoadSceneWithFade(_resultsceneName);
         }
         else {
-            Debug.LogError("ClearSceneController: GameManager インスタンスが見つかりません！直接シーンをロードします。",this);
-            // 変数名を ResultsceneName に修正
+            Debug.LogError("ClearSceneController: GameManager インスタンスが見つかりません！直接シーンをロードします。", this);
+            // 直接シーンをロード
             SceneManager.LoadScene(_resultsceneName);
         }
     }

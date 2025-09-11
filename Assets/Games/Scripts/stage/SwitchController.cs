@@ -1,86 +1,86 @@
 using UnityEngine;
 
-// This script controls a toggle switch's functionality and visual state.
-// It detects player interaction and triggers a method on the target platform.
+/// <summary>
+/// スイッチの機能と見た目を制御するスクリプトです。
+/// プレイヤーとの接触を検知し、対応するプラットフォームのメソッドをトリガーします。
+/// </summary>
 public class SwitchController : MonoBehaviour {
-    [Header("Switch Settings")]
-    [Tooltip("The ID of this switch. It should match the ID on the target platform.")]
-    public int switchId = 1;
-    [Tooltip("The platform GameObject that this switch will control.")]
-    public TilemapSwitchPlatform targetPlatform;
+    [Header("このスイッチのID"), SerializeField]
+    private int _switchId = 1;
+    [Header("このスイッチが制御するターゲットのプラットフォーム"), SerializeField]
+    private TilemapSwitchPlatform _targetPlatform;
 
-    [Header("Visuals")]
-    [Tooltip("The SpriteRenderer component of this switch.")]
-    [SerializeField] private SpriteRenderer _spriteRenderer;
-    [Tooltip("The sprite for the 'up' state of the crank.")]
-    [SerializeField] private Sprite _crankUpSprite;
-    [Tooltip("The sprite for the 'down' state of the crank.")]
-    [SerializeField] private Sprite _crankDownSprite;
+    [Header("このスイッチのSpriteRendererコンポーネント"), SerializeField]
+    private SpriteRenderer _spriteRenderer; 
 
-    [Header("Audio")] // ★追加: オーディオ設定
-    [Tooltip("The sound effect to play when the switch is toggled.")]
-    [SerializeField] private AudioClip _switchSoundEffect;
+    [Header("クランクの「上」状態のスプライト"), SerializeField]
+    private Sprite _crankUpSprite; 
+
+    [Header("クランクの「下」状態のスプライト"), SerializeField]
+    private Sprite _crankDownSprite; 
+
+    [Header("スイッチが切り替わったときに再生する効果音"), SerializeField]
+    private AudioClip _switchSoundEffect;
+
     private AudioSource _audioSource; // AudioSourceコンポーネントへの参照
-
-    // Current state of the switch (true if 'up', false if 'down')
-    private bool _isUpState;
+    private bool _isUpState; // スイッチの現在の状態（true = 上, false = 下）
 
     private void Start() {
-        // Get SpriteRenderer if not assigned in Inspector
-        if(_spriteRenderer == null) {
+        // SpriteRendererが未割り当ての場合、自動取得
+        if (_spriteRenderer == null) {
             _spriteRenderer = GetComponent<SpriteRenderer>();
         }
 
-        // Get or add AudioSource component
+        // AudioSourceコンポーネントを取得または追加
         _audioSource = GetComponent<AudioSource>();
-        if(_audioSource == null) {
+        if (_audioSource == null) {
             _audioSource = gameObject.AddComponent<AudioSource>();
         }
 
-        // Initialize the switch state based on its initial sprite
-        if(_spriteRenderer != null) {
-            if(_spriteRenderer.sprite == _crankUpSprite) {
+        // 初期スプライトに基づいてスイッチの状態を初期化
+        if (_spriteRenderer != null) {
+            if (_spriteRenderer.sprite == _crankUpSprite) {
                 _isUpState = true;
             }
-            else if(_spriteRenderer.sprite == _crankDownSprite) {
+            else if (_spriteRenderer.sprite == _crankDownSprite) {
                 _isUpState = false;
             }
             else {
                 _isUpState = false;
                 _spriteRenderer.sprite = _crankDownSprite;
-                Debug.LogWarning("SwitchController: Initial sprite is not recognized as crankUpSprite or crankDownSprite. Defaulting to crankDownSprite.",this);
+                Debug.LogWarning("SwitchController: 初期スプライトが認識されません。crankDownSpriteに設定します。", this);
             }
         }
         else {
-            Debug.LogError("SwitchController: SpriteRenderer is not assigned or found.",this);
+            Debug.LogError("SwitchController: SpriteRendererが割り当てられていません。", this);
         }
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
-        if(other.CompareTag("Player")) {
+        if (other.CompareTag("Player")) {
             ToggleSwitchState();
         }
     }
 
+    /// <summary>
+    /// スイッチの状態を切り替え、見た目とサウンド、プラットフォームの動作を更新します。
+    /// </summary>
     private void ToggleSwitchState() {
         _isUpState = !_isUpState;
 
-        if(_spriteRenderer != null) {
+        if (_spriteRenderer != null) {
             _spriteRenderer.sprite = _isUpState ? _crankUpSprite : _crankDownSprite;
         }
 
-        // Play the sound effect
-        if(_audioSource != null && _switchSoundEffect != null) {
+        if (_audioSource != null && _switchSoundEffect != null) {
             _audioSource.PlayOneShot(_switchSoundEffect);
         }
 
-        // Trigger the corresponding action on the target platform
-        if(targetPlatform != null) {
-            // ★変更: BGMを切り替えるメソッドを呼び出す
-            targetPlatform.ToggleVisibilityWithBGM();
+        if (_targetPlatform != null) {
+            _targetPlatform.ToggleVisibilityWithBGM();
         }
         else {
-            Debug.LogWarning("SwitchController: Target Platform not assigned for switch with ID: " + switchId,this);
+            Debug.LogWarning("SwitchController: ID " + _switchId + " に対応するターゲットプラットフォームが割り当てられていません。", this);
         }
     }
 }

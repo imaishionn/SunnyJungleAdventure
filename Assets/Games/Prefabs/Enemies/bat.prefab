@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 2524413992110924459}
   - component: {fileID: -8493781278248394022}
   m_Layer: 0
-  m_Name: Bat
+  m_Name: bat
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -121,10 +121,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 327c293c2647835489aa34a8c92fd587, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 50
-  DetectRange: 12
-  FlySpeed: 5
-  m_deathAnimationDuration: 1
+  _scoreValue: 150
+  _detectRange: 10
+  _flySpeed: 5
+  _deathAnimationDuration: 1
 --- !u!70 &2790815756443884054
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -174,4 +174,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5991d52fefd0ca44f889db35a6d2984f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreValue: 50
+  _scoreValue: 150

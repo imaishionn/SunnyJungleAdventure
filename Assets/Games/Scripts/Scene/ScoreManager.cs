@@ -9,28 +9,32 @@ using UnityEngine.UI;
 /// スコアシーンでスコア表示、ランク付け、リーダーボード管理を行うスクリプト。
 /// </summary>
 public class ScoreManager : MonoBehaviour {
-    // UI設定
-    [Header("UI References")]
-    [SerializeField] private TextMeshProUGUI _scoreText;
-    [SerializeField] private TextMeshProUGUI _timeText;
-    [SerializeField] private TextMeshProUGUI _rankText;
-    [SerializeField] private Button _titleButton;
+   
+    [Header("今回のスコア"), SerializeField]
+    private TextMeshProUGUI _scoreText;
 
-    [Header("Leaderboard Settings")]
-    [Tooltip("ランキング表示用のText UI要素のリスト。インスペクターで設定してください。")]
-    [SerializeField] private List<TextMeshProUGUI> _leaderboardEntries = new();
-    [Tooltip("ランキングに保存する最大件数")]
-    [SerializeField] private int _maxLeaderboardCount = 5;
+    [Header("残り時間"), SerializeField]
+    private TextMeshProUGUI _timeText;
 
-    // ゲームパッド設定
-    [Header("GamePad Setting")]
-    [Tooltip("ゲームパッド操作で最初に選択状態にしたいUI要素")]
-    [SerializeField] private Selectable _firstSelected;
+    [Header("今回のランク"), SerializeField]
+    private TextMeshProUGUI _rankText;
 
-    // シーン名
-    [Header("Scene Names")]
-    [Tooltip("タイトルシーンの名前。GameManagerから取得する方が望ましい")]
-    [SerializeField] private string _titleSceneName;
+    [Header("タイトル画面に戻るボタン"), SerializeField]
+    private Button _titleButton;
+
+    [Header("ランキング表示用のText UI要素のリスト"), SerializeField]
+    private List<TextMeshProUGUI> _leaderboardEntries = new();
+
+    [Header("ランキング二保存する最大件数"), SerializeField]
+    private int _maxLeaderboardCount = 3; 
+
+    
+    [Header("ゲームパッド操作で最初に選択状態にしたいUI要素"), SerializeField]
+    private Selectable _firstSelected;
+
+   
+    [Header("タイトルシーンの名前"), SerializeField]
+    private string _titleSceneName;
 
     // PlayerPrefsのキー
     private const string LEADERBOARD_SCORE_KEY_PREFIX = "LeaderboardScore_";
@@ -38,37 +42,34 @@ public class ScoreManager : MonoBehaviour {
 
     private void OnEnable() {
         // GameManagerのインスタンスが存在するか確認
-        // GameManager.instance を GameManager.Instance に修正
-        if(GameManager.Instance == null) {
+        if (GameManager.Instance == null) {
             UnityEngine.Debug.LogError("GameManagerのインスタンスが見つかりません。スコア表示はできません。");
             // GameManagerがない場合は、ダミーデータで表示
-            DisplayResults(0,0);
+            DisplayResults(0, 0);
         }
         else {
             // GameManagerから最終スコアと時間を取得
-            // GameManager.instance.finalScore を GameManager.Instance.finalScore に修正
-            // GameManager.instance.finalTime を GameManager.Instance.finalTime に修正
             int finalScore = GameManager.Instance.FinalScore;
             float finalTime = GameManager.Instance.FinalTime;
 
             // スコアと時間をUIに表示
-            DisplayResults(finalScore,finalTime);
+            DisplayResults(finalScore, finalTime);
 
             // スコアをリーダーボードに保存
-            SaveToLeaderboard(finalScore,finalTime);
+            SaveToLeaderboard(finalScore, finalTime);
         }
 
         // リーダーボードを更新
         UpdateLeaderboardDisplay();
 
         // ボタンのクリックイベントにメソッドを登録
-        if(_titleButton != null) {
+        if (_titleButton != null) {
             _titleButton.onClick.RemoveAllListeners(); // 重複登録防止
             _titleButton.onClick.AddListener(OnTitleButtonClicked);
         }
 
         // 最初のUI要素を選択
-        if(_firstSelected != null) {
+        if (_firstSelected != null) {
             EventSystem.current.SetSelectedGameObject(_firstSelected.gameObject);
         }
     }
@@ -78,18 +79,18 @@ public class ScoreManager : MonoBehaviour {
     /// </summary>
     /// <param name="score">表示するスコア</param>
     /// <param name="time">表示する時間</param>
-    private void DisplayResults(int score,float time) {
-        if(_scoreText != null) {
+    private void DisplayResults(int score, float time) {
+        if (_scoreText != null) {
             _scoreText.text = "スコア" + score.ToString();
         }
 
-        if(_timeText != null) {
+        if (_timeText != null) {
             _timeText.text = "残り時間" + Mathf.RoundToInt(time).ToString() + "秒";
         }
 
         // 評価を計算して表示
         string rank = CalculateRank(score);
-        if(_rankText != null) {
+        if (_rankText != null) {
             _rankText.text = "ランク" + rank;
         }
     }
@@ -99,25 +100,25 @@ public class ScoreManager : MonoBehaviour {
     /// </summary>
     /// <param name="newScore">保存するスコア</param>
     /// <param name="newTime">保存する時間</param>
-    private void SaveToLeaderboard(int newScore,float newTime) {
-        List<KeyValuePair<int,float>> scoreEntries = LoadLeaderboardEntries();
-        scoreEntries.Add(new KeyValuePair<int,float>(newScore,newTime));
+    private void SaveToLeaderboard(int newScore, float newTime) {
+        List<KeyValuePair<int, float>> scoreEntries = LoadLeaderboardEntries();
+        scoreEntries.Add(new KeyValuePair<int, float>(newScore, newTime));
 
         // スコアを降順にソートし、スコアが同じ場合は時間を昇順にソート
-        scoreEntries.Sort((a,b) => {
+        scoreEntries.Sort((a, b) => {
             int scoreComparison = b.Key.CompareTo(a.Key);
             return scoreComparison != 0 ? scoreComparison : a.Value.CompareTo(b.Value);
         });
 
         // 最大件数を超えたら削除
-        if(scoreEntries.Count > _maxLeaderboardCount) {
-            scoreEntries.RemoveRange(_maxLeaderboardCount,scoreEntries.Count - _maxLeaderboardCount);
+        if (scoreEntries.Count > _maxLeaderboardCount) {
+            scoreEntries.RemoveRange(_maxLeaderboardCount, scoreEntries.Count - _maxLeaderboardCount);
         }
 
         // PlayerPrefsに保存
-        for(int i = 0;i < scoreEntries.Count;i++) {
-            PlayerPrefs.SetInt(LEADERBOARD_SCORE_KEY_PREFIX + i,scoreEntries[i].Key);
-            PlayerPrefs.SetFloat(LEADERBOARD_TIME_KEY_PREFIX + i,scoreEntries[i].Value);
+        for (int i = 0; i < scoreEntries.Count; i++) {
+            PlayerPrefs.SetInt(LEADERBOARD_SCORE_KEY_PREFIX + i, scoreEntries[i].Key);
+            PlayerPrefs.SetFloat(LEADERBOARD_TIME_KEY_PREFIX + i, scoreEntries[i].Value);
         }
         PlayerPrefs.Save();
     }
@@ -126,13 +127,13 @@ public class ScoreManager : MonoBehaviour {
     /// リーダーボードのエントリをPlayerPrefsから読み込みます。
     /// </summary>
     /// <returns>読み込んだスコアと時間のペアのリスト</returns>
-    private List<KeyValuePair<int,float>> LoadLeaderboardEntries() {
+    private List<KeyValuePair<int, float>> LoadLeaderboardEntries() {
         var entries = new List<KeyValuePair<int, float>>();
-        for(int i = 0;i < _maxLeaderboardCount;i++) {
-            if(PlayerPrefs.HasKey(LEADERBOARD_SCORE_KEY_PREFIX + i)) {
+        for (int i = 0; i < _maxLeaderboardCount; i++) {
+            if (PlayerPrefs.HasKey(LEADERBOARD_SCORE_KEY_PREFIX + i)) {
                 int score = PlayerPrefs.GetInt(LEADERBOARD_SCORE_KEY_PREFIX + i);
                 float time = PlayerPrefs.GetFloat(LEADERBOARD_TIME_KEY_PREFIX + i);
-                entries.Add(new KeyValuePair<int,float>(score,time));
+                entries.Add(new KeyValuePair<int, float>(score, time));
             }
         }
         return entries;
@@ -142,11 +143,11 @@ public class ScoreManager : MonoBehaviour {
     /// UIにリーダーボードのランキングを表示します。
     /// </summary>
     private void UpdateLeaderboardDisplay() {
-        List<KeyValuePair<int,float>> entries = LoadLeaderboardEntries();
+        List<KeyValuePair<int, float>> entries = LoadLeaderboardEntries();
 
         // リーダーボードのUI要素を更新
-        for(int i = 0;i < _leaderboardEntries.Count;i++) {
-            if(i < entries.Count) {
+        for (int i = 0; i < _leaderboardEntries.Count; i++) {
+            if (i < entries.Count) {
                 int score = entries[i].Key;
                 float time = entries[i].Value;
 
@@ -174,13 +175,10 @@ public class ScoreManager : MonoBehaviour {
     /// </summary>
     private void OnTitleButtonClicked() {
         // GameManagerのインスタンスを使用してタイトルシーンに遷移
-        // GameManager.instance を GameManager.Instance に修正
-        if(GameManager.Instance != null && !string.IsNullOrEmpty(GameManager.Instance.TitleSceneName)) {
-            // GameManager.instance.LoadSceneWithFade を GameManager.Instance.LoadSceneWithFade に修正
-            // GameManager.instance.TitleSceneName を GameManager.Instance.TitleSceneName に修正
+        if (GameManager.Instance != null && !string.IsNullOrEmpty(GameManager.Instance.TitleSceneName)) {
             GameManager.Instance.LoadSceneWithFade(GameManager.Instance.TitleSceneName);
         }
-        else if(!string.IsNullOrEmpty(_titleSceneName)) {
+        else if (!string.IsNullOrEmpty(_titleSceneName)) {
             // GameManagerがない場合は直接シーンをロード
             SceneManager.LoadScene(_titleSceneName);
         }

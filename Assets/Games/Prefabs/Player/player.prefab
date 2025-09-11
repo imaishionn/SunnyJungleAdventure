@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5660758626751130929}
   - component: {fileID: 5660758626751130928}
   - component: {fileID: 5660758626751131087}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: StompCheck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -82,7 +82,7 @@ GameObject:
   - component: {fileID: 5660758626989370350}
   - component: {fileID: 5660758626989370351}
   - component: {fileID: 5660758626989370349}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: GroundCheck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -156,8 +156,8 @@ GameObject:
   - component: {fileID: 5660758627347551233}
   - component: {fileID: 5660758627347551234}
   - component: {fileID: 5660758627347551232}
-  m_Layer: 0
-  m_Name: Player
+  m_Layer: 2
+  m_Name: player
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -245,13 +245,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9d9f7b00dcb7fc4c86593a5356f56fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 8
-  jumpForce: 15
-  maxJumps: 2
-  m_stompBounceForce: 7
-  invincibleDuration: 0.5
-  m_groundCheckComponent: {fileID: 5660758626989370349}
-  m_gameOverFallHeight: -19
+  _jumpForce: 12
+  _maxJumps: 2
+  _stompBounceForce: 7
+  _invincibleDuration: 0.2
+  _groundCheckComponent: {fileID: 5660758626989370349}
+  _gameOverFallHeight: -19
 --- !u!50 &5660758627347551233
 Rigidbody2D:
   serializedVersion: 4
@@ -265,7 +264,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 1
+  m_LinearDrag: 0
   m_AngularDrag: 0
   m_GravityScale: 3
   m_Material: {fileID: 6200000, guid: eb992ea6638f85b4da37b0b6371c6310, type: 2}
@@ -318,7 +317,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5660758627914583132}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: RayPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}

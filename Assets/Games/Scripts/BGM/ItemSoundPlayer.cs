@@ -18,10 +18,10 @@ public class ItemSoundPlayer : MonoBehaviour {
     [Header("敵撃破音"), SerializeField]
     private AudioClip _enemyDefeatClip;
 
-    [Header("敵撃破音の再生音量"), SerializeField, Range(0f,1f)]
+    [Header("敵撃破音の再生音量"), SerializeField, Range(0f, 1f)]
     private float _enemyDefeatVolume = 1.0f;
 
-    [Header("ゲームオーバー音の再生音量"), SerializeField, Range(0f,1f)]
+    [Header("ゲームオーバー音の再生音量"), SerializeField, Range(0f, 1f)]
     private float _gameOverVolume = 1.0f;
 
     /// <summary>
@@ -29,7 +29,7 @@ public class ItemSoundPlayer : MonoBehaviour {
     /// </summary>
     public void Awake() {
         _audioSource = GetComponent<AudioSource>();
-        if(_audioSource == null) {
+        if (_audioSource == null) {
             Debug.LogError("ItemSoundPlayer: AudioSourceコンポーネントがアタッチされていません。");
         }
     }
@@ -42,9 +42,9 @@ public class ItemSoundPlayer : MonoBehaviour {
     /// <summary>
     /// 再生
     /// </summary>
-    private void Play(AudioClip audioClip,float volume = 1f) {
-        if(CanPlaySound(audioClip)) {
-            _audioSource.PlayOneShot(audioClip,volume);
+    private void Play(AudioClip audioClip, float volume = 1f) {
+        if (CanPlaySound(audioClip)) {
+            _audioSource.PlayOneShot(audioClip, volume);
         }
     }
 
@@ -61,10 +61,10 @@ public class ItemSoundPlayer : MonoBehaviour {
     /// <summary>
     /// ゲームオーバー音を再生
     /// </summary>
-    public void PlayGameOverSound() => Play(_jumpClip,_gameOverVolume);
+    public void PlayGameOverSound() => Play(_gameOverClip, _gameOverVolume); // ここを修正しました
 
     /// <summary>
     /// 敵撃破音を再生
     /// </summary>
-    public void PlayEnemyDefeatSound() => Play(_enemyDefeatClip,_enemyDefeatVolume);
+    public void PlayEnemyDefeatSound() => Play(_enemyDefeatClip, _enemyDefeatVolume);
 }

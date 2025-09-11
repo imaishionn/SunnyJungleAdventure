@@ -1,145 +1,129 @@
+using System;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// 敵キャラクター「ハゲタカ」のAIと動作を制御するスクリプトです。
+/// 敵キャラクター「ハゲタカ」のAIと動作を制御するスクリプト。
 /// プレイヤーを検知すると追跡を開始し、向きを反転させながら飛行します。
-/// Enemyクラスを継承しています。
 /// </summary>
 public class Vulture : Enemy {
-    // ----------------------------------------------------------------------------------------------------
-    // インスペクターで設定するパラメーター
-    // ----------------------------------------------------------------------------------------------------
-    [Header("プレイヤー検知設定")]
-    [Tooltip("プレイヤーを検知する半径")]
-    [SerializeField] private float _detectRange = 5f;
+    private const string PLAYER_TAG = "Player";
+    private static class AnimatorParams {
+        public const string Fly = "fly";
+    }
 
-    [Header("移動設定")]
-    [Tooltip("飛行速度")]
-    [SerializeField] private float _flySpeed = 5f;
+    [Header("プレイヤーを検知する範囲"), SerializeField]
+    private float _detectRange = 5f;
 
-    // ----------------------------------------------------------------------------------------------------
-    // プライベート変数
-    // ----------------------------------------------------------------------------------------------------
-    [SerializeField] private Transform _player;
+    [Header("プレイヤー追跡時の移動速度"), SerializeField]
+    private float _flySpeed = 5f;
+
+    private Transform _player;
     private bool _isFlying = false;
 
-    // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviourのライフサイクルメソッド
-    // ----------------------------------------------------------------------------------------------------
     protected override void Awake() {
-        // 親クラスのAwake()を呼び出し、基盤となる初期化を行う
         base.Awake();
-
-        // 'Player'タグを持つオブジェクトを探し、見つかればTransformを取得
-        if(_player == null) {
-            var playerObj = GameObject.FindGameObjectWithTag("Player");
-            if(playerObj != null)
-                {
-                _player = playerObj.transform;
-            }
-            else {
-                Debug.LogWarning("Vulture: 'Player'タグを持つGameObjectが見つかりません。プレイヤー追跡機能が無効になります。",this);
-            }
-        }
-
-        // Rigidbody2Dの設定
-        if(m_rb != null) {
-            m_rb.gravityScale = 0f; // 重力を無効化
-            m_rb.drag = 1f;         // 飛行中に滑らかに減速させるための抵抗
-        }
+        FindPlayer();
+        SetupRigidbody();
     }
 
     protected override void OnEnable() {
-        // 親クラスのOnEnable()を呼び出す
         base.OnEnable();
-
-        // オブジェクトがプールから再利用される際の初期化
-        IsDead = false;
-        _isFlying = false;
-
-        // 速度をリセット
-        if(m_rb != null) {
-            m_rb.velocity = Vector2.zero;
-        }
-
-        // アニメーションをリセット
-        if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
-            m_animator.SetBool("fly",false);
-        }
+        ResetState();
     }
 
     protected void FixedUpdate() {
-        // 死亡状態の場合は処理を停止
-        if(IsDead) {
+        if (IsDead || _player == null || m_rb == null) {
+            m_rb.velocity = Vector2.zero;
+            if (m_animator != null && HasAnimatorParameter(AnimatorParams.Fly, AnimatorControllerParameterType.Bool)) {
+                m_animator.SetBool(AnimatorParams.Fly, false);
+            }
+            _isFlying = false;
             return;
         }
 
-        // プレイヤーやRigidbody2Dが設定されていない場合は、動きを停止して処理を抜ける
-        if(_player == null || m_rb == null) {
-            if(m_rb != null) {
-                m_rb.velocity = Vector2.zero;
-            }
-            if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
-                m_animator.SetBool("fly",false);
-            }
-            return;
+        HandlePlayerDetection();
+    }
+
+    /// <summary>
+    /// アニメーターに指定されたパラメータが存在するか確認します。
+    /// </summary>
+    /// <param name="paramName">パラメータ名</param>
+    /// <param name="paramType">パラメータの型</param>
+    /// <returns>存在する場合はtrue、しない場合はfalse</returns>
+    private bool HasAnimatorParameter(string paramName, AnimatorControllerParameterType paramType) {
+        if (m_animator == null) {
+            return false;
         }
 
-        // プレイヤーとの距離を計算
-        float distance = Vector2.Distance(transform.position,_player.position);
-
-        // プレイヤーが検知範囲内にいるかチェック
-        if(distance < _detectRange) {
-            // プレイヤーに向かって飛行
-            FlyToPlayer();
-
-            // 飛行状態のアニメーションを有効にする（一度だけ実行）
-            if(!_isFlying) {
-                if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
-                    m_animator.SetBool("fly",true);
-                }
-                _isFlying = true;
+        foreach (AnimatorControllerParameter param in m_animator.parameters) {
+            if (param.nameHash == Animator.StringToHash(paramName) && param.type == paramType) {
+                return true;
             }
+        }
+        return false;
+    }
+
+    private void FindPlayer() {
+        var playerObj = GameObject.FindGameObjectWithTag(PLAYER_TAG);
+        if (playerObj != null) {
+            _player = playerObj.transform;
         }
         else {
-            // プレイヤーが検知範囲外に出た場合
-            if(_isFlying) {
-                // 飛行アニメーションを無効にする（一度だけ実行）
-                if(m_animator != null && HasAnimatorParameter("fly",AnimatorControllerParameterType.Bool)) {
-                    m_animator.SetBool("fly",false);
-                }
-                _isFlying = false;
-            }
+            Debug.LogWarning("Vulture: 'Player'タグを持つGameObjectが見つかりません。プレイヤー追跡機能が無効になります。", this);
+        }
+    }
 
-            // 速度を停止
+    private void SetupRigidbody() {
+        if (m_rb != null) {
+            m_rb.gravityScale = 0f;
+            m_rb.drag = 1f;
+        }
+    }
+
+    private void ResetState() {
+        IsDead = false;
+        _isFlying = false;
+        if (m_rb != null) {
             m_rb.velocity = Vector2.zero;
         }
+        if (m_animator != null && HasAnimatorParameter(AnimatorParams.Fly, AnimatorControllerParameterType.Bool)) {
+            m_animator.SetBool(AnimatorParams.Fly, false);
+        }
     }
 
-    // ----------------------------------------------------------------------------------------------------
-    // プライベートメソッド
-    // ----------------------------------------------------------------------------------------------------
-    /// <summary>
-    /// プレイヤーに向かって移動します。
-    /// </summary>
+    private void HandlePlayerDetection() {
+        float distance = Vector2.Distance(transform.position, _player.position);
+
+        if (distance < _detectRange) {
+            FlyToPlayer();
+            SetFlyingState(true);
+        }
+        else {
+            m_rb.velocity = Vector2.zero;
+            SetFlyingState(false);
+        }
+    }
+
     private void FlyToPlayer() {
-        // プレイヤーへの方向を正規化して取得
         Vector2 direction = (_player.position - transform.position).normalized;
-        // Rigidbody2Dに速度を設定して移動
         m_rb.velocity = direction * _flySpeed;
 
-        // キャラクターの向きをプレイヤーに合わせて反転
-        if(direction.x > 0 && transform.localScale.x < 0) {
-            FlipSprite();
-        }
-        else if(direction.x < 0 && transform.localScale.x > 0) {
+        if (direction.x > 0 && transform.localScale.x < 0 || direction.x < 0 && transform.localScale.x > 0) {
             FlipSprite();
         }
     }
 
-    /// <summary>
-    /// キャラクターのx軸スケールを反転させ、向きを変えます。
-    /// </summary>
+    private void SetFlyingState(bool isFlying) {
+        if (_isFlying == isFlying) {
+            return;
+        }
+        _isFlying = isFlying;
+        if (m_animator != null && HasAnimatorParameter(AnimatorParams.Fly, AnimatorControllerParameterType.Bool)) {
+            m_animator.SetBool(AnimatorParams.Fly, _isFlying);
+        }
+    }
+
     private void FlipSprite() {
         Vector3 scale = transform.localScale;
         scale.x *= -1;

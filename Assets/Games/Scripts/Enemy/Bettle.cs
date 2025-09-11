@@ -1,61 +1,44 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// 敵キャラクター「カブトムシ」のAIと動作を制御するスクリプトです。
+/// 敵キャラクター「カブトムシ」のAIと動作を制御するスクリプト。
 /// 一定の範囲内で上下に移動し、プレイヤーを検知するとボムを投下します。
-/// Enemyクラスを継承しています。
 /// </summary>
 public class Bettle : Enemy {
-    // プレイヤーのタグを定数で定義
     private const string PLAYER_TAG = "Player";
 
-    // ----------------------------------------------------------------------------------------------------
-    // インスペクターで設定するパラメーター
-    // ----------------------------------------------------------------------------------------------------
-    [Header("プレイヤー検知設定")]
-    [Tooltip("プレイヤーのTransform。見つからない場合は'Player'タグで自動検索します。")]
-    [SerializeField]
-    private Transform _playerTransform;
-    [Tooltip("プレイヤーを検知する半径")]
-    [SerializeField]
-    private float _detectRange = 5f;
+    [Header("プレイヤーのTransform"), SerializeField]
+    private Transform _playerTransform; // プレイヤーのTransform
+    [Header("プレイヤーの検知設定"), SerializeField]
+    private float _detectRange = 5f; // プレイヤーを検知する範囲
 
-    [Header("ボム設定")]
-    [Tooltip("投下するボムのPrefab")]
-    [SerializeField]
-    private GameObject _bombPrefab;
-    [Tooltip("ボムを投下する位置")]
-    [SerializeField]
-    private Transform _launchPoint;
-    [Tooltip("ボムを投下する速度")]
-    [SerializeField]
-    private float _bombLaunchSpeed = 10f;
-    [Tooltip("ボムを投下する間隔 (秒)")]
-    [SerializeField]
-    private float _attackInterval = 3f;
+    [Header("ボムを投下する位置"), SerializeField]
+    private Transform _launchPoint; // ボムを投下する位置
+    [Header("ボムのプレハブ"), SerializeField]
+    private GameObject _bombPrefab; // ボムのプレハブ
+    [Header("ボムの投下速度"), SerializeField]
+    private float _bombLaunchSpeed = 10f; // ボムの投下速度
+    [Header("爆攻撃のクールタイム"), SerializeField]
+    private float _attackInterval = 3f; // 攻撃のクールタイム
 
-    [Header("上下移動設定")]
-    [Tooltip("上下移動の速度")]
-    [SerializeField]
+    [Header("上下移動の速度"), SerializeField]
     private float _verticalMoveSpeed = 1f;
-    [Tooltip("上下移動の振幅 (中心からの距離)")]
-    [SerializeField]
-    private float _verticalMoveRange = 2f;
+    [Header("上下移動の範囲"), SerializeField]
+    private float _verticalMoveRange = 2f; 
 
-    // ----------------------------------------------------------------------------------------------------
-    // プライベート変数
-    // ----------------------------------------------------------------------------------------------------
     private float _attackTimer;
     private Vector3 _startPosition;
 
-    // ----------------------------------------------------------------------------------------------------
-    // MonoBehaviourのライフサイクルメソッド
-    // ----------------------------------------------------------------------------------------------------
     protected override void Awake() {
         base.Awake();
         FindPlayer();
         _startPosition = transform.position;
-        _attackTimer = _attackInterval;
+    }
+
+    protected override void OnEnable() {
+        base.OnEnable();
+        _attackTimer = _attackInterval; // オブジェクト再利用時にタイマーをリセット
     }
 
     private void Update() {
@@ -70,18 +53,14 @@ public class Bettle : Enemy {
         }
     }
 
-    // ----------------------------------------------------------------------------------------------------
-    // プライベートメソッド
-    // ----------------------------------------------------------------------------------------------------
-
     private void FindPlayer() {
         if (_playerTransform == null) {
-            var playerObj = GameObject.FindGameObjectWithTag(PLAYER_TAG);
-            if (playerObj != null) {
-                _playerTransform = playerObj.transform;
+            var playerObject = GameObject.FindGameObjectWithTag(PLAYER_TAG);
+            if (playerObject != null) {
+                _playerTransform = playerObject.transform;
             }
             else {
-                Debug.LogWarning($"Bettle: '{PLAYER_TAG}'タグを持つGameObjectが見つかりません。プレイヤー追跡機能が無効になります。", this);
+                Debug.LogWarning("Bettle: 'Player'タグのGameObjectが見つかりません。プレイヤー追跡は無効になります。", this);
             }
         }
     }
@@ -105,12 +84,8 @@ public class Bettle : Enemy {
     }
 
     private void Attack() {
-        if (_bombPrefab == null) {
-            Debug.LogError("Bettle: bombPrefabが割り当てられていません。", this);
-            return;
-        }
-        if (_launchPoint == null) {
-            Debug.LogError("Bettle: launchPointが割り当てられていません。", this);
+        if (_bombPrefab == null || _launchPoint == null) {
+            Debug.LogError("Bettle: ボムのプレハブまたは投下位置が設定されていません。", this);
             return;
         }
 
@@ -122,7 +97,7 @@ public class Bettle : Enemy {
             bombScript.Launch(direction, _bombLaunchSpeed);
         }
         else {
-            Debug.LogError("Bettle: 生成したボムにBombコンポーネントが見つかりません。", this);
+            Debug.LogError("Bettle: 生成したオブジェクトにBombコンポーネントがありません。", this);
         }
     }
 }

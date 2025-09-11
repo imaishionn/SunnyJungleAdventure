@@ -6,32 +6,24 @@ using UnityEngine;
 /// GameManagerから通知を受け取り、表示を更新します。
 /// </summary>
 public class ScoreDisplay : MonoBehaviour {
-    [Header("UI要素"), Tooltip("ジェムのカウントを表示するTextMeshProUGUIコンポーネント"), SerializeField]
-    private TextMeshProUGUI _gemCountText;
+    [Header("UI要素"), SerializeField]
+    private TextMeshProUGUI _gemCountText; // ジェムのカウントを表示するTextMeshProUGUIコンポーネント
 
     private void Awake() {
-        // 必要なUI要素が割り当てられているか確認
-        if(_gemCountText == null) {
-            Debug.LogError("ScoreDisplay: gemCountText がインスペクターで割り当てられていません！",this);
+        if (_gemCountText == null) {
+            Debug.LogError("ScoreDisplay: gemCountText がインスペクターで割り当てられていません！", this);
         }
     }
 
-    /// <summary>
-    /// このコンポーネントが有効になったときに呼び出されます。
-    /// </summary>
     private void OnEnable() {
-        if(GameManager.Instance != null) {
+        if (GameManager.Instance != null) {
             GameManager.Instance.OnGemCountChanged += UpdateGemCount;
             UpdateGemCount(GameManager.Instance.CurrentGemCount);
         }
     }
 
-    /// <summary>
-    /// このコンポーネントが無効になったときに呼び出されます。
-    /// </summary>
     private void OnDisable() {
-        if(GameManager.Instance != null) {
-            // イベントの購読を解除。メモリリークを防ぐための重要な処理です。
+        if (GameManager.Instance != null) {
             GameManager.Instance.OnGemCountChanged -= UpdateGemCount;
         }
     }
@@ -42,8 +34,7 @@ public class ScoreDisplay : MonoBehaviour {
     /// </summary>
     /// <param name="newCount">新しいジェムの数</param>
     public void UpdateGemCount(int newCount) {
-        if(_gemCountText != null) {
-            // テキストを短くして1行に収まるように変更
+        if (_gemCountText != null) {
             _gemCountText.text = $"{newCount}";
         }
     }
