@@ -4143,7 +4143,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _player: {fileID: 0}
-  _cameraOffset: {x: 0, y: 1, z: -10}
+  _cameraOffset: {x: 0, y: 0, z: -10}
   _useClampX: 0
   _useClampY: 0
   _cameraMaxPos: {x: 0, y: 0}
