@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System; // System.Actionを使うため
 
 /// <summary>
 /// ゲーム全体の進行状況、状態、データ、UI、BGMなどを管理するシングルトンクラス。
@@ -84,13 +85,14 @@ public class GameManager : MonoBehaviour {
     public int CurrentGemCount { get; private set; }
     public int CurrentStageIndex { get; set; }
     public string CurrentSceneName { get; private set; }
+    // ★修正: ゲームステートの取得をプロパティに変更
+    public GameState CurrentGameState { get; private set; } = GameState.Gameplay;
 
     // イベント
     public System.Action<int> OnGemCountChanged;
-
-    private GameState _currentGameState = GameState.Gameplay;
     private float _currentTime;
     private Coroutine _fadeCoroutine;
+    private Coroutine _bgmFadeCoroutine; // ★追加
     private bool _isGlobalTransitioning = false;
     private AudioSource _audioSource;
     private readonly Dictionary<string, AudioClip> _sceneBGMMap = new();
@@ -117,6 +119,8 @@ public class GameManager : MonoBehaviour {
 
     private void Start() {
         if (SceneManager.GetActiveScene().name == "FirstScene") {
+            // ★修正: タイトルに遷移する前にゲームデータをリセット
+            ResetGameData();
             SceneManager.LoadScene(TitleSceneName);
         }
     }
@@ -129,7 +133,7 @@ public class GameManager : MonoBehaviour {
     }
 
     private void Update() {
-        if (_isTimeLimited && _currentGameState == GameState.Gameplay) {
+        if (_isTimeLimited && CurrentGameState == GameState.Gameplay) {
             _currentTime -= Time.deltaTime;
             UpdateTimeDisplay();
             if (_currentTime <= 0) {
@@ -139,10 +143,10 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    public GameState GetCurrentGameState() => _currentGameState;
-
+    // ★修正: GetCurrentGameState() を削除 (プロパティ CurrentGameState を使用)
     public void SetState(GameState newState) {
-        _currentGameState = newState;
+        CurrentGameState = newState;
+        // ポーズ中はTime.timeScaleを0に設定
         Time.timeScale = newState switch {
             GameState.Gameplay or GameState.Cutscene => 1,
             GameState.Pause or GameState.GameOver or GameState.StageClear => 0,
@@ -175,11 +179,10 @@ public class GameManager : MonoBehaviour {
     }
 
     public void GameOver() {
-        if (_currentGameState == GameState.GameOver || _isGlobalTransitioning) {
+        if (CurrentGameState == GameState.GameOver || _isGlobalTransitioning) {
             return;
         }
 
-        // ★修正: ゲームオーバー時のシーン名を保存
         CurrentSceneName = SceneManager.GetActiveScene().name;
 
         FinalScore = CurrentGemCount;
@@ -187,12 +190,11 @@ public class GameManager : MonoBehaviour {
         SetState(GameState.GameOver);
 
         PlayBGM(null);
-        ResetGameData();
         LoadSceneWithFade(_gameOverSceneName);
     }
 
     public void GameClear() {
-        if (_currentGameState == GameState.StageClear || _isGlobalTransitioning) {
+        if (CurrentGameState == GameState.StageClear || _isGlobalTransitioning) {
             return;
         }
         FinalScore = CurrentGemCount;
@@ -210,6 +212,9 @@ public class GameManager : MonoBehaviour {
             return;
         }
         SetState(GameState.Gameplay);
+        // ★修正: リトライ時にゲームデータをリセットする
+        ResetGameData();
+
         if (!string.IsNullOrEmpty(CurrentSceneName)) {
             LoadSceneWithFade(CurrentSceneName);
         }
@@ -219,12 +224,34 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    // ★追加: ステージ選択からの開始処理
+    /// <summary>
+    /// ステージ選択シーンから特定のステージをロードします。
+    /// </summary>
+    public void StartStage(int stageIndex) {
+        if (stageIndex >= 0 && stageIndex < StageSceneNames.Length && !_isGlobalTransitioning) {
+            CurrentStageIndex = stageIndex;
+
+            ResetGameData();
+            SetState(GameState.Gameplay);
+
+            LoadSceneWithFade(StageSceneNames[stageIndex]);
+        }
+        else if (stageIndex >= StageSceneNames.Length) {
+            Debug.LogWarning($"GameManager: ステージインデックス {stageIndex} は存在しません。タイトルへ戻ります。");
+            LoadSceneWithFade(TitleSceneName);
+        }
+    }
+
+
     public void GoToNextStage() {
         if (_isGlobalTransitioning) {
             return;
         }
         CurrentStageIndex++;
         if (CurrentStageIndex < StageSceneNames.Length) {
+            // ★修正: 次のステージへ行く前にゲームデータをリセット
+            ResetGameData();
             LoadSceneWithFade(StageSceneNames[CurrentStageIndex]);
         }
         else {
@@ -268,22 +295,21 @@ public class GameManager : MonoBehaviour {
         CurrentGemCount = 0;
         OnGemCountChanged?.Invoke(CurrentGemCount);
         _currentTime = _isTimeLimited ? _timeLimitSeconds : 0f;
+
+        // ★修正: リザルトデータのクリア
+        FinalScore = 0;
+        FinalTime = 0f;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
         SetGameStateByScene(scene.name);
         UpdatePermanentUIForScene(scene.name);
+
+        // ★修正: PlayerMoveにジョイスティックを渡す処理を追加
+        SetupMobileControls(scene.name);
+
         PlayBGMForScene(scene.name);
         _isGlobalTransitioning = false;
-
-        // CurrentSceneNameはGameOver()メソッドで設定するので、このメソッドからは削除
-        // ここでの設定は、特定のシーンへの遷移を妨げる可能性がありました。
-
-        if (IsGameplayScene(scene.name) || scene.name == TitleSceneName || scene.name.Contains("StageSelect")) {
-            if (_permanentUICanvas != null) {
-                _permanentUICanvas.SetActive(true);
-            }
-        }
 
         SaveCurrentStageIndex();
     }
@@ -317,18 +343,40 @@ public class GameManager : MonoBehaviour {
         }
         else if (IsGameplayScene(sceneName)) {
             SetState(GameState.Gameplay);
-            InitializeGameplayState();
+            // ★修正: ここでのResetGameData()呼び出しを削除 (StartStage/Retry/GoToNextStageで実行するため)
         }
         else {
             Debug.LogWarning($"GameManager: 不明なシーン'{sceneName}'です。ゲーム状態をGameplayに設定します。", this);
             SetState(GameState.Gameplay);
+            // ResetGameData(); // 不明なシーンの場合もデータリセットを削除
         }
     }
 
-    private void InitializeGameplayState() {
-        _currentTime = _timeLimitSeconds;
-        OnGemCountChanged?.Invoke(CurrentGemCount);
+    // ★追加: モバイルコントロールのセットアップメソッド
+    private void SetupMobileControls(string sceneName) {
+        if (_mobileControlCanvas == null) {
+            return;
+        }
+
+        bool isGameplay = IsGameplayScene(sceneName);
+
+        // UIの有効/無効を切り替える
+        _mobileControlCanvas.SetActive(isGameplay && Application.isMobilePlatform);
+
+        if (isGameplay && Application.isMobilePlatform) {
+            // 新しいVirtualJoystickのインスタンスを取得
+            VirtualJoystick joystick = _mobileControlCanvas.GetComponentInChildren<VirtualJoystick>(true);
+            if (joystick != null) {
+                // 現在のシーンでアクティブなPlayerMoveインスタンスを見つけて参照を設定
+                PlayerMove player = FindObjectOfType<PlayerMove>();
+                if (player != null) {
+                    player.SetMobileControls(joystick);
+                    Debug.Log("GameManager: 新しいVirtualJoystickの参照をPlayerMoveに設定しました。", this);
+                }
+            }
+        }
     }
+
 
     private void UpdateTimeDisplay() {
         if (_timeLimitText != null) {
@@ -337,22 +385,52 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    public void PlayBGM(AudioClip clip) {
+    // ★修正: BGMのフェード機能を追加
+    public void PlayBGM(AudioClip clip, float fadeDuration = 1.0f) {
         if (_audioSource == null) {
-            Debug.LogWarning("GameManager: BGM用AudioSourceが割り当てられていません。", this);
             return;
         }
+
         if (_audioSource.clip == clip && _audioSource.isPlaying) {
             return;
         }
 
-        _audioSource.Stop();
-        if (clip != null) {
-            _audioSource.clip = clip;
-            _audioSource.volume = _initialBGMVolume;
-            _audioSource.Play();
+        if (_bgmFadeCoroutine != null) {
+            StopCoroutine(_bgmFadeCoroutine);
         }
+        _bgmFadeCoroutine = StartCoroutine(FadeBGM(clip, fadeDuration));
     }
+
+    // ★追加: BGMフェードコルーチン
+    private IEnumerator FadeBGM(AudioClip newClip, float duration) {
+        float startVolume = _audioSource.volume;
+        float timer = 0f;
+
+        // 現在のBGMをフェードアウト
+        while (timer < duration && _audioSource.isPlaying) {
+            timer += Time.unscaledDeltaTime;
+            _audioSource.volume = Mathf.Lerp(startVolume, 0f, timer / duration);
+            yield return null;
+        }
+        _audioSource.Stop();
+        _audioSource.volume = 0f;
+
+        // 新しいBGMをフェードイン
+        if (newClip != null) {
+            _audioSource.clip = newClip;
+            _audioSource.Play();
+            timer = 0f;
+            while (timer < duration) {
+                timer += Time.unscaledDeltaTime;
+                _audioSource.volume = Mathf.Lerp(0f, _initialBGMVolume, timer / duration);
+                yield return null;
+            }
+            _audioSource.volume = _initialBGMVolume;
+        }
+
+        _bgmFadeCoroutine = null;
+    }
+
 
     private void PlayBGMForScene(string sceneName) {
         if (_sceneBGMMap.ContainsKey(sceneName)) {
@@ -366,9 +444,14 @@ public class GameManager : MonoBehaviour {
     private void UpdatePermanentUIForScene(string sceneName) {
         bool isGameplay = IsGameplayScene(sceneName);
 
-        if (_permanentUICanvas != null) {
-            _permanentUICanvas.SetActive(isGameplay || sceneName == TitleSceneName || sceneName.Contains("StageSelect"));
-        }
+        _permanentUICanvas.SetActive(
+            isGameplay ||
+            sceneName == TitleSceneName ||
+            sceneName.Contains("StageSelect") ||
+            sceneName == _gameOverSceneName ||
+            sceneName == _clearSceneName ||
+            sceneName == _scoreSceneName
+        );
 
         if (_scorePanel != null) {
             _scorePanel.SetActive(isGameplay);
@@ -377,6 +460,8 @@ public class GameManager : MonoBehaviour {
             _timeLimitText.gameObject.SetActive(isGameplay && _isTimeLimited);
         }
         if (_mobileControlCanvas != null) {
+            // SetupMobileControlsで制御されるため、ここではSetActiveは不要だが、
+            // 念のためロジックを維持 (ただし、SetupMobileControlsが後に呼ばれることに注意)
             _mobileControlCanvas.SetActive(isGameplay && Application.isMobilePlatform);
         }
     }
@@ -388,7 +473,6 @@ public class GameManager : MonoBehaviour {
 
         _globalFadeCanvasGroup.blocksRaycasts = true;
         _globalFadeCanvasGroup.interactable = true;
-        _permanentUICanvas.SetActive(false);
 
         yield return StartCoroutine(FadeCanvasGroup(0f, 1f, duration, onFadeOutComplete));
         yield return SceneManager.LoadSceneAsync(sceneName);
@@ -409,6 +493,7 @@ public class GameManager : MonoBehaviour {
         }
 
         float timer = 0f;
+        // Time.unscaledDeltaTime を使用してポーズ中でも動作
         while (timer < duration) {
             timer += Time.unscaledDeltaTime;
             _globalFadeCanvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, timer / duration);
@@ -448,12 +533,9 @@ public class GameManager : MonoBehaviour {
         for (int i = 0; i < StageSceneNames.Length; i++) {
             if (StageSceneNames[i] == currentSceneName) {
                 CurrentStageIndex = i;
-                // CurrentSceneName = currentSceneName; // OnSceneLoaded()からは削除
                 return;
             }
         }
-        // ステージシーン以外の場合、インデックスをリセット
         CurrentStageIndex = -1;
-        // CurrentSceneName = ""; // OnSceneLoaded()からは削除
     }
 }

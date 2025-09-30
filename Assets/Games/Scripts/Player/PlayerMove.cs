@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
 
 /// <summary>
 /// プレイヤーキャラクターの移動とジャンプを管理するスクリプトです。
@@ -13,32 +12,27 @@ public class PlayerMove : MonoBehaviour {
     public float MoveSpeed { get; } = 7f;
 
     [Header("ジャンプの高さ"), SerializeField]
-    private float _jumpForce = 100f; 
+    private float _jumpForce = 10f;
 
     [Header("ジャンプの回数"), SerializeField]
-    private int _maxJumps = 2; 
+    private int _maxJumps = 2;
 
     [Header("敵との相互作用"), SerializeField]
-    private float _stompBounceForce = 7f; 
-    [Header("ダメージを受けた後の無敵時間"),SerializeField]
-    private float _invincibleDuration = 0.2f; 
+    private float _stompBounceForce = 7f;
+    [Header("ダメージを受けた後の無敵時間"), SerializeField]
+    private float _invincibleDuration = 0.2f;
 
     [Header("コンポーネントとオブジェクト"), SerializeField]
-    private GroundCheck _groundCheckComponent; 
+    private GroundCheck _groundCheckComponent;
+    // private SpriteRenderer _spriteRenderer; // ★削除: 点滅処理が不要なため
 
     [Header("ゲームオーバー条件"), SerializeField]
-    private float _gameOverFallHeight = -10f; 
+    private float _gameOverFallHeight = -10f;
 
-    // [SerializeField]は不要です。Start()で動的に取得します
     private VirtualJoystick _joystick;
-
-    // UIデバッグ用の参照
-    [Header("デバッグ"), SerializeField]
-    private TextMeshProUGUI _debugText;
 
     private Rigidbody2D _rb;
     private Animator _animator;
-    private ItemSoundPlayer _itemSoundPlayer;
 
     private bool _isGrounded;
     private bool _isFacingRight = true;
@@ -47,39 +41,67 @@ public class PlayerMove : MonoBehaviour {
 
     public bool IsDead { get; private set; } = false;
 
+    public static event Action OnPlayerDie;
+    public static event Action OnEnemyStomp;
+
     private void Awake() {
         if (!TryGetComponent<Rigidbody2D>(out _rb)) {
-            Debug.LogError("PlayerMove: Rigidbody2Dがアタッチされていません。", this);
+            Debug.LogError("PlayerMove: Rigidbody2Dがアタッチされていません。このスクリプトは動作しません。", this);
+            enabled = false;
+            return;
         }
-        if (!TryGetComponent<Animator>(out _animator)) {
-            Debug.LogError("PlayerMove: Animatorがアタッチされていません。", this);
-        }
+
+        TryGetComponent<Animator>(out _animator);
 
         if (_groundCheckComponent == null) {
             _groundCheckComponent = GetComponentInChildren<GroundCheck>();
             if (_groundCheckComponent == null) {
-                Debug.LogError("PlayerMove: GroundCheckコンポーネントが見つかりません。", this);
+                Debug.LogWarning("PlayerMove: GroundCheckコンポーネントが見つかりません。接地判定は行われません。", this);
             }
         }
 
-        _itemSoundPlayer = FindObjectOfType<ItemSoundPlayer>();
         _jumpsRemaining = _maxJumps;
     }
 
     private void Start() {
-        // FindObjectOfTypeはAwake()ではなくStart()で行う
-        _joystick = FindObjectOfType<VirtualJoystick>();
-        if (_joystick == null) {
-            Debug.LogWarning("PlayerMove: VirtualJoystickが見つかりませんでした。PCキーボードでの操作になります。");
+        if (_joystick == null && Application.isMobilePlatform) {
+            Debug.LogWarning("PlayerMove: VirtualJoystickはGameManager経由で設定される必要があります。");
         }
     }
 
     public void SetMobileControls(VirtualJoystick joystick) => _joystick = joystick;
 
+    /// <summary>
+    /// GameManagerからの呼び出し用: シーンロード時にプレイヤーの状態をリセットします。
+    /// </summary>
+    public void ResetPlayerState() {
+        IsDead = false;
+        _isInvincible = false;
+        _jumpsRemaining = _maxJumps;
+
+        if (_rb != null) {
+            _rb.velocity = Vector2.zero;
+            _rb.isKinematic = false;
+        }
+        if (TryGetComponent<Collider2D>(out Collider2D playerCollider)) {
+            playerCollider.enabled = true;
+        }
+
+        if (_animator != null && HasAnimatorParameter("GameOver", AnimatorControllerParameterType.Trigger)) {
+            _animator.ResetTrigger("GameOver");
+        }
+
+        // ★重要: ジャンプ不能の原因となる可能性のあるフラグをすべてリセットしたことをログで確認
+        Debug.Log("PlayerMove State Reset Complete. IsDead=false, JumpsRemaining=" + _maxJumps);
+    }
+
+
     private void Update() {
         if (IsDead) {
             return;
         }
+
+        // ゲームステートによる入力ブロックは削除しました。
 
         bool previousIsGrounded = _isGrounded;
         if (_groundCheckComponent != null) {
@@ -104,18 +126,6 @@ public class PlayerMove : MonoBehaviour {
         if (transform.position.y < _gameOverFallHeight) {
             Die();
         }
-
-        if (_debugText != null) {
-            string debugInfo = $"Move Input: {moveInput:F2}\n";
-            if (_joystick != null) {
-                debugInfo += $"Joystick Direction: {_joystick.InputDirection.x:F2}\n";
-            }
-            else {
-                debugInfo += "Joystick Reference is NULL\n";
-            }
-            debugInfo += $"Is Grounded: {_isGrounded}";
-            _debugText.text = debugInfo;
-        }
     }
 
     private void HandleMovementInput(float moveInput) {
@@ -129,26 +139,22 @@ public class PlayerMove : MonoBehaviour {
     }
 
     public void Jump() {
+        // ★重要: ジャンプをブロックする条件はIsDeadと_jumpsRemainingのみ
         if (IsDead || _jumpsRemaining <= 0) {
+            // ジャンプがブロックされたことをログで確認
+            Debug.LogWarning($"Jump Blocked! IsDead: {IsDead}, Jumps Remaining: {_jumpsRemaining}");
             return;
         }
 
         if (_rb != null) {
-            _rb.velocity = new Vector2(_rb.velocity.x, _jumpForce);
+            _rb.velocity = new Vector2(_rb.velocity.x, 0);
+            _rb.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
         }
         _jumpsRemaining--;
+        Debug.Log($"Jump Success. Jumps Remaining: {_jumpsRemaining}");
 
-        if (_itemSoundPlayer != null) {
-            _itemSoundPlayer.PlayJumpSound();
-        }
-
-        if (_animator != null) {
-            if (_isGrounded && HasAnimatorParameter("JumpTrigger", AnimatorControllerParameterType.Trigger)) {
-                _animator.SetTrigger("JumpTrigger");
-            }
-            else if (!_isGrounded && HasAnimatorParameter("DoubleJumpTrigger", AnimatorControllerParameterType.Trigger)) {
-                _animator.SetTrigger("DoubleJumpTrigger");
-            }
+        if (ItemSoundPlayer.Instance != null) {
+            ItemSoundPlayer.Instance.PlayJumpSound();
         }
     }
 
@@ -160,7 +166,11 @@ public class PlayerMove : MonoBehaviour {
         }
 
         if (collision.gameObject.CompareTag("Enemy")) {
-            if (transform.position.y > collision.transform.position.y) {
+            if (_rb == null) {
+                return;
+            }
+
+            if (_rb.velocity.y < 0) {
                 StompEnemy(collision.gameObject);
             }
             else {
@@ -180,6 +190,13 @@ public class PlayerMove : MonoBehaviour {
 
         _rb.velocity = new Vector2(_rb.velocity.x, _stompBounceForce);
         enemy.TakeDamage();
+
+        if (ItemSoundPlayer.Instance != null) {
+            ItemSoundPlayer.Instance.PlayEnemyDefeatSound();
+        }
+
+        OnEnemyStomp?.Invoke();
+
         StartCoroutine(BecomeInvincible(_invincibleDuration));
     }
 
@@ -188,10 +205,13 @@ public class PlayerMove : MonoBehaviour {
             return;
         }
         IsDead = true;
+        Debug.Log("Player Die.");
 
-        if (_itemSoundPlayer != null) {
-            _itemSoundPlayer.PlayGameOverSound();
+        if (ItemSoundPlayer.Instance != null) {
+            ItemSoundPlayer.Instance.PlayGameOverSound();
         }
+
+        OnPlayerDie?.Invoke();
 
         if (_rb != null) {
             _rb.velocity = Vector2.zero;
@@ -265,7 +285,11 @@ public class PlayerMove : MonoBehaviour {
 
     private IEnumerator BecomeInvincible(float duration) {
         _isInvincible = true;
-        yield return new WaitForSeconds(duration);
+
+        // 点滅ロジックは完全に削除されています。
+
+        yield return new WaitForSecondsRealtime(duration);
+
         _isInvincible = false;
     }
 }

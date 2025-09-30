@@ -4,6 +4,9 @@ using UnityEngine;
 /// アイテム取得やアクションに応じた効果音を再生
 /// </summary>
 public class ItemSoundPlayer : MonoBehaviour {
+    // シングルトンインスタンスを定義
+    public static ItemSoundPlayer Instance { get; private set; }
+
     private AudioSource _audioSource;
 
     [Header("宝石獲得音"), SerializeField]
@@ -28,6 +31,15 @@ public class ItemSoundPlayer : MonoBehaviour {
     /// Awake
     /// </summary>
     public void Awake() {
+        // シングルトンインスタンスの割り当てと、シーンをまたぐ設定
+        if (Instance != null && Instance != this) {
+            Destroy(gameObject);
+        }
+        else {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+
         _audioSource = GetComponent<AudioSource>();
         if (_audioSource == null) {
             Debug.LogError("ItemSoundPlayer: AudioSourceコンポーネントがアタッチされていません。");
@@ -61,7 +73,7 @@ public class ItemSoundPlayer : MonoBehaviour {
     /// <summary>
     /// ゲームオーバー音を再生
     /// </summary>
-    public void PlayGameOverSound() => Play(_gameOverClip, _gameOverVolume); // ここを修正しました
+    public void PlayGameOverSound() => Play(_gameOverClip, _gameOverVolume);
 
     /// <summary>
     /// 敵撃破音を再生
