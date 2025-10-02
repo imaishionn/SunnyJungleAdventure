@@ -7,23 +7,37 @@ using UnityEngine;
 /// 地面をパトロールし、指定された移動範囲の端または壁に到達すると向きを変えます。
 /// </summary>
 public class Dino : Enemy {
-    // アニメーターパラメーターの定数
+    /// <summary>
+    /// アニメーターパラメーターの定数
+    /// </summary>
     private static class AnimatorParams {
+        /// <summary>
+        /// 走るアニメーションのパラメータ名
+        /// </summary>
         public const string Run = "run";
     }
 
     [Header("パトロール時の設定"), SerializeField]
-    private float _moveSpeed = 3f; // パトロール時の移動速度
+    private float _moveSpeed = 3f;
+
     [Header("パトロールの範囲"), SerializeField]
-    private float _patrolRange = 5f; // パトロールする初期位置からの最大範囲
+    private float _patrolRange = 5f;
 
     [Header("壁の認識"), SerializeField]
-    private LayerMask _wallLayer; // 壁として認識するレイヤー
-    [Header("壁をチェックする距離"), SerializeField]
-    private float _wallCheckDistance = 0.5f; // 壁をチェックする距離
+    private LayerMask _wallLayer;
 
+    [Header("壁をチェックする距離"), SerializeField]
+    private float _wallCheckDistance = 0.5f;
+
+    /// <summary>
+    /// 初期位置
+    /// </summary>
     private Vector2 _initialPosition;
-    private int _moveDirection = 1; // 1: right, -1: left
+
+    /// <summary>
+    /// 現在の移動方向（1: 右, -1: 左）
+    /// </summary>
+    private int _moveDirection = 1; 
 
     protected override void Awake() {
         base.Awake();

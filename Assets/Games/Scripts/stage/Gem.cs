@@ -4,10 +4,19 @@ using UnityEngine;
 /// プレイヤーが触れるとスコアに加算される宝石の挙動を制御します。
 /// </summary>
 public class Gem : MonoBehaviour {
-    [Header("スコア設定"), SerializeField]
-    private int _scoreValue = 1; // 宝石を回収したときに加算されるスコア値
+   
 
-    private bool _isCollected = false; // 既に回収されたかどうかのフラグ
+    [Header("スコア設定"), SerializeField]
+    private int _scoreValue = 1;
+
+    /// <summary>
+    /// 宝石が既に回収されたかどうかのフラグ
+    /// </summary>
+    private bool _isCollected = false;
+
+    /// <summary>
+    /// 宝石の取得時に効果音を再生するためのItemSoundPlayerコンポーネントへの参照
+    /// </summary>
     private static ItemSoundPlayer _itemSoundPlayer; // シングルトン化されたItemSoundPlayerへの参照をキャッシュ
 
     private void Awake() {

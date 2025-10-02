@@ -5,8 +5,14 @@ using UnityEngine.EventSystems;
 /// ジャンプボタンUIのタッチイベントを処理し、プレイヤーのジャンプを呼び出します。
 /// </summary>
 public class JumpButtonController : MonoBehaviour, IPointerDownHandler {
+    /// <summary>
+    /// プレイヤーの移動スクリプトへの参照
+    /// </summary>
     private PlayerMove _playerMove;
 
+    /// <summary>
+    /// シーン内のプレイヤーを探すもの
+    /// </summary>
     private void Start() => FindPlayer();
 
     /// <summary>
@@ -22,7 +28,7 @@ public class JumpButtonController : MonoBehaviour, IPointerDownHandler {
         if (_playerMove == null) {
             // シーンロード直後などでPlayerMoveがまだ生成されていない可能性があるため、
             // ログレベルをWarningに下げて、深刻なエラーとしない
-            Debug.LogWarning("JumpButtonController: シーン内にPlayerMoveコンポーネントが見つかりません。", this);
+            
         }
     }
 

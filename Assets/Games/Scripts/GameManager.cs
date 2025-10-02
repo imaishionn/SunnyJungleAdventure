@@ -10,50 +10,72 @@ using System; // System.Actionを使うため
 /// シーンをまたいで存在し、ゲームの中心的な制御を担います。
 /// </summary>
 public class GameManager : MonoBehaviour {
-    public static GameManager Instance { get; private set; }
 
-    [Header("GameManager"), SerializeField]
+   
+
+    [Header("時間制限やスコアが入っている場所"), SerializeField]
     private GameObject _permanentUICanvas;
-    [SerializeField]
+
+    [Header("フェードを管理している場所"),SerializeField]
     private CanvasGroup _globalFadeCanvasGroup;
-    [SerializeField]
+
+    [Header("フェードを起こすPanel"), SerializeField]
     private UnityEngine.UI.Image _globalFadePanelImage;
-    [SerializeField]
+
+    [Header("EventSystems"), SerializeField]
     private UnityEngine.EventSystems.EventSystem _permanentEventSystem;
-    [SerializeField]
+
+    [Header("スコアに関したスクリプトが入った場所"), SerializeField]
     private ScoreDisplay _scoreDisplay;
-    [SerializeField]
+
+    [Header("スコア関連が入ったPanel"), SerializeField]
     private GameObject _scorePanel;
-    [SerializeField]
+
+    [Header("時間制限などのテキストの表示場所"), SerializeField]
     private TMPro.TextMeshProUGUI _timeLimitText;
-    [SerializeField]
+
+    [Header("モバイル版のまとめたもの"), SerializeField]
     private GameObject _mobileControlCanvas;
 
-    [Header("Sceneの名前"), SerializeField]
+    [Header("ゲームオーバシーンの名前"), SerializeField]
     private string _gameOverSceneName = "GameOverScene";
-    [SerializeField]
+
+    [Header("クリアシーンの名前"), SerializeField]
     private string _clearSceneName = "ClearScene";
-    [SerializeField]
+
+    [Header("スコアシーンの名前"), SerializeField]
     private string _scoreSceneName = "ResultScene";
 
     [Header("時間制限"), SerializeField]
     private bool _isTimeLimited = false;
-    [SerializeField]
+
+
+    [Header("時間制限の秒数"),SerializeField]
     private float _timeLimitSeconds = 60.0f;
-    [SerializeField]
+
+    [Header("フェードする時間"), SerializeField]
     private float _fadeDuration = 1.0f;
 
     [Header("BGM"), SerializeField]
     private List<SceneBGMData> _sceneBGMList;
-    [Range(0f, 1f), SerializeField]
+
+    [Header("BGMのボリューム"),Range(0f, 1f), SerializeField]
     private float _initialBGMVolume = 0.5f;
 
-    // シーン名の定数
+    /// <summary>
+    /// GameManagerのシングルトンインスタンス
+    /// </summary>
+    public static GameManager Instance { get; private set; }
+
+    /// <summary>
+    /// ステージシーンの名前リスト
+    /// </summary>
     [Header("ステージシーンの設定")]
     public string[] StageSceneNames;
     public readonly string TitleSceneName = "TitleScene";
     public readonly string StageSelectSceneName = "StageSelectScene";
     public readonly string StageSelect2SceneName = "StageSelect2Scene";
+
 
     public enum GameState {
         Title,

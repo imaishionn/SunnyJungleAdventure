@@ -17,7 +17,7 @@ public class TilemapSwitchPlatform : MonoBehaviour {
     private bool _startsActive = false; 
 
     [Header("trueの場合、プラットフォームは一定時間経過後に自動的に消滅します"), SerializeField]
-    private bool _hasTimeLimit = true; // trueの場合、プラットフォームは一定時間経過後に自動的に消滅します
+    private bool _hasTimeLimit = true;
 
     [Header("プラットフォームが自動で消滅するまでの時間"), SerializeField]
     private float _displayDuration = 5.0f; 
@@ -26,15 +26,42 @@ public class TilemapSwitchPlatform : MonoBehaviour {
     private AudioClip _platformBGM; 
 
     [Header("シーンの通常BGM"),SerializeField]
-    private AudioClip _normalBGM; 
+    private AudioClip _normalBGM;
 
+
+    /// <summary>
+    /// Tilemapコンポーネントへの参照
+    /// </summary>
     private Tilemap _tilemap;
+
+    /// <summary>
+    /// TilemapRendererコンポーネントへの参照
+    /// </summary>
     private TilemapRenderer _tilemapRenderer;
+
+    /// <summary>
+    /// TilemapCollider2Dコンポーネントへの参照
+    /// </summary>
     private TilemapCollider2D _tilemapCollider;
+
+    /// <summary>
+    /// プラットフォームの初期カラー（透明度を含む）
+    /// </summary>
     private Color _initialColor;
 
+    /// <summary>
+    /// アニメーション中かどうかのフラグ
+    /// </summary>
     private bool _isAnimating = false;
+
+    /// <summary>
+    /// プラットフォームが現在アクティブかどうかのフラグ
+    /// </summary>
     private bool _isActive;
+
+    /// <summary>
+    /// 自動消滅のコルーチン参照
+    /// </summary>
     private Coroutine _autoDisappearCoroutine;
 
     private void Start() {

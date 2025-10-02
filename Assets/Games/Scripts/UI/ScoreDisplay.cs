@@ -6,8 +6,10 @@ using UnityEngine;
 /// GameManagerから通知を受け取り、表示を更新します。
 /// </summary>
 public class ScoreDisplay : MonoBehaviour {
-    [Header("UI要素"), SerializeField]
-    private TextMeshProUGUI _gemCountText; // ジェムのカウントを表示するTextMeshProUGUIコンポーネント
+
+
+    [Header("スコアのUI要素"), SerializeField]
+    private TextMeshProUGUI _gemCountText;
 
     private void Awake() {
         if (_gemCountText == null) {

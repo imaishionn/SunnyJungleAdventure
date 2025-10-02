@@ -7,8 +7,15 @@ using UnityEngine;
 /// プレイヤーを検知すると追跡を開始し、向きを反転させながら飛行します。
 /// </summary>
 public class Vulture : Enemy {
+    /// <summary>
+    /// プレイヤーを識別するためのタグ
+    /// </summary>
     private const string PLAYER_TAG = "Player";
+
     private static class AnimatorParams {
+        /// <summary>
+        /// 飛行アニメーションのパラメータ名
+        /// </summary>
         public const string Fly = "fly";
     }
 
@@ -18,7 +25,14 @@ public class Vulture : Enemy {
     [Header("プレイヤー追跡時の移動速度"), SerializeField]
     private float _flySpeed = 5f;
 
+    /// <summary>
+    /// プレイヤーを格納するTransform 
+    /// </summary>
     private Transform _player;
+
+    /// <summary>
+    /// 飛行中かどうかの状態
+    /// </summary>
     private bool _isFlying = false;
 
     protected override void Awake() {

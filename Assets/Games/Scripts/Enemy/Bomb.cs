@@ -6,25 +6,48 @@ using UnityEngine;
 /// プレイヤーや地面に接触すると爆発し、コライダーを拡大してダメージを与えます。
 /// </summary>
 public class Bomb : MonoBehaviour {
+
     private static class AnimatorParams {
         public const string ExplodeTrigger = "Explode";
     }
 
+    /// <summary>
+    /// プレイヤーを識別するためのタグ
+    /// </summary>
     private const string PLAYER_TAG = "Player";
+
+    /// <summary>
+    /// 地面を識別するためのタグ
+    /// </summary>
     private const string GROUND_TAG = "Ground";
 
     [Header("爆発アニメーションの再生時間とコライダー拡大にかかる時間"), SerializeField]
     private float _explosionDuration = 0.5f; 
 
     [Header("爆発の当たり判定"), SerializeField]
-    private float _startRadius = 0.05f; // 爆発コライダーの初期半径
+    private float _startRadius = 0.05f; 
 
     [Header("爆発の最終の当たり判定"), SerializeField]
-    private float _endRadius = 0.5f; // 爆発コライダーの最終半径
+    private float _endRadius = 0.5f;
 
+    /// <summary>
+    /// Rigidbody2Dコンポーネントへの参照
+    /// </summary>
     private Rigidbody2D _rb;
+
+    /// <summary>
+    /// Animatorコンポーネントへの参照
+    /// </summary>
     private Animator _anim;
+
+    /// <summary>
+    /// CircleCollider2Dコンポーネントへの参照
+    /// </summary>
     private CircleCollider2D _bombCollider;
+
+    /// <summary>
+    /// 爆発が既に発生したかどうかのフラグ
+    /// </summary>
     private bool _hasExploded = false;
 
     private void Awake() {

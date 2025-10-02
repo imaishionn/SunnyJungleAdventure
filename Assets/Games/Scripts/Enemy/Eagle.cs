@@ -7,9 +7,23 @@ using UnityEngine;
 /// プレイヤーを検知すると追跡し、ダメージを受けると点滅します。
 /// </summary>
 public class Eagle : Enemy {
+    /// <summary>
+    /// プレイヤーを識別するためのタグ 
+    /// </summary>
     private const string PLAYER_TAG = "Player";
+
+    /// <summary>
+    ///  アニメーターのパラメータ名を定義する静的クラス 
+    /// </summary>
     private static class AnimatorParams {
+        /// <summary>
+        /// 飛行アニメーションのパラメータ名 
+        /// </summary>
         public const string Fly = "fly";
+
+        /// <summary>
+        /// ダメージを受けたときのアニメーションのパラメータ名
+        /// </summary>
         public const string Hurt = "hurt";
     }
 
@@ -20,16 +34,39 @@ public class Eagle : Enemy {
     private float _flySpeed = 5f;
 
     [Header("ダメージ"), SerializeField]
-    private float _flashDuration = 1f; // 点滅する合計時間
-    [Header("点滅の間隔"), SerializeField]
-    private float _flashInterval = 0.1f; // 点滅の間隔
+    private float _flashDuration = 1f;
 
+    [Header("点滅の間隔"), SerializeField]
+    private float _flashInterval = 0.1f;
+
+    /// <summary>
+    /// プレイヤーを格納するTransform
+    /// </summary>
     private Transform _player;
+
+    /// <summary>
+    /// 飛行中かどうかの状態
+    /// </summary>
     private bool _isFlying;
+
+    /// <summary>
+    /// ワシの体力
+    /// </summary>
     private int _hp = 3;
+
+    /// <summary>
+    /// SpriteRendererコンポーネントへの参照 
+    /// </summary>
     private SpriteRenderer _spriteRenderer;
+
+    /// <summary>
+    /// 点滅処理のコルーチン参照 
+    /// </summary>
     private Coroutine _flashCoroutine;
 
+    /// <summary>
+    /// 初期化処理
+    /// </summary>
     protected override void Awake() {
         base.Awake();
         FindPlayer();

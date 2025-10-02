@@ -6,18 +6,49 @@ using UnityEngine;
 /// 敵キャラクターの基本的な挙動を管理する基底クラスです。
 /// </summary>
 public class Enemy : MonoBehaviour {
-    protected Rigidbody2D m_rb;
-    protected Animator m_animator;
-    protected Collider2D m_collider;
-
-    public bool IsDead { get; protected set; } = false;
-    public Collider2D EnemyCollider => m_collider;
-
-    private bool _hasAnimator = false;
-    private static readonly int _animatorDesHash = Animator.StringToHash("des");
 
     [Header("スコア設定"), SerializeField]
-    private int _scoreValue = 100; 
+    private int _scoreValue = 100;
+
+
+
+    /// <summary>
+    /// Rigidbody2Dコンポーネントへの参照
+    /// </summary>
+    protected Rigidbody2D m_rb;
+
+    /// <summary>
+    /// アニメーターコンポーネントへの参照
+    /// </summary>
+    protected Animator m_animator;
+
+    /// <summary>
+    /// Collider2Dコンポーネントへの参照 
+    /// </summary>
+
+    protected Collider2D m_collider;
+
+    /// <summary>
+    /// 敵が死亡しているかどうかの状態
+    /// </summary>
+    public bool IsDead { get; protected set; } = false;
+
+    /// <summary>
+    /// 敵のCollider2Dコンポーネントへの公開プロパティ
+    /// </summary>
+    public Collider2D EnemyCollider => m_collider;
+
+    /// <summary>
+    /// アニメーターが存在するかどうかのフラグ
+    /// </summary>
+    private bool _hasAnimator = false;
+
+    /// <summary>
+    /// アニメーターの「des」トリガーパラメータのハッシュ値
+    /// </summary>
+    private static readonly int _animatorDesHash = Animator.StringToHash("des");
+
+
 
     protected virtual void Awake() {
         m_rb = GetComponent<Rigidbody2D>();

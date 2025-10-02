@@ -7,6 +7,7 @@ using UnityEngine.UI;
 /// ゲームオーバー画面のUIとシーン遷移を管理するスクリプトです。
 /// </summary>
 public class GameOverManager : MonoBehaviour {
+
     [Header("UI設定"), SerializeField]
     private Selectable _firstSelected; // ゲームパッド操作で最初に選択状態にしたいUI要素
 
@@ -17,8 +18,11 @@ public class GameOverManager : MonoBehaviour {
     private Button _retryButton; 
 
     [Header("タイトルシーンの名前"), SerializeField]
-    private string _titleSceneName = "TitleScene"; 
+    private string _titleSceneName = "TitleScene";
 
+    /// <summary>
+    /// シーン遷移中かどうかのフラグ
+    /// </summary>
     private bool _isTransitioning = false;
 
     private void Start() {

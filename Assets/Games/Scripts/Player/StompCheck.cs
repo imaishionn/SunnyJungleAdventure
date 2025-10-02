@@ -5,8 +5,12 @@ using UnityEngine;
 /// プレイヤーキャラクターの足元の子オブジェクトにアタッチして使用します。
 /// </summary>
 public class StompCheck : MonoBehaviour {
+    /// <summary>
+    /// PlayerMoveコンポーネント
+    /// </summary>
     [Header("コンポーネント")]
     private PlayerMove _playerMove;
+
 
     private void Awake() {
         _playerMove = GetComponentInParent<PlayerMove>();

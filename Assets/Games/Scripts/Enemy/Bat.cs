@@ -8,10 +8,20 @@ using UnityEngine;
 /// </summary>
 public class Bat : Enemy {
     private static class AnimatorParams {
+        /// <summary>
+        /// 飛行アニメーションのパラメータ名
+        /// </summary>
         public const string Fly = "fly";
+
+        /// <summary>
+        /// 死亡アニメーションのパラメータ名
+        /// </summary>
         public const string Death = "des";
     }
 
+    /// <summary>
+    /// プレイヤーを識別するためのタグ
+    /// </summary>
     private const string PLAYER_TAG = "Player";
 
     [Header("プレイヤーを検知する範囲"), SerializeField]
@@ -21,9 +31,16 @@ public class Bat : Enemy {
     private float _flySpeed = 5f;
 
     [Header("死亡アニメーションの再生時間"), SerializeField]
-    private float _deathAnimationDuration = 1.0f; 
+    private float _deathAnimationDuration = 1.0f;
 
+    /// <summary>
+    ///プレイヤーを格納するTransform
+    /// </summary>
     private Transform _player;
+
+    /// <summary>
+    /// 飛行中かどうかの状態
+    /// </summary>
     private bool _isFlying = false;
 
     protected override void Awake() {

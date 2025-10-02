@@ -6,6 +6,7 @@ using UnityEngine;
 /// 指定した数と間隔で、敵を定期的に配置します。
 /// </summary>
 public class Spawner : MonoBehaviour {
+
     [Header("オブジェクトプールを管理するクラス"), SerializeField]
     private ObjectPoolManager _objectPoolManager;
 
@@ -13,9 +14,11 @@ public class Spawner : MonoBehaviour {
     private float _spawnInterval = 3f; 
 
     [ Header("スポーンする敵の総数"), SerializeField]
-    private int _spawnCount = 5; 
+    private int _spawnCount = 5;
 
-
+    /// <summary>
+    /// 現在スポーンした敵の数
+    /// </summary>
     private int _spawnedCount;
 
     private void Start() {

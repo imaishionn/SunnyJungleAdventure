@@ -4,10 +4,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// プレイヤーキャラクターの移動とジャンプを管理するスクリプトです。
-/// 敵との相互作用、ゲームオーバー処理も含まれます。
+/// プレイヤーの移動、ジャンプ、敵との相互作用を管理するスクリプト。
 /// </summary>
 public class PlayerMove : MonoBehaviour {
+    /// <summary>
+    /// プロパティ
+    /// </summary>
     [field: Header("移動設定"), SerializeField]
     public float MoveSpeed { get; } = 7f;
 
@@ -24,25 +26,53 @@ public class PlayerMove : MonoBehaviour {
 
     [Header("コンポーネントとオブジェクト"), SerializeField]
     private GroundCheck _groundCheckComponent;
-    // private SpriteRenderer _spriteRenderer; // ★削除: 点滅処理が不要なため
 
     [Header("ゲームオーバー条件"), SerializeField]
     private float _gameOverFallHeight = -10f;
 
+    /// <summary>
+    /// モバイルコントロール用のジョイスティック
+    /// </summary>
     private VirtualJoystick _joystick;
 
+    /// <summary>
+    /// プライベートフィールド
+    /// </summary>
     private Rigidbody2D _rb;
+    /// <summary>
+    /// アニメーターコンポーネントへの参照
+    /// </summary>
     private Animator _animator;
 
+    /// <summary>
+    /// 接地状態
+    /// </summary>
     private bool _isGrounded;
+
+    /// <summary>
+    /// プレイヤーの向き
+    /// </summary>
     private bool _isFacingRight = true;
+
+    /// <summary>
+    /// 残りのジャンプ回数
+    /// </summary>
     private int _jumpsRemaining;
+
+    /// <summary>
+    /// 無敵状態かどうか
+    /// </summary>
     private bool _isInvincible = false;
 
+/// <summary>
+/// イベント
+/// </summary>
     public bool IsDead { get; private set; } = false;
 
     public static event Action OnPlayerDie;
     public static event Action OnEnemyStomp;
+
+
 
     private void Awake() {
         if (!TryGetComponent<Rigidbody2D>(out _rb)) {
@@ -91,7 +121,7 @@ public class PlayerMove : MonoBehaviour {
             _animator.ResetTrigger("GameOver");
         }
 
-        // ★重要: ジャンプ不能の原因となる可能性のあるフラグをすべてリセットしたことをログで確認
+
         Debug.Log("PlayerMove State Reset Complete. IsDead=false, JumpsRemaining=" + _maxJumps);
     }
 

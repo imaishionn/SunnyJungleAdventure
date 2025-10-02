@@ -26,7 +26,15 @@ public class StageSelectManager : MonoBehaviour {
     [Header("ステージ選択画面全体のページオブジェクト"), SerializeField]
     private GameObject _stageSelectPage;
 
+
+    /// <summary>
+    /// ステージ選択ボタンの配列
+    /// </summary>
     private Button[] _stageButtons;
+
+    /// <summary>
+    /// 1ページあたりのステージ数
+    /// </summary>
     private const int STAGES_PER_PAGE = 3;
 
     private void Awake() {

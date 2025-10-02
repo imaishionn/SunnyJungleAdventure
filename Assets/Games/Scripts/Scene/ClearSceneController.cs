@@ -7,12 +7,19 @@ using UnityEngine.UI;
 /// ゲームクリア後のシーンで、UIやシーン遷移を制御するスクリプトです。
 /// </summary>
 public class ClearSceneController : MonoBehaviour {
+ 
     [Header("ゲームパッド操作で最初に選択状態にしたいUI要素"), SerializeField]
     private Selectable _firstSelected;
 
+    /// <summary>
+    /// スコアシーンの名前
+    /// </summary>
     [Header("スコアシーンの名前"), SerializeField]
-    private string _resultsceneName = "Resultscene"; 
+    private string _resultsceneName = "Resultscene";
 
+    /// <summary>
+    /// シーン遷移中かどうかのフラグ
+    /// </summary>
     private bool _isTransitioning = false;
 
     private void Start() {

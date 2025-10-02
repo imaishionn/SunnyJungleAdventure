@@ -5,13 +5,21 @@ using UnityEngine;
 /// オブジェクトプールを管理するシングルトンクラスです。
 /// </summary>
 public class ObjectPoolManager : MonoBehaviour {
+
+    /// <summary>
+    /// インスタンス
+    /// </summary>
     public static ObjectPoolManager Instance { get; private set; }
 
     [Header("オブジェクトプール（大量のオブジェクト）の設定"), SerializeField]
-    private GameObject _enemyPrefab; // プールする敵のプレハブ
-    [Header("プールの初期サイズ"), SerializeField]
-    private int _poolSize = 10; // プールの初期サイズ
+    private GameObject _enemyPrefab;
 
+    [Header("プールの初期サイズ"), SerializeField]
+    private int _poolSize = 10;
+
+    /// <summary>
+    /// 敵オブジェクトのプール 
+    /// </summary>
     private List<GameObject> _enemyPool;
 
     private void Awake() {

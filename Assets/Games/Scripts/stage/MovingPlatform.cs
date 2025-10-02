@@ -8,7 +8,7 @@ using UnityEditor;
 /// 設定された座標間を往復移動する足場を制御するスクリプトです。
 /// プレイヤーが乗ると、プレイヤーも一緒に移動します。
 /// </summary>
-[RequireComponent(typeof(BoxCollider2D))] // 衝突判定に必要
+[RequireComponent(typeof(BoxCollider2D))] 
 public class MovingPlatform : MonoBehaviour {
     [Header("プラットフォームの移動速度"), SerializeField]
     private float _moveSpeed = 2.0f; 
@@ -20,11 +20,28 @@ public class MovingPlatform : MonoBehaviour {
     private float _moveDistanceX = 0f; 
 
     [Header("Y軸方向への移動距離"), SerializeField]
-    private float _moveDistanceY = 0f; // Y軸方向への移動距離
+    private float _moveDistanceY = 0f;
+
+    /// <summary>
+    /// 足場の初期位置を管理。
+    /// </summary>
     private Vector3 _initialPosition; // 足場の初期位置
+
+    /// <summary>
+    /// 足場の終点位置を管理。
+    /// </summary>
     private Vector3 _endPosition;      // 足場の終点位置
+
+    /// <summary>
+    /// 足場の現在の目標位置を管理。
+    /// </summary>
     private Vector3 _targetPosition;   // 現在の目標位置
+
+    /// <summary>
+    /// 移動を制御するコルーチンの参照
+    /// </summary>
     private Coroutine _movementCoroutine;
+
 
     private void Start() {
         _initialPosition = transform.position;

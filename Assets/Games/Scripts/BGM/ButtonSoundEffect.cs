@@ -15,10 +15,18 @@ public class ButtonSoundEffect : MonoBehaviour, IPointerEnterHandler, IPointerDo
 
     [Header("クリックの音量の設定"), SerializeField, Range(0f, 1f)]
     private float _クリック音量 = 1.0f;
+
     [Header("選択中の音の設定"), SerializeField, Range(0f, 1f)]
     private float _ホバー音量 = 1.0f;
 
+    /// <summary>
+    /// オーディオソース
+    /// </summary>
     private AudioSource _audioSource;
+
+    /// <summary>
+    /// ボタンコンポーネント
+    /// </summary>
     private Button _button;
 
     private void Awake() {

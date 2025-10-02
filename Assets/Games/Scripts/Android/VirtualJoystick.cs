@@ -5,7 +5,9 @@ using UnityEngine.EventSystems;
 /// タッチ操作でプレイヤーを動かすためのバーチャルジョイスティック。
 /// </summary>
 public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPointerDownHandler {
-    // シングルトンインスタンス
+    /// <summary>
+    /// インスタンス
+    /// </summary>
     public static VirtualJoystick Instance { get; private set; }
 
     [Header("ジョイコンの動かない方"), SerializeField]
@@ -14,8 +16,14 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
     [Header("ジョイコンの動く方"), SerializeField]
     private RectTransform _joystickKnob;
 
+    /// <summary>
+    ///プライベートフィールドを使ってジョイスティックの入力方向を取得します。
+    /// </summary>
     public Vector2 InputDirection { get; private set; }
 
+    /// <summary>
+    /// ジョイスティックの半径
+    /// </summary>
     private float _joystickRadius;
 
     private void Awake() {

@@ -7,7 +7,14 @@ using UnityEngine;
 /// プレイヤーを検知すると地面を追跡し、崖の手前で停止または反転します。
 /// </summary>
 public class Dog : Enemy {
+    /// <summary>
+    /// プレイヤーを識別するためのタグ
+    /// </summary>
     private const string PLAYER_TAG = "Player";
+
+    /// <summary>
+    /// アニメーターのパラメータ名を定義する静的クラス
+    /// </summary>
     private const string RUN_TRIGGER = "run";
 
     [Header("プレイヤーを検知する範囲"), SerializeField]
@@ -29,9 +36,16 @@ public class Dog : Enemy {
     private float _groundCheckRadius = 0.2f; 
 
     [Header("進行方向の崖をチェックする距離"), SerializeField]
-    private float _groundAheadCheckDistance = 0.5f; 
+    private float _groundAheadCheckDistance = 0.5f;
 
+    /// <summary>
+    /// プレイヤーを格納するTransform
+    /// </summary>
     private Transform _player;
+
+    /// <summary>
+    /// プレイヤーを検知したかどうかの状態 
+    /// </summary>
     private bool _isPlayerDetected = false;
 
     protected override void Awake() {

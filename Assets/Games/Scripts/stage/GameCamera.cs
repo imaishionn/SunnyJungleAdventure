@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 /// プレイヤーを追跡し、設定された範囲内でカメラの移動を制限するスクリプトです。
 /// </summary>
 public class GameCamera : MonoBehaviour {
+
     [Header("追跡するプレイヤーオブジェクト"), SerializeField]
     private GameObject _player;
 

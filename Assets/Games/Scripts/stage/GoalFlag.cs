@@ -6,16 +6,17 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class GoalFlag : MonoBehaviour {
     [Header("シーン遷移設定"), SerializeField]
-    private string _gameClearSceneName = "ClearScene"; // ゲームクリア後に遷移するシーンの名前
+    private string _gameClearSceneName = "ClearScene";
 
-    private bool _isTriggered = false; // ゴールが既にトリガーされたかどうかのフラグ
+    /// <summary>
+    /// ゴールが既にトリガーされたかどうかのフラグ
+    /// </summary>
+    private bool _isTriggered = false;
 
     /// <summary>
     /// プレイヤーがゴールに触れたときに呼び出される
     /// </summary>
-    private void OnTriggerEnter2D(Collider2D other) {
-        Goal(other);
-    }
+    private void OnTriggerEnter2D(Collider2D other) => Goal(other);
 
     /// <summary>
     /// ゴール

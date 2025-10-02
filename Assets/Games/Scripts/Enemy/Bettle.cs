@@ -9,25 +9,37 @@ public class Bettle : Enemy {
     private const string PLAYER_TAG = "Player";
 
     [Header("プレイヤーのTransform"), SerializeField]
-    private Transform _playerTransform; // プレイヤーのTransform
+    private Transform _playerTransform;
+
     [Header("プレイヤーの検知設定"), SerializeField]
-    private float _detectRange = 5f; // プレイヤーを検知する範囲
+    private float _detectRange = 5f; 
 
     [Header("ボムを投下する位置"), SerializeField]
-    private Transform _launchPoint; // ボムを投下する位置
+    private Transform _launchPoint;
+
     [Header("ボムのプレハブ"), SerializeField]
-    private GameObject _bombPrefab; // ボムのプレハブ
+    private GameObject _bombPrefab;
+
     [Header("ボムの投下速度"), SerializeField]
-    private float _bombLaunchSpeed = 10f; // ボムの投下速度
-    [Header("爆攻撃のクールタイム"), SerializeField]
-    private float _attackInterval = 3f; // 攻撃のクールタイム
+    private float _bombLaunchSpeed = 10f;
+
+    [Header("爆発攻撃のクールタイム"), SerializeField]
+    private float _attackInterval = 3f; 
 
     [Header("上下移動の速度"), SerializeField]
     private float _verticalMoveSpeed = 1f;
-    [Header("上下移動の範囲"), SerializeField]
-    private float _verticalMoveRange = 2f; 
 
-    private float _attackTimer;
+    [Header("上下移動の範囲"), SerializeField]
+    private float _verticalMoveRange = 2f;
+
+    /// <summary>
+    /// 攻撃するまでのタイマー
+    /// </summary>
+    private float _attackIntervalTimer;
+
+    /// <summary>
+    /// 初期位置
+    /// </summary>
     private Vector3 _startPosition;
 
     protected override void Awake() {
@@ -38,7 +50,7 @@ public class Bettle : Enemy {
 
     protected override void OnEnable() {
         base.OnEnable();
-        _attackTimer = _attackInterval; // オブジェクト再利用時にタイマーをリセット
+        _attackIntervalTimer = _attackInterval; // オブジェクト再利用時にタイマーをリセット
     }
 
     private void Update() {
@@ -74,11 +86,11 @@ public class Bettle : Enemy {
         float distanceToPlayer = Vector2.Distance(transform.position, _playerTransform.position);
 
         if (distanceToPlayer < _detectRange) {
-            _attackTimer -= Time.deltaTime;
+            _attackIntervalTimer -= Time.deltaTime;
 
-            if (_attackTimer <= 0) {
+            if (_attackIntervalTimer <= 0) {
                 Attack();
-                _attackTimer = _attackInterval;
+                _attackIntervalTimer = _attackInterval;
             }
         }
     }

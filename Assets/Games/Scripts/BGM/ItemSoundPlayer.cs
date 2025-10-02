@@ -4,11 +4,6 @@ using UnityEngine;
 /// アイテム取得やアクションに応じた効果音を再生
 /// </summary>
 public class ItemSoundPlayer : MonoBehaviour {
-    // シングルトンインスタンスを定義
-    public static ItemSoundPlayer Instance { get; private set; }
-
-    private AudioSource _audioSource;
-
     [Header("宝石獲得音"), SerializeField]
     private AudioClip _gemClip;
 
@@ -26,6 +21,16 @@ public class ItemSoundPlayer : MonoBehaviour {
 
     [Header("ゲームオーバー音の再生音量"), SerializeField, Range(0f, 1f)]
     private float _gameOverVolume = 1.0f;
+
+    /// <summary>
+    /// オーディオソース
+    /// </summary>
+    private AudioSource _audioSource;
+
+    /// <summary>
+    /// インスタンス
+    /// </summary>
+    public static ItemSoundPlayer Instance { get; private set; }
 
     /// <summary>
     /// Awake

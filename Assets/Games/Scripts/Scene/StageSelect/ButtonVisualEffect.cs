@@ -8,17 +8,13 @@ using UnityEngine.UI;
 /// 選択時の拡大/縮小、クリック時の点滅効果を管理します。
 /// </summary>
 public class ButtonVisualEffect : MonoBehaviour, ISelectHandler, IDeselectHandler, IPointerClickHandler {
-    private Vector3 _originalScale; // 元の大きさを保存
-    private Image _buttonImage;
-    private Color _originalColor;
-    private Coroutine _blinkCoroutine;
-    private Coroutine _scaleCoroutine;
+
 
     [Header("拡大率"), SerializeField]
     private float _scaleFactor = 1.1f;
 
     [Header("拡大/縮小にかかる時間"), SerializeField]
-    private float _transitionDuration = 0.1f; 
+    private float _transitionDuration = 0.1f;
 
     [Header("点滅回数"), SerializeField]
     private int _blinkCount = 3;
@@ -28,6 +24,33 @@ public class ButtonVisualEffect : MonoBehaviour, ISelectHandler, IDeselectHandle
 
     [Header("点滅時の色"), SerializeField]
     private Color _blinkColor = Color.white;
+
+    /// <summary>
+    /// // 元の大きさを保存
+    /// </summary>
+    private Vector3 _originalScale;
+
+    /// <summary>
+    /// Imageコンポーネントへの参照
+    /// </summary>
+    private Image _buttonImage;
+
+    /// <summary>
+    /// 元の色を保存
+    /// </summary>
+    private Color _originalColor;
+
+    /// <summary>
+    /// 点滅コルーチンの参照
+    /// </summary>
+    private Coroutine _blinkCoroutine;
+
+    /// <summary>
+    /// 拡大/縮小コルーチンの参照
+    /// </summary>
+    private Coroutine _scaleCoroutine;
+
+   
 
     // UnityのMonoBehaviourはコンストラクタを使用しないため削除
 

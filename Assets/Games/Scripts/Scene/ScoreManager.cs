@@ -9,7 +9,6 @@ using UnityEngine.UI;
 /// スコアシーンでスコア表示、ランク付け、リーダーボード管理を行うスクリプト。
 /// </summary>
 public class ScoreManager : MonoBehaviour {
-   
     [Header("今回のスコア"), SerializeField]
     private TextMeshProUGUI _scoreText;
 
@@ -36,8 +35,14 @@ public class ScoreManager : MonoBehaviour {
     [Header("タイトルシーンの名前"), SerializeField]
     private string _titleSceneName;
 
-    // PlayerPrefsのキー
+    /// <summary>
+    /// リーダーボードのスコアを保存するためのPlayerPrefsキーのプレフィックス
+    /// </summary>
     private const string LEADERBOARD_SCORE_KEY_PREFIX = "LeaderboardScore_";
+
+    /// <summary>
+    /// リーダーボードの時間を保存するためのPlayerPrefsキーのプレフィックス
+    /// </summary>
     private const string LEADERBOARD_TIME_KEY_PREFIX = "LeaderboardTime_";
 
     private void OnEnable() {

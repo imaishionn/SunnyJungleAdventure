@@ -7,6 +7,7 @@ using UnityEngine.UI;
 /// ボタンクリックによるシーン遷移を制御します。
 /// </summary>
 public class TitleSceneManager : MonoBehaviour {
+
     [Header("ゲーム開始ボタン"), SerializeField]
     private Button _startButton; 
 

@@ -22,8 +22,16 @@ public class SwitchController : MonoBehaviour {
     [Header("スイッチが切り替わったときに再生する効果音"), SerializeField]
     private AudioClip _switchSoundEffect;
 
-    private AudioSource _audioSource; // AudioSourceコンポーネントへの参照
-    private bool _isUpState; // スイッチの現在の状態（true = 上, false = 下）
+
+    /// <summary>
+    /// AudioSource
+    /// </summary>
+    private AudioSource _audioSource; 
+
+    /// <summary>
+    /// スイッチの現在の状態(true = 上, false = 下）
+    /// </summary>
+    private bool _isUpState; 
 
     private void Start() {
         // SpriteRendererが未割り当ての場合、自動取得

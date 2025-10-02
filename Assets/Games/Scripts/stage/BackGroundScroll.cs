@@ -4,11 +4,11 @@ using UnityEngine;
 /// プレイヤーの横移動に応じて背景をスクロールさせるスクリプトです。
 /// </summary>
 public class BackGroundScroll : MonoBehaviour {
-    [Header("コンポーネント"), SerializeField]
-    private PlayerMove _playerMove; // プレイヤーの移動速度を取得するためのPlayerMoveコンポーネント
+    [Header("プレイヤーの移動速度を取得するためのPlayerMoveコンポーネント\r\n"), SerializeField]
+    private PlayerMove _playerMove; 
 
-    [Header("スクロール設定"), SerializeField]
-    private float _division = 1.0f; // 背景のスクロール速度を補正します（大きいほど遅くなる）。ゼロは不可。
+    [Header("背景のスクロール速度"), SerializeField]
+    private float _division = 1.0f;
 
     private void Awake() {
         if (_playerMove == null) {
