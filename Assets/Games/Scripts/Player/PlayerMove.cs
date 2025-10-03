@@ -44,6 +44,15 @@ public class PlayerMove : MonoBehaviour {
     /// </summary>
     private Animator _animator;
 
+    // ★修正: アニメーターパラメータのハッシュIDを定義
+    private int _animParamRun;
+    private int _animParamIsGrounded;
+    private int _animParamVelocityY;
+    // ★修正: トリガー名を定数として定義
+    private const string ANIM_TRIGGER_JUMP = "JumpTrigger";
+    private const string ANIM_TRIGGER_GAMEOVER = "GameOver";
+
+
     /// <summary>
     /// 接地状態
     /// </summary>
@@ -64,15 +73,16 @@ public class PlayerMove : MonoBehaviour {
     /// </summary>
     private bool _isInvincible = false;
 
-/// <summary>
-/// イベント
-/// </summary>
+    /// <summary>
+    /// イベント
+    /// </summary>
     public bool IsDead { get; private set; } = false;
 
     public static event Action OnPlayerDie;
     public static event Action OnEnemyStomp;
 
 
+    // -------------------- 初期化とリセット --------------------
 
     private void Awake() {
         if (!TryGetComponent<Rigidbody2D>(out _rb)) {
@@ -81,7 +91,14 @@ public class PlayerMove : MonoBehaviour {
             return;
         }
 
-        TryGetComponent<Animator>(out _animator);
+        if (TryGetComponent<Animator>(out _animator)) {
+            // ★修正: アニメーターパラメータをハッシュ化してキャッシュ
+            _animParamRun = Animator.StringToHash("run");
+            _animParamIsGrounded = Animator.StringToHash("isGrounded");
+            _animParamVelocityY = Animator.StringToHash("velocityY");
+            // JumpTriggerはトリガーのためハッシュ化は必須ではないが、一応定義
+            // _animParamJumpTrigger = Animator.StringToHash(ANIM_TRIGGER_JUMP);
+        }
 
         if (_groundCheckComponent == null) {
             _groundCheckComponent = GetComponentInChildren<GroundCheck>();
@@ -94,6 +111,7 @@ public class PlayerMove : MonoBehaviour {
     }
 
     private void Start() {
+        // GameManagerからの参照が設定されるべきなので、ここでは警告のみ
         if (_joystick == null && Application.isMobilePlatform) {
             Debug.LogWarning("PlayerMove: VirtualJoystickはGameManager経由で設定される必要があります。");
         }
@@ -117,27 +135,30 @@ public class PlayerMove : MonoBehaviour {
             playerCollider.enabled = true;
         }
 
-        if (_animator != null && HasAnimatorParameter("GameOver", AnimatorControllerParameterType.Trigger)) {
-            _animator.ResetTrigger("GameOver");
+        // 死亡トリガーをリセット (アニメーションが残るのを防ぐ)
+        if (_animator != null) {
+            if (HasAnimatorParameter(ANIM_TRIGGER_GAMEOVER, AnimatorControllerParameterType.Trigger)) {
+                _animator.ResetTrigger(ANIM_TRIGGER_GAMEOVER);
+            }
         }
-
 
         Debug.Log("PlayerMove State Reset Complete. IsDead=false, JumpsRemaining=" + _maxJumps);
     }
 
+    // -------------------- 更新処理 --------------------
 
     private void Update() {
         if (IsDead) {
             return;
         }
 
-        // ゲームステートによる入力ブロックは削除しました。
-
+        // 接地判定の更新とジャンプ回数のリセット
         bool previousIsGrounded = _isGrounded;
         if (_groundCheckComponent != null) {
             _isGrounded = _groundCheckComponent.GetIsGround();
         }
 
+        // 着地した瞬間、ジャンプ回数をリセット
         if (!previousIsGrounded && _isGrounded) {
             _jumpsRemaining = _maxJumps;
         }
@@ -145,6 +166,7 @@ public class PlayerMove : MonoBehaviour {
         float moveInput = (_joystick != null) ? _joystick.InputDirection.x : Input.GetAxis("Horizontal");
         HandleMovementInput(moveInput);
 
+        // PC/WebGLでのジャンプ入力
         if (Input.GetButtonDown("Jump")) {
             Jump();
         }
@@ -153,10 +175,13 @@ public class PlayerMove : MonoBehaviour {
             UpdateAnimatorParameters(_rb.velocity.x);
         }
 
+        // 落下によるゲームオーバー判定
         if (transform.position.y < _gameOverFallHeight) {
             Die();
         }
     }
+
+    // -------------------- 移動・ジャンプ --------------------
 
     private void HandleMovementInput(float moveInput) {
         if (_rb != null) {
@@ -171,15 +196,21 @@ public class PlayerMove : MonoBehaviour {
     public void Jump() {
         // ★重要: ジャンプをブロックする条件はIsDeadと_jumpsRemainingのみ
         if (IsDead || _jumpsRemaining <= 0) {
-            // ジャンプがブロックされたことをログで確認
             Debug.LogWarning($"Jump Blocked! IsDead: {IsDead}, Jumps Remaining: {_jumpsRemaining}");
             return;
         }
 
         if (_rb != null) {
+            // 既存のY軸速度をリセットしてからジャンプ力を加える (多段ジャンプ時の挙動を安定させる)
             _rb.velocity = new Vector2(_rb.velocity.x, 0);
             _rb.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
         }
+
+        // ★【修正】JumpTriggerを起動する処理を追加
+        if (_animator != null && HasAnimatorParameter(ANIM_TRIGGER_JUMP, AnimatorControllerParameterType.Trigger)) {
+            _animator.SetTrigger(ANIM_TRIGGER_JUMP);
+        }
+
         _jumpsRemaining--;
         Debug.Log($"Jump Success. Jumps Remaining: {_jumpsRemaining}");
 
@@ -188,26 +219,26 @@ public class PlayerMove : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// モバイルのジャンプボタンからの呼び出し用
+    /// </summary>
     public void OnMobileJumpButtonPressed() => Jump();
 
+    // -------------------- 衝突・ダメージ --------------------
+
+    // ★★★★ このメソッドを修正しました ★★★★
     private void OnCollisionEnter2D(Collision2D collision) {
         if (IsDead || _isInvincible) {
             return;
         }
 
+        // 敵本体のコライダーとの接触は全て横/下からの接触とみなし、ダメージ（死亡）とする。
+        // 踏みつけ判定は、子オブジェクトのStompCheckスクリプトに完全に委譲されました。
         if (collision.gameObject.CompareTag("Enemy")) {
-            if (_rb == null) {
-                return;
-            }
-
-            if (_rb.velocity.y < 0) {
-                StompEnemy(collision.gameObject);
-            }
-            else {
-                Die();
-            }
+            Die();
         }
     }
+    // ★★★★ 修正終わり ★★★★
 
     public void StompEnemy(GameObject enemyObject) {
         if (IsDead || _rb == null) {
@@ -245,14 +276,15 @@ public class PlayerMove : MonoBehaviour {
 
         if (_rb != null) {
             _rb.velocity = Vector2.zero;
-            _rb.isKinematic = true;
+            _rb.isKinematic = true; // 物理演算を停止
         }
         if (TryGetComponent<Collider2D>(out Collider2D playerCollider)) {
             playerCollider.enabled = false;
         }
 
-        if (_animator != null && HasAnimatorParameter("GameOver", AnimatorControllerParameterType.Trigger)) {
-            _animator.SetTrigger("GameOver");
+        // アニメーションを再生
+        if (_animator != null && HasAnimatorParameter(ANIM_TRIGGER_GAMEOVER, AnimatorControllerParameterType.Trigger)) {
+            _animator.SetTrigger(ANIM_TRIGGER_GAMEOVER);
         }
         else {
             StartCoroutine(FallbackDeathSequence());
@@ -260,6 +292,8 @@ public class PlayerMove : MonoBehaviour {
     }
 
     public void OnGameOverAnimationEnd() => FinalizeDeathAndSceneTransition();
+
+    // -------------------- アニメーションとユーティリティ --------------------
 
     private void Flip() {
         _isFacingRight = !_isFacingRight;
@@ -273,19 +307,17 @@ public class PlayerMove : MonoBehaviour {
             return;
         }
 
-        if (HasAnimatorParameter("run", AnimatorControllerParameterType.Bool)) {
-            _animator.SetBool("run", Mathf.Abs(moveInput) > 0.01f);
-        }
-
-        if (HasAnimatorParameter("isGrounded", AnimatorControllerParameterType.Bool)) {
-            _animator.SetBool("isGrounded", _isGrounded);
-        }
-
-        if (HasAnimatorParameter("velocityY", AnimatorControllerParameterType.Float) && _rb != null) {
-            _animator.SetFloat("velocityY", _rb.velocity.y);
+        // ★修正: ハッシュIDを使用して高速にパラメータを設定
+        _animator.SetBool(_animParamRun, Mathf.Abs(moveInput) > 0.01f);
+        _animator.SetBool(_animParamIsGrounded, _isGrounded);
+        if (_rb != null) {
+            _animator.SetFloat(_animParamVelocityY, _rb.velocity.y);
         }
     }
 
+    /// <summary>
+    /// アニメーターに特定のパラメータが存在するかチェックする (汎用的なチェックを残す)
+    /// </summary>
     private bool HasAnimatorParameter(string paramName, AnimatorControllerParameterType paramType) {
         if (_animator == null) {
             return false;
@@ -315,11 +347,7 @@ public class PlayerMove : MonoBehaviour {
 
     private IEnumerator BecomeInvincible(float duration) {
         _isInvincible = true;
-
-        // 点滅ロジックは完全に削除されています。
-
         yield return new WaitForSecondsRealtime(duration);
-
         _isInvincible = false;
     }
 }
